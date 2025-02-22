@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
+</head>
+<body>
+    <div class="container-grid-basic">
+        <div class="menu-toggle" aria-label="Toggle navigation" role="button" tabindex="0">
+            <i class="material-icons md-light">menu</i>
+        </div>
+
+        <!-- Notification panel to display sent out notifications -->
+        <div class="notifications-container" id="notificationPanel">
+            <button class="close-btn" id="closeNotifications">&times;</button>
+            <h2>Notifications</h2>
+            <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+            <!-- <button class="clear-all" id="clearAll"></button> -->
+            <ul id="notification-list">
+            </ul>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-flex-container">
+                <div class="logo">
+                    <h1>
+                        <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
+                    </h1>
+                </div>
+                 <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                                <i class="material-icons md-light">home</i>
+                                <h4>Home</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                                <i class="material-icons md-light">analytics</i>
+                                <h4>Graph</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                                <i class="material-icons md-light">smartphone</i>
+                                <h4>Compact</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="toggleNotifications">
+                                <i class="material-icons md-light">notifications</i>
+                                <h4>Notifications</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                                <i class="material-icons md-light">settings</i>
+                                <h4>Settings</h4>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="main-section-chart">
+            <div class="chart-flexbox-container">
+                <div class="settings-container">
+                    <h2>Thresholds & Messages</h2>
+                    <div class="settings-container-list">
+                        <form id="messages-form">
+                            <input class="input" type="text" name="advice_1" id="advice-1">
+                            <label>0 - 50</label>
+                            <br>
+                            <input class="input" type="text" name="advice_2" id="advice-2">
+                            <label>51 - 100</label>
+                            <br>
+                            <input class="input" type="text" name="advice_3" id="advice-3">
+                            <label>101 - 200</label>
+                            <br>
+                            <input class="input" type="text" name="advice_4" id="advice-4">
+                            <label>201 - 300</label>
+                            <br>
+                            <input class="input" type="text" name="advice_5" id="advice-5">
+                            <label>301 - 450</label>
+                            <br>
+                            <input class="input" type="text" name="advice_6" id="advice-6">
+                            <label>451 - 500</label>
+                        </form>
+                    </div>
+                </div>
+                <div class="settings-container">
+                    <h2>Fetching</h2>
+                    <div class="settings-container-list">
+                        <form id="fetching-form">
+                            <input class="input" placeholder="ms" type="number" name="fetch_sensor" id="fetch-sensor">
+                            <label>Fetch sensor data interval</label>
+                            <br>
+                            <input class="input" placeholder="ms" type="number" name="fetch_averages" id="fetch-averages">
+                            <label>Fetch averages interval</label>
+                            <br>
+                            <input class="input" placeholder="ms" type="number" name="fetch_minmax" id="fetch-minmax">
+                            <label>Fetch min & max values interval</label>
+                        </form>
+                    </div>
+                </div>
+                <div class="settings-container">
+                    <h2>Notifications</h2>
+                    <div class="settings-container-list">
+                        <form id="notifications-form">
+                            <input type="checkbox" class="switch" name="notifications_enabled" id="notifications-enabled">
+                            <label>Turn on notifications</label>
+                            <br>
+                            <br>
+                            <input class="input" type="number" min="0" max="500" name="notification_threshold" id="notification-threshold">
+                            <label>Threshold</label>
+                            <br>
+                            <input class="input" placeholder="s" type="number" min="0" name="notification_cooldown" id="notification-cooldown">
+                            <label>Cooldown</label>
+                            <br>
+                            <input class="input" type="text" name="notification_message" id="notification-message">
+                            <label>Message</label>
+                            <br>
+                        </form>
+                    </div>
+                </div>
+                <div class="changes">
+                    <button class="button-17" id="cancelChanges">Cancel</button>
+                    <button class="button-17" id="submitForms">Apply Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script type="module" src="/static/js/settings.js"></script>
+</body>
+</html>

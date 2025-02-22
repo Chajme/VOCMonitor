@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="cache-control" content="max-age=31536000, immutable">
+    <title>Chart</title>
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
+</head>
+<body>
+    <div class="container-grid-basic">
+        <div class="menu-toggle" aria-label="Toggle navigation" role="button" tabindex="0">
+            <i class="material-icons md-light">menu</i>
+        </div>
+
+        <!-- Notification panel to display sent out notifications -->
+        <div class="notifications-container" id="notificationPanel">
+            <button class="close-btn" id="closeNotifications">&times;</button>
+            <h2>Notifications</h2>
+            <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+            <!-- <button class="clear-all" id="clearAll"></button> -->
+            <ul id="notification-list">
+            </ul>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-flex-container">
+                <div class="logo">
+                    <h1>
+                        <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
+                    </h1>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                                <i class="material-icons md-light">home</i>
+                                <h4>Home</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                                <i class="material-icons md-light">analytics</i>
+                                <h4>Graph</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                                <i class="material-icons md-light">smartphone</i>
+                                <h4>Compact</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="toggleNotifications">
+                                <i class="material-icons md-light">notifications</i>
+                                <h4>Notifications</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                                <i class="material-icons md-light">settings</i>
+                                <h4>Settings</h4>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="main-section-chart">
+            <div class="chart-flexbox-container">
+                <div class="chart-box-chart-page">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div class="chart-box-2-chart-page">
+                    <div class="option-box">
+                        <button id="resetZoom" class="button-17">Reset zoom</button>
+                    </div>
+                    <div class="option-box">
+                        <div class="checkbox-wrapper-14">
+                            <input type="checkbox" class="switch" id="showAllData">
+                            <label for="showAllData">Show All Data</label>
+                          </div>
+                    </div>
+                    <div class="option-box">
+                        <button id="exportChartAsPDF" class="button-17">Export as PDF</button>
+                    </div>
+                    <div class="option-box">
+                        <button id="exportChartAsPNG" class="button-17">Export as PNG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script type="module" src="/static/js/chartPage.js"></script>
+</body>
+</html>
