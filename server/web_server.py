@@ -64,37 +64,39 @@ class WebServer:
 
         @self.app.route('/data')
         def new_data():
-            try:
-                new_data_row = self.db.get_last_row()
-                print(new_data_row)
+            """try:"""
+            new_data_row = self.db.get_last_row()
+            print(new_data_row)
 
-                new_data_list = {
-                    "timestamp": new_data_row[0],
-                    "temperature": new_data_row[1],
-                    "humidity": new_data_row[2],
-                    "voc_index": new_data_row[3]
-                }
+            new_data_list = {
+                "timestamp": new_data_row[0],
+                "temperature": new_data_row[1],
+                "humidity": new_data_row[2],
+                "voc_index": new_data_row[3]
+            }
 
-                (notifications_on,
-                 notifications_threshold,
-                 cooldown,
-                 notification_message) = self.db.get_user_settings_notifications()
+            (notifications_on,
+             notifications_threshold,
+             cooldown,
+             notification_message,
+             email_notifications_on,
+             email_notification_threshold,
+             email_cooldown
+             ) = self.db.get_user_settings_notifications()
 
-                if notifications_on == 1:
-                    self.check_sensor_data(
-                        int(new_data_row[3]),
-                        notifications_threshold,
-                        cooldown,
-                        1000,
-                        notification_message
-                    )
-            except Exception:
+            if notifications_on == 1 or email_notifications_on == 1:
+                self.check_sensor_data(notifications_on, email_notifications_on,
+                                        int(new_data_row[3]), notifications_threshold, cooldown,
+                                        notification_message, 1000,
+                                        email_notification_threshold)
+
+            """except Exception:
                 new_data_list = {
                     "timestamp": 0,
                     "temperature": 0,
                     "humidity": 0,
                     "voc_index": 0
-                }
+                }"""
 
             return jsonify(new_data_list)
 
@@ -161,6 +163,10 @@ class WebServer:
                 notification_cooldown = request.form.get('notification_cooldown')
                 notification_message = request.form.get('notification_message')
 
+                email_notifications_enabled = request.form.get('email_notifications_enabled') == 'true'
+                email_notification_threshold = request.form.get('email_notification_threshold')
+                email_notification_cooldown = request.form.get('email_notification_cooldown')
+
                 self.db.set_user_settings(
                     advice_1,
                     advice_2,
@@ -174,7 +180,10 @@ class WebServer:
                     notifications_enabled,
                     notification_threshold,
                     notification_cooldown,
-                    notification_message
+                    notification_message,
+                    email_notifications_enabled,
+                    email_notification_threshold,
+                    email_notification_cooldown
                 )
                 
                 return jsonify({"message": "Settings updated successfully!"}), 200
@@ -184,6 +193,14 @@ class WebServer:
         @self.app.route('/get_settings')
         def get_settings():
             return self.db.get_user_settings()
+
+        @self.app.route('/default_settings', methods=['POST'])
+        def set_default_settings():
+            try:
+                self.db.set_default_settings()
+                return ({"message": "Settings reset successfully!"}), 200
+            except Exception as e:
+                return {'message': f'Error resetting settings: {str(e)}'}, 500
 
         @self.app.route('/notification_history')
         def get_notifications():
@@ -210,6 +227,12 @@ class WebServer:
             except Exception as e:
                 return jsonify({"message": f"Error clearing notifications: {str(e)}"}), 500
 
+        @self.app.route('/delete_notification', methods=['POST'])
+        def delete_notification():
+            notification_id = request.json.get('id')
+
+            self.db.delete_notification(notification_id)
+
         @self.socketio.on('connect')
         def test_connect():
             if self.socket_connection_established is not True:
@@ -220,46 +243,39 @@ class WebServer:
         self.app.run()
 
 
-    def check_sensor_data(self, voc, set_threshold, cooldown, email_cooldown, notification_message):
+    def check_sensor_data(self, notifications_on, email_notifications_on,
+                            voc, set_threshold, cooldown, notification_message,
+                            email_cooldown, email_notification_threshold):
         current_time = time.time()
-        if voc > set_threshold:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        if voc > set_threshold and notifications_on == 1:
             if not self.notification_sent or (current_time - self.last_notification) > cooldown:
                 self.socketio.emit('alert', {'message': notification_message})
                 self.mqtt.threshold_exceeded_notification("on")
 
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                message = notification_message
-                self.db.new_notification(timestamp, message, voc)
+                self.db.new_notification(timestamp, notification_message, voc)
 
                 self.notification_sent = True
                 self.last_notification = current_time
 
-                self.send_email_voc_threshold_exceeded(timestamp, voc, message)
-
-                """if not self.email_notification_sent or (current_time - self.last_email_notification) > email_cooldown:
-                    self.send_email_voc_threshold_exceeded(timestamp, voc, message)
-
-                    self.email_notification_sent = True
-                    self.last_email_notification = current_time"""
+                """self.send_email_voc_threshold_exceeded(timestamp, voc, message)"""
             if (current_time - self.last_notification) > 5:
                 self.mqtt.threshold_exceeded_notification("off")
                 print('Setting threshold exceeded to off')
         else:
             self.notification_sent = False
 
+        if voc > email_notification_threshold and email_notifications_on == 1:
+            if not self.email_notification_sent or (current_time - self.last_email_notification) > email_cooldown:
+                self.send_email_voc_threshold_exceeded(timestamp, voc, notification_message)
 
-        """if voc > set_threshold and not self.notification_sent:
-            self.socketio.emit('alert', {'message': 'Poor air quality, you should open a window.'})
-            self.notification_sent = True
+                self.db.new_notification("email--" + timestamp, notification_message, voc)
+
+                self.email_notification_sent = True
+                self.last_email_notification = current_time
         else:
-            if self.notification_sent:
-                self.notification_sent = False"""
-        """elif voc > 300 and not self.notification_sent:
-            self.socketio.emit('alert', {'message': 'Bad air quality, open a window!'})
-            self.notification_sent = True
-        elif voc > 400 and not self.notification_sent:
-            self.socketio.emit('alert', {'message': 'Hazardous air quality, open a window immediately!'})
-            self.notification_sent = True"""
+            self.email_notification_sent = False
 
     def set_mail_config(self):
         self.app.config['MAIL_SERVER'] = 'smtp.gmail.com'

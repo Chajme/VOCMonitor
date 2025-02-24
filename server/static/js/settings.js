@@ -1,7 +1,8 @@
 import {
     fetchUserSettings,
     submitForms,
-    cancelChanges} from "./modules/settingsHandler.js"
+    cancelChanges,
+    resetDefault} from "./modules/settingsHandler.js"
 
 import {
     setupMenuHighlighter,
@@ -22,6 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Button listeners for handling changes in settings
     document.getElementById('submitForms').addEventListener('click', submitForms);
     document.getElementById('cancelChanges').addEventListener('click', cancelChanges);
-
+    document.getElementById('resetDefault').addEventListener('click', resetDefault);
 });
 

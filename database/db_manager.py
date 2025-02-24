@@ -14,24 +14,15 @@ class DatabaseManager:
         #Clearing the db and dropping tables
         self.clear_table("data")
         self.drop_table("user_settings")
-        self.drop_table("user_settings_2")
 
         #Create tables
-        self.create_table()
+        self.create_table_data()
         self.create_table_notification_history()
-        self.create_user_setting_table()
+        self.create_user_settings_table()
 
         #Setting default user settings
-        self.set_user_settings(
-            "No action needed.",
-            "Current VOC levels are good, no action is necessary.",
-            "VOC levels are higher, you should open a window.",
-            "Poor air quality, open a window.",
-            "Very bad air quality, open a window immediately.",
-            "Hazardous air quality, open a window and vacate the room immediately.",
-            5000, 30000, 45000, 1, 200, 300,
-            "Poor air quality, open a window."
-        )
+        self.set_default_settings()
+
         self.con.close()
 
     def insert(self, timestamp, temperature, humidity, voc):
@@ -52,7 +43,7 @@ class DatabaseManager:
         self.con.commit()
         self.con.close()
 
-    def create_table(self):
+    def create_table_data(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS data (timestamp, temperature, humidity, voc)")
@@ -62,7 +53,7 @@ class DatabaseManager:
     def create_table_notification_history(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS notifications (timestamp TEXT, message TEXT, voc INTEGER)")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp TEXT, message TEXT, voc INTEGER)")
         self.con.commit()
         self.con.close()
 
@@ -76,6 +67,13 @@ class DatabaseManager:
         self.con.commit()
         self.con.close()
 
+    def delete_notification(self, notification_id):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute("REMOVE FROM notifications WHERE id = ?", (notification_id,))
+        self.con.commit()
+        self.con.close()
+
     def get_notification_history(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
@@ -85,10 +83,10 @@ class DatabaseManager:
         self.con.close()
         return all_rows
 
-    def create_user_setting_table(self):
+    def create_user_settings_table(self):
             self.con = sqlite3.connect(self.db_name)
             self.cur = self.con.cursor()
-            self.cur.execute("CREATE TABLE IF NOT EXISTS user_settings_2 ("
+            self.cur.execute("CREATE TABLE IF NOT EXISTS user_settings ("
                              "id INTEGER PRIMARY KEY,"
                              "advice1 TEXT,"
                              "advice2 TEXT,"
@@ -102,7 +100,10 @@ class DatabaseManager:
                              "notifications INTEGER DEFAULT 1,"
                              "notification_threshold INTEGER,"
                              "cooldown INTEGER,"
-                             "notification_message TEXT)")
+                             "notification_message TEXT,"
+                             "email_notifications_on INTEGER DEFAULT 1,"
+                             "email_notification_threshold INTEGER,"
+                             "email_cooldown INTEGER)")
             self.con.commit()
             self.con.close()
 
@@ -114,12 +115,15 @@ class DatabaseManager:
                           notifications,
                           notification_threshold,
                           cooldown,
-                          notification_message):
+                          notification_message,
+                          email_notifications_on,
+                          email_notification_threshold,
+                          email_cooldown):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
             """
-                INSERT INTO user_settings_2 (
+                INSERT INTO user_settings (
                 id,
                 advice1,
                 advice2,
@@ -133,9 +137,12 @@ class DatabaseManager:
                 notifications, 
                 notification_threshold,
                 cooldown,
-                notification_message
+                notification_message,
+                email_notifications_on, 
+                email_notification_threshold,
+                email_cooldown
                 ) 
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     advice1 = excluded.advice1,
                     advice2 = excluded.advice2,
@@ -149,10 +156,14 @@ class DatabaseManager:
                     notifications = excluded.notifications,
                     notification_threshold = excluded.notification_threshold,
                     cooldown = excluded.cooldown,
-                    notification_message = excluded.notification_message
+                    notification_message = excluded.notification_message,
+                    email_notifications_on = excluded.email_notifications_on,
+                    email_notification_threshold = excluded.email_notification_threshold,
+                    email_cooldown = excluded.email_cooldown
                 """,
             (advice_1, advice_2, advice_3, advice_4, advice_5, advice_6,
-                fetch_sensor, fetch_averages, fetch_minmax, notifications, notification_threshold, cooldown, notification_message)
+                fetch_sensor, fetch_averages, fetch_minmax, notifications, notification_threshold,
+             cooldown, notification_message, email_notifications_on, email_notification_threshold, email_cooldown)
         )
         self.con.commit()
         self.con.close()
@@ -163,8 +174,9 @@ class DatabaseManager:
         query = """
             SELECT advice1, advice2, advice3, advice4, advice5, advice6,
                    fetchSensor, fetchAverages, fetchMinmax, notifications,
-                   notification_threshold, cooldown, notification_message
-            FROM user_settings_2 WHERE id=1
+                   notification_threshold, cooldown, notification_message,
+                   email_notifications_on, email_notification_threshold, email_cooldown
+            FROM user_settings WHERE id=1
         """
         result = self.cur.execute(query).fetchone()
         if result:
@@ -181,7 +193,10 @@ class DatabaseManager:
                 "notifications": bool(result[9]),
                 "notification_threshold": result[10],
                 "cooldown": result[11],
-                "notification_message": result[12]
+                "notification_message": result[12],
+                "email_notifications_on": bool(result[13]),
+                "email_notification_threshold": result[14],
+                "email_cooldown": result[15]
             }
         else:
             return {
@@ -197,18 +212,53 @@ class DatabaseManager:
                 "notifications": False,
                 "notification_threshold": 0,
                 "cooldown": 0,
-                "notification_message": ""
+                "notification_message": "",
+                "email_notifications_on": False,
+                "email_notification_threshold": 0,
+                "email_cooldown": 0
             }
 
     def get_user_settings_notifications(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
-        query = ("SELECT notifications, notification_threshold, cooldown, notification_message "
-                 "FROM user_settings_2 WHERE id=1")
+        query = ("SELECT notifications, "
+                 "notification_threshold, "
+                 "cooldown, "
+                 "notification_message, "
+                 "email_notifications_on, "
+                 "email_notification_threshold, "
+                 "email_cooldown "
+                 "FROM user_settings WHERE id=1")
         result = self.cur.execute(query).fetchone()
-        notifications_on, notification_threshold, cooldown, notification_message = result
+        (notifications_on,
+         notification_threshold,
+         cooldown,
+         notification_message,
+         email_notifications_on,
+         email_notification_threshold,
+         email_cooldown
+         ) = result
 
-        return notifications_on, notification_threshold, cooldown, notification_message
+        return (notifications_on,
+                notification_threshold,
+                cooldown,
+                notification_message,
+                email_notifications_on,
+                email_notification_threshold,
+                email_cooldown)
+
+    def set_default_settings(self):
+        self.set_user_settings(
+            "No action needed.",
+            "Current VOC levels are good, no action is necessary.",
+            "VOC levels are higher, you should open a window.",
+            "Poor air quality, open a window.",
+            "Very bad air quality, open a window immediately.",
+            "Hazardous air quality, open a window and vacate the room immediately.",
+            5000, 30000, 45000, 1, 200, 300,
+            "Poor air quality, open a window.",
+            1, 300, 7200
+        )
 
     def print_table(self, table_name):
         self.con = sqlite3.connect(self.db_name)

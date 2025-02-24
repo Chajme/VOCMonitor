@@ -26,7 +26,7 @@ function initializeSocket() {
 async function fetchNotifications() {
     try {
         const response = await fetch('/notification_history');
-        const data = await response.json();  // This should now work correctly
+        const data = await response.json();
 
         console.log('All database data:', data);
 
@@ -36,6 +36,8 @@ async function fetchNotifications() {
         data.forEach(notification => {
             const listItem = document.createElement('li');
             // listItem.textContent = notification.message;  // Correctly access message field
+
+            // <button onclick="deleteNotification(${notification.id})" class="delete-btn">X</button>
 
 
             listItem.innerHTML = `
@@ -51,6 +53,21 @@ async function fetchNotifications() {
         console.error('Error fetching all data:', error);
     }
 }
+
+// async function deleteNotification(id) {
+//     let response = await fetch('/delete_notification', {
+//         method: 'POST',
+//         headers: {'content-type': 'application/json'},
+//         body: JSON.stringify({id: id})
+//     });
+
+//     let result = await response.json();
+//     if (result.success) {
+//         fetchNotifications();
+//     } else {
+//         alert("Failed to delte notification.")
+//     }
+// }
 
 
 export {
