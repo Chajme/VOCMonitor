@@ -103,7 +103,8 @@ class DatabaseManager:
                              "notification_message TEXT,"
                              "email_notifications_on INTEGER DEFAULT 1,"
                              "email_notification_threshold INTEGER,"
-                             "email_cooldown INTEGER)")
+                             "email_cooldown INTEGER,"
+                             "email_address TEXT)")
             self.con.commit()
             self.con.close()
 
@@ -118,7 +119,8 @@ class DatabaseManager:
                           notification_message,
                           email_notifications_on,
                           email_notification_threshold,
-                          email_cooldown):
+                          email_cooldown,
+                          email_address):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
@@ -140,9 +142,10 @@ class DatabaseManager:
                 notification_message,
                 email_notifications_on, 
                 email_notification_threshold,
-                email_cooldown
-                ) 
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                email_cooldown,
+                email_address 
+) 
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     advice1 = excluded.advice1,
                     advice2 = excluded.advice2,
@@ -159,11 +162,13 @@ class DatabaseManager:
                     notification_message = excluded.notification_message,
                     email_notifications_on = excluded.email_notifications_on,
                     email_notification_threshold = excluded.email_notification_threshold,
-                    email_cooldown = excluded.email_cooldown
+                    email_cooldown = excluded.email_cooldown,
+                    email_address = excluded.email_address
                 """,
             (advice_1, advice_2, advice_3, advice_4, advice_5, advice_6,
                 fetch_sensor, fetch_averages, fetch_minmax, notifications, notification_threshold,
-             cooldown, notification_message, email_notifications_on, email_notification_threshold, email_cooldown)
+             cooldown, notification_message, email_notifications_on, email_notification_threshold, email_cooldown,
+             email_address)
         )
         self.con.commit()
         self.con.close()
@@ -175,7 +180,7 @@ class DatabaseManager:
             SELECT advice1, advice2, advice3, advice4, advice5, advice6,
                    fetchSensor, fetchAverages, fetchMinmax, notifications,
                    notification_threshold, cooldown, notification_message,
-                   email_notifications_on, email_notification_threshold, email_cooldown
+                   email_notifications_on, email_notification_threshold, email_cooldown, email_address
             FROM user_settings WHERE id=1
         """
         result = self.cur.execute(query).fetchone()
@@ -196,7 +201,8 @@ class DatabaseManager:
                 "notification_message": result[12],
                 "email_notifications_on": bool(result[13]),
                 "email_notification_threshold": result[14],
-                "email_cooldown": result[15]
+                "email_cooldown": result[15],
+                "email_address": result[16]
             }
         else:
             return {
@@ -215,7 +221,8 @@ class DatabaseManager:
                 "notification_message": "",
                 "email_notifications_on": False,
                 "email_notification_threshold": 0,
-                "email_cooldown": 0
+                "email_cooldown": 0,
+                "email_address": ""
             }
 
     def get_user_settings_notifications(self):
@@ -247,6 +254,13 @@ class DatabaseManager:
                 email_notification_threshold,
                 email_cooldown)
 
+    def get_user_email_address(self):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute("SELECT email_address from user_settings where id=1")
+        email_address = self.cur.fetchone()
+        return email_address
+
     def set_default_settings(self):
         self.set_user_settings(
             "No action needed.",
@@ -257,7 +271,7 @@ class DatabaseManager:
             "Hazardous air quality, open a window and vacate the room immediately.",
             5000, 30000, 45000, 1, 200, 300,
             "Poor air quality, open a window.",
-            1, 300, 7200
+            1, 300, 7200, "erikmolitoris60@gmail.com"
         )
 
     def print_table(self, table_name):

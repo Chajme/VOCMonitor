@@ -166,6 +166,7 @@ class WebServer:
                 email_notifications_enabled = request.form.get('email_notifications_enabled') == 'true'
                 email_notification_threshold = request.form.get('email_notification_threshold')
                 email_notification_cooldown = request.form.get('email_notification_cooldown')
+                email_address = request.form.get('email_address')
 
                 self.db.set_user_settings(
                     advice_1,
@@ -183,7 +184,8 @@ class WebServer:
                     notification_message,
                     email_notifications_enabled,
                     email_notification_threshold,
-                    email_notification_cooldown
+                    email_notification_cooldown,
+                    email_address
                 )
                 
                 return jsonify({"message": "Settings updated successfully!"}), 200
@@ -296,7 +298,7 @@ class WebServer:
             print(f"Failed to send email: {e}")
 
     def send_email_voc_threshold_exceeded(self, timestamp, voc_level, message):
-        receiver_address = "erikmolitoris60@gmail.com"
+        receiver_address = self.db.get_user_email_address()
         subject = "VOC Warning"
         body = f"{timestamp} \n Current VOC level: {voc_level}, set threshold exceeded. \n {message}"
         self.send_email(receiver_address, subject, body)

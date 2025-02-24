@@ -15,6 +15,7 @@ let notificationMessage;
 let emailNotificationOn;
 let emailNotificationThreshold;
 let emailNotificationCooldown;
+let emailAddress;
 
 // Fetching user settings and setting variable values. Setting values to input fields.
 async function fetchUserSettings() {
@@ -46,6 +47,7 @@ async function fetchUserSettings() {
             emailNotificationOn = data.email_notifications_on;
             emailNotificationThreshold = data.email_notification_threshold;
             emailNotificationCooldown = data.email_cooldown;
+            emailAddress = data.email_address;
 
             // Giving the values to elements
             document.getElementById('advice-1').value = advice_1;
@@ -67,7 +69,7 @@ async function fetchUserSettings() {
             document.getElementById('email-notifications-enabled').checked = emailNotificationOn;
             document.getElementById('email-notification-threshold').value = emailNotificationThreshold;
             document.getElementById('email-notification-cooldown').value = emailNotificationCooldown;
-
+            document.getElementById('email-address').value = emailAddress;
         });
 }
 
@@ -159,5 +161,6 @@ export {
     notificationMessage,
     emailNotificationOn,
     emailNotificationCooldown,
-    emailNotificationThreshold
+    emailNotificationThreshold,
+    emailAddress
 }
