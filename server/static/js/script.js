@@ -15,7 +15,8 @@ import {
 import {
     attachEventHandlers,
     exportChartAsPDF,
-    exportChartAsPNG
+    exportChartAsPNG,
+    pauseFetchingHandler
 } from "./modules/buttonHandlers.js";
 
 import {
@@ -38,12 +39,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     var humidityData = [];
     var timestamps = [];
     let fetchInterval;
+    let paused = false;
 
     initializeSocket();
     setupMenuHighlighter();
     setupMenuToggle();
     setupNotificationToggle();
-
 
     // Setting up a chart and initializing it
     const ctx = document.getElementById('myChart').getContext('2d');
@@ -81,10 +82,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initChart(ctx, timestamps, datasets);
     attachEventHandlers(() => myChart.resetZoom());
+    pauseFetchingHandler(() => {
+        if (!paused) {
+            console.log("Pausing fetching...");
+            clearInterval(fetchInterval);
+            fetchInterval = null;
+        } else {
+            console.log("Resuming fetching...");
+            fetchInterval = setInterval(() => {
+                fetchSensorData(
+                    updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                    userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3,
+                    userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
+                );
+            }, userSettingsJson.fetch_sensor);
+        }
+        paused = !paused;
+        console.log("Paused state is now:", paused);
+    });
 
     // Export buttons listeners
     document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
     document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
+
 
     // ShowAllData button listener, stops fetching data when checked, displays all data from the database. Resumes fetching once unchecked
     document.getElementById('showAllData').addEventListener('change', async (event) => {
@@ -109,6 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, userSettingsJson.fetch_sensor);
         }
     });
+
 
     // Waiting for user settings to get fetched, then setting the intervals
     const userSettingsJson = await fetchUserSettingsJson();
