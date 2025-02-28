@@ -210,13 +210,14 @@ class WebServer:
             print(all_notifications)
 
             """all_notifications_json = {
-                "timestamp": [row[0] for row in all_notifications],
-                "message": [row[1] for row in all_notifications],
-                "voc": [row[2] for row in all_notifications],
+                "id": [row[0] for row in all_notifications],   
+                "timestamp": [row[1] for row in all_notifications],
+                "message": [row[2] for row in all_notifications],
+                "voc": [row[3] for row in all_notifications],
             }"""
 
             all_notifications_json = [
-                {"timestamp": row[0], "message": row[1], "voc": row[2]} for row in all_notifications
+                {"id": row[0], "timestamp": row[1], "message": row[2], "voc": row[3]} for row in all_notifications
             ]
 
             return jsonify(all_notifications_json)
@@ -232,8 +233,12 @@ class WebServer:
         @self.app.route('/delete_notification', methods=['POST'])
         def delete_notification():
             notification_id = request.json.get('id')
-
-            self.db.delete_notification(notification_id)
+            print("Notification id: ", notification_id)
+            try:
+                self.db.delete_notification(notification_id)
+                return jsonify({"message": "Notification successfully deleted!"}), 200
+            except Exception as e:
+                return jsonify({"message": f"Error deleting notifications: {str(e)}"}), 500
 
         @self.socketio.on('connect')
         def test_connect():

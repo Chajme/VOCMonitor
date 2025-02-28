@@ -14,6 +14,7 @@ class DatabaseManager:
         #Clearing the db and dropping tables
         self.clear_table("data")
         self.drop_table("user_settings")
+        #self.drop_table("notifications")
 
         #Create tables
         self.create_table_data()
@@ -70,15 +71,15 @@ class DatabaseManager:
     def delete_notification(self, notification_id):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
-        self.cur.execute("REMOVE FROM notifications WHERE id = ?", (notification_id,))
+        self.cur.execute("DELETE FROM notifications WHERE id = ?", (notification_id,))
         self.con.commit()
         self.con.close()
 
     def get_notification_history(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
+        self.cur.execute("SELECT id, timestamp, message, voc FROM notifications ORDER BY timestamp DESC")
         self.con.commit()
-        self.cur.execute("SELECT timestamp, message, voc FROM notifications ORDER BY timestamp DESC")
         all_rows = self.cur.fetchall()
         self.con.close()
         return all_rows

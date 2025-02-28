@@ -35,9 +35,9 @@ async function fetchNotifications() {
 
         data.forEach(notification => {
             const listItem = document.createElement('li');
+            listItem.setAttribute("data-id", notification.id);
             // listItem.textContent = notification.message;  // Correctly access message field
 
-            // <button onclick="deleteNotification(${notification.id})" class="delete-btn">X</button>
 
 
             listItem.innerHTML = `
@@ -45,6 +45,19 @@ async function fetchNotifications() {
                 ${notification.message} <br><br>
                 <em>VOC Level: ${notification.voc}</em>
             `;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'X';
+            deleteBtn.classList.add('delete-btn');
+
+            // Check if ID exists before binding event
+            if (notification.id) {
+                deleteBtn.addEventListener('click', () => deleteNotification(notification.id));
+            } else {
+                console.error("Notification missing ID:", notification);
+            }
+
+            listItem.appendChild(deleteBtn);
 
             notificationList.appendChild(listItem);
         });
@@ -54,20 +67,23 @@ async function fetchNotifications() {
     }
 }
 
-// async function deleteNotification(id) {
-//     let response = await fetch('/delete_notification', {
-//         method: 'POST',
-//         headers: {'content-type': 'application/json'},
-//         body: JSON.stringify({id: id})
-//     });
+window.deleteNotification = async function(id) {
+    let response = await fetch('/delete_notification', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({id: id})
+    });
 
-//     let result = await response.json();
-//     if (result.success) {
-//         fetchNotifications();
-//     } else {
-//         alert("Failed to delte notification.")
-//     }
-// }
+    console.log("Notification id: ", id);
+
+    let result = await response.json();
+    if (response.ok && result.message === "Notification successfully deleted!") {
+        fetchNotifications();
+        document.querySelector(`#notification-list li[data-id='${id}']`)?.remove();
+    } else {
+        alert("Failed to delete notification.")
+    }
+}
 
 
 export {
