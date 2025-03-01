@@ -21,55 +21,60 @@
         <div class="notifications-container" id="notificationPanel">
             <button class="close-btn" id="closeNotifications">&times;</button>
             <h2>Notifications</h2>
-            <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+            <div class="clear-all-container" >
+                <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+                <label style="color: white;">Clear All</label>
+            </div>
             <!-- <button class="clear-all" id="clearAll"></button> -->
             <ul id="notification-list">
             </ul>
         </div>
 
         <div class="menu-section">
-
-            <div class="menu-section-flex-container">
-                <div class="logo">
-                    <h1>
-                        <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
-                    </h1>
+            <div class="menu-div">
+                <div class="menu-section-flex-container">
+                    <div class="logo">
+                        <h1>
+                            <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
+                        </h1>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <ul class="nav-list">
+                            <li>
+                                <a class="nav-list-link" href="{{ url_for('index') }}">
+                                    <i class="material-icons md-light">home</i>
+                                    <h4>Home</h4>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-list-link" href="{{ url_for('chart') }}">
+                                    <i class="material-icons md-light">analytics</i>
+                                    <h4>Graph</h4>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-list-link" href="{{ url_for('compact') }}">
+                                    <i class="material-icons md-light">smartphone</i>
+                                    <h4>Compact</h4>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="toggleNotifications">
+                                    <i class="material-icons md-light">notifications</i>
+                                    <h4>Notifications</h4>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-list-link" href="{{ url_for('settings') }}">
+                                    <i class="material-icons md-light">settings</i>
+                                    <h4>Settings</h4>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                <nav class="sidebar-nav">
-                    <ul class="nav-list">
-                        <li>
-                            <a class="nav-list-link" href="{{ url_for('index') }}">
-                                <i class="material-icons md-light">home</i>
-                                <h4>Home</h4>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-list-link" href="{{ url_for('chart') }}">
-                                <i class="material-icons md-light">analytics</i>
-                                <h4>Graph</h4>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-list-link" href="{{ url_for('compact') }}">
-                                <i class="material-icons md-light">smartphone</i>
-                                <h4>Compact</h4>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="toggleNotifications">
-                                <i class="material-icons md-light">notifications</i>
-                                <h4>Notifications</h4>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-list-link" href="{{ url_for('settings') }}">
-                                <i class="material-icons md-light">settings</i>
-                                <h4>Settings</h4>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
+
         </div>
         <div class="top-section">
             <div class="top-section-flex-container">

@@ -44,10 +44,6 @@ class WebServer:
         def settings():
             return render_template("settings.html")
 
-        @self.app.route('/notifications')
-        def notifications():
-            return render_template("notifications.html")
-
         @self.app.route('/all-data')
         def all_data():
             all_data_row = self.db.get_all_rows()

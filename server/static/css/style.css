@@ -67,9 +67,19 @@ body {
 }
 
 .menu-section {
-    background-color: var(--color-primary);
+    /* background-color: var(--color-primary); */
+    background-color: var(--color-background);
     grid-area: menu;
     min-height: 800px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* border-radius: 30px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px; */
 }
 
 .top-section {
@@ -175,7 +185,7 @@ body {
 
 .chart-box-2 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: space-around;
     flex-flow: wrap;
@@ -234,6 +244,21 @@ body {
     text-align: right;
 }
 
+.menu-div {
+    /* height: 100%;
+    width: 100%; */
+    /* height: 980px; */
+    height: 100%;
+
+    background-color: var(--color-primary);
+    border-radius: 30px;
+    /* margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px; */
+    padding-left: 10px;
+    box-shadow: var(--box-shadow);
+}
+
 /******************************Flexbox menu-section*/
 .menu-section-flex-container {
     display: flex;
@@ -248,9 +273,13 @@ body {
 .logo{
     /* margin-top: 5%;
     margin-bottom: 50%; */
-    margin-top: 11.5px;
+    /* margin-top: 11.5px;
     margin-right: 11.5px;
-    margin-bottom: 110px;
+    margin-bottom: 110px; */
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 75px;
     height: 150px;
     width: 125px;
 }
@@ -298,11 +327,12 @@ body {
 
     /* left: 0; */
     right: 0;
-    background: var(--color-container1, #ff5722);
+    background: var(--color-container2);
     /* width: 5px; */
-    width: 7px;
+    width: 10px;
     transition: height 150ms ease-in-out;
     border-radius: 30px;
+    margin-right: 7px;
 }
 /*
 .sidebar-nav a[data-selected="true"] h4 {
@@ -431,7 +461,7 @@ body {
 .values-box,
 .chart-box,
 .chart-box-2,
-.menu-section {
+.menu-div {
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -444,7 +474,7 @@ body {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-.menu-section:hover {
+.menu-div:hover {
     transform: translateX(-5px);
     box-shadow: 0px 0px 30px rgba(4, 6, 134, 0.5);
 }
@@ -456,6 +486,7 @@ body {
 }
 
 #notification-list li {
+    position: relative;
     background-color: var(--color-container);
     /*border: 1px solid #ddd;*/
     padding: 25px;
@@ -524,13 +555,31 @@ body {
 
 .delete-btn {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 10px;
+    right: 10px;
     background: transparent;
     color: black;
     border: none;
     padding: 5px;
     cursor: pointer;
+}
+
+.clear-all-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    gap: 10px;
+    margin: 1rem;
+    width: 100%;
+    padding-left: 0px;
+}
+
+.clear-all-container label {
+    letter-spacing: 2px;
+    font-family: "Inter";
+    font-weight: 200;
 }
 
 /*--Media layouts-------------------------------------------------------------------------------*/
