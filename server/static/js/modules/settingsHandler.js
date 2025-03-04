@@ -16,6 +16,8 @@ let emailNotificationOn;
 let emailNotificationThreshold;
 let emailNotificationCooldown;
 let emailAddress;
+let espAlarmEnabled;
+let alarmTime;
 
 // Fetching user settings and setting variable values. Setting values to input fields.
 async function fetchUserSettings() {
@@ -49,7 +51,11 @@ async function fetchUserSettings() {
             emailNotificationCooldown = data.email_cooldown;
             emailAddress = data.email_address;
 
-            // Giving the values to elements
+            // ESP32 alarm
+            espAlarmEnabled = data.esp_alarm_enabled;
+            alarmTime = data.alarm_time;
+
+            // Assigning the values to elements
             document.getElementById('advice-1').value = advice_1;
             document.getElementById('advice-2').value = advice_2;
             document.getElementById('advice-3').value = advice_3;
@@ -70,6 +76,9 @@ async function fetchUserSettings() {
             document.getElementById('email-notification-threshold').value = emailNotificationThreshold;
             document.getElementById('email-notification-cooldown').value = emailNotificationCooldown;
             document.getElementById('email-address').value = emailAddress;
+
+            document.getElementById('esp-alarm-enabled').value = espAlarmEnabled;
+            document.getElementById('alarm-time').value = alarmTime;
         });
 }
 
@@ -145,22 +154,5 @@ export {
     submitForms,
     cancelChanges,
     fetchUserSettingsJson,
-    resetDefault,
-    advice_1,
-    advice_2,
-    advice_3,
-    advice_4,
-    advice_5,
-    advice_6,
-    fetchSensorInterval,
-    fetchAveragesInterval,
-    fetchMinMaxInterval,
-    notificationsOn,
-    notificationsThreshold,
-    notificationCooldown,
-    notificationMessage,
-    emailNotificationOn,
-    emailNotificationCooldown,
-    emailNotificationThreshold,
-    emailAddress
+    resetDefault
 }

@@ -68,10 +68,12 @@ body {
 
 .menu-section {
     /* background-color: var(--color-primary); */
+    /* position: fixed; */
     background-color: var(--color-background);
     grid-area: menu;
-    min-height: 800px;
+    min-height: 100vh;
 
+    /* max-height: 1052px; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -245,16 +247,17 @@ body {
 }
 
 .menu-div {
-    /* height: 100%;
-    width: 100%; */
-    /* height: 980px; */
-    height: 100%;
+    top: 0;
+    left: 0;
+
+    margin-top: 20px;
+    margin-left: 10px;
+    position: fixed;
+    min-height: 1000px;
 
     background-color: var(--color-primary);
     border-radius: 30px;
-    /* margin-left: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px; */
+
     padding-left: 10px;
     box-shadow: var(--box-shadow);
 }
@@ -460,6 +463,16 @@ body {
     font-size: x-small;
 }
 
+/* Changes container with cancel, reset and apply */
+.changes-container {
+    position: sticky;
+    bottom: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
 /* Input field in input field display */
 .input-container {
     display: inline-block;
@@ -659,12 +672,10 @@ body {
 
     /*****************************Flexbox top section*/
     .top-section-flex-container {
-        /* flex-direction: column; */
-
         display: flex;
-        flex-wrap: wrap; /* Allow the elements to wrap on smaller screens */
-        justify-content: space-between; /* Distribute elements evenly */
-        width: 100%; /* Ensure full width */
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
         height: auto;
         gap: 10px;
     }
@@ -687,17 +698,20 @@ body {
 
     .menu-section {
         position: fixed;
-        left: 0;
         top: 0;
+        left: 0;
         height: 100vh;
         width: 250px;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, visibility 0s 0.3s;
+        visibility: hidden;
         z-index: 1000;
     }
 
     .menu-section.open {
         transform: translateX(0);
+        visibility: visible;
+        transition: transform 0.3s ease, visibility 0s;
     }
 
     .menu-section .logo {

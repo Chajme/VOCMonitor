@@ -105,7 +105,9 @@ class DatabaseManager:
                              "email_notifications_on INTEGER DEFAULT 1,"
                              "email_notification_threshold INTEGER,"
                              "email_cooldown INTEGER,"
-                             "email_address TEXT)")
+                             "email_address TEXT,"
+                             "esp_alarm_enabled INTEGER DEFAULT 1,"
+                             "alarm_time INTEGER)")
             self.con.commit()
             self.con.close()
 
@@ -121,7 +123,9 @@ class DatabaseManager:
                           email_notifications_on,
                           email_notification_threshold,
                           email_cooldown,
-                          email_address):
+                          email_address,
+                          esp_alarm_enabled,
+                          alarm_time):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
@@ -144,9 +148,11 @@ class DatabaseManager:
                 email_notifications_on, 
                 email_notification_threshold,
                 email_cooldown,
-                email_address 
+                email_address,
+                esp_alarm_enabled,
+                alarm_time  
 ) 
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     advice1 = excluded.advice1,
                     advice2 = excluded.advice2,
@@ -164,12 +170,14 @@ class DatabaseManager:
                     email_notifications_on = excluded.email_notifications_on,
                     email_notification_threshold = excluded.email_notification_threshold,
                     email_cooldown = excluded.email_cooldown,
-                    email_address = excluded.email_address
+                    email_address = excluded.email_address,
+                    esp_alarm_enabled = excluded.esp_alarm_enabled,
+                    alarm_time = excluded.alarm_time
                 """,
             (advice_1, advice_2, advice_3, advice_4, advice_5, advice_6,
                 fetch_sensor, fetch_averages, fetch_minmax, notifications, notification_threshold,
              cooldown, notification_message, email_notifications_on, email_notification_threshold, email_cooldown,
-             email_address)
+             email_address, esp_alarm_enabled, alarm_time)
         )
         self.con.commit()
         self.con.close()
@@ -181,7 +189,8 @@ class DatabaseManager:
             SELECT advice1, advice2, advice3, advice4, advice5, advice6,
                    fetchSensor, fetchAverages, fetchMinmax, notifications,
                    notification_threshold, cooldown, notification_message,
-                   email_notifications_on, email_notification_threshold, email_cooldown, email_address
+                   email_notifications_on, email_notification_threshold, email_cooldown, email_address, esp_alarm_enabled,
+                   alarm_time 
             FROM user_settings WHERE id=1
         """
         result = self.cur.execute(query).fetchone()
@@ -203,7 +212,9 @@ class DatabaseManager:
                 "email_notifications_on": bool(result[13]),
                 "email_notification_threshold": result[14],
                 "email_cooldown": result[15],
-                "email_address": result[16]
+                "email_address": result[16],
+                "esp_alarm_enabled": result[17],
+                "alarm_time": result[18]
             }
         else:
             return {
@@ -223,7 +234,9 @@ class DatabaseManager:
                 "email_notifications_on": False,
                 "email_notification_threshold": 0,
                 "email_cooldown": 0,
-                "email_address": ""
+                "email_address": "",
+                "esp_alarm_enabled": 0,
+                "alarm_time": 0
             }
 
     def get_user_settings_notifications(self):
@@ -235,7 +248,9 @@ class DatabaseManager:
                  "notification_message, "
                  "email_notifications_on, "
                  "email_notification_threshold, "
-                 "email_cooldown "
+                 "email_cooldown, "
+                 "esp_alarm_enabled, "
+                 "alarm_time "
                  "FROM user_settings WHERE id=1")
         result = self.cur.execute(query).fetchone()
         (notifications_on,
@@ -244,7 +259,9 @@ class DatabaseManager:
          notification_message,
          email_notifications_on,
          email_notification_threshold,
-         email_cooldown
+         email_cooldown,
+         esp_alarm_enabled,
+         alarm_time
          ) = result
 
         return (notifications_on,
@@ -253,7 +270,9 @@ class DatabaseManager:
                 notification_message,
                 email_notifications_on,
                 email_notification_threshold,
-                email_cooldown)
+                email_cooldown,
+                esp_alarm_enabled,
+                alarm_time)
 
     def get_user_email_address(self):
         self.con = sqlite3.connect(self.db_name)
@@ -272,7 +291,8 @@ class DatabaseManager:
             "Hazardous air quality, open a window and vacate the room immediately.",
             5000, 30000, 45000, 1, 200, 300,
             "Poor air quality, open a window.",
-            1, 300, 7200, "erikmolitoris60@gmail.com"
+            1, 300, 7200, "erikmolitoris60@gmail.com",
+            1, 10
         )
 
     def print_table(self, table_name):

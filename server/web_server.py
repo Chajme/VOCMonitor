@@ -77,14 +77,16 @@ class WebServer:
              notification_message,
              email_notifications_on,
              email_notification_threshold,
-             email_cooldown
+             email_cooldown,
+             esp_alarm_enabled,
+             alarm_time
              ) = self.db.get_user_settings_notifications()
 
             if notifications_on == 1 or email_notifications_on == 1:
                 self.check_sensor_data(notifications_on, email_notifications_on,
                                         int(new_data_row[3]), notifications_threshold, cooldown,
                                         notification_message, 1000,
-                                        email_notification_threshold)
+                                        email_notification_threshold, esp_alarm_enabled, alarm_time)
 
             """except Exception:
                 new_data_list = {
@@ -164,6 +166,9 @@ class WebServer:
                 email_notification_cooldown = request.form.get('email_notification_cooldown')
                 email_address = request.form.get('email_address')
 
+                esp_alarm_enabled = request.form.get('esp_alarm_enabled')
+                alarm_time = request.form.get('alarm_time')
+
                 self.db.set_user_settings(
                     advice_1,
                     advice_2,
@@ -181,7 +186,9 @@ class WebServer:
                     email_notifications_enabled,
                     email_notification_threshold,
                     email_notification_cooldown,
-                    email_address
+                    email_address,
+                    esp_alarm_enabled,
+                    alarm_time
                 )
                 
                 return jsonify({"message": "Settings updated successfully!"}), 200
@@ -248,14 +255,16 @@ class WebServer:
 
     def check_sensor_data(self, notifications_on, email_notifications_on,
                             voc, set_threshold, cooldown, notification_message,
-                            email_cooldown, email_notification_threshold):
+                            email_cooldown, email_notification_threshold, esp_alarm_enabled, alarm_time):
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if voc > set_threshold and notifications_on == 1:
             if not self.notification_sent or (current_time - self.last_notification) > cooldown:
                 self.socketio.emit('alert', {'message': notification_message})
-                self.mqtt.threshold_exceeded_notification("on")
+
+                if esp_alarm_enabled == 1:
+                    self.mqtt.threshold_exceeded_notification("on")
 
                 self.db.new_notification(timestamp, notification_message, voc)
 
@@ -263,7 +272,7 @@ class WebServer:
                 self.last_notification = current_time
 
                 """self.send_email_voc_threshold_exceeded(timestamp, voc, message)"""
-            if (current_time - self.last_notification) > 5:
+            if (current_time - self.last_notification) > alarm_time and esp_alarm_enabled == 1:
                 self.mqtt.threshold_exceeded_notification("off")
                 print('Setting threshold exceeded to off')
         else:

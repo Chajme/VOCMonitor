@@ -158,10 +158,20 @@
                             <br>
                             <input class="input" type="email" name="email_address" id="email-address">
                             <label>Email address</label>
+                            <br>
+                            <br>
+                            <input type="checkbox" class="switch" name="esp_alarm_enabled" id="esp-alarm-enabled">
+                            <label>Turn on ESP32 alarm</label>
+                            <br>
+                            <br>
+                            <div class="input-container s">
+                                <input class="input" type="number" min="0" name="alarm_time" id="alarm-time">
+                            </div>
+                            <label>Alarm time</label>
                         </form>
                     </div>
                 </div>
-                <div class="changes">
+                <div class="changes-container">
                     <button class="button-17" id="cancelChanges">Cancel</button>
                     <button class="button-17" id="resetDefault">Reset Default</button>
                     <button class="button-17" id="submitForms">Apply Changes</button>
