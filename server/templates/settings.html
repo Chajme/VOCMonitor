@@ -105,13 +105,19 @@
                     <h2>Fetching</h2>
                     <div class="settings-container-list">
                         <form id="fetching-form">
-                            <input class="input" placeholder="ms" type="number" name="fetch_sensor" id="fetch-sensor">
+                            <div class="input-container ms">
+                                <input class="input" type="number" name="fetch_sensor" id="fetch-sensor">
+                            </div>
                             <label>Fetch sensor data interval</label>
                             <br>
-                            <input class="input" placeholder="ms" type="number" name="fetch_averages" id="fetch-averages">
+                            <div class="input-container ms">
+                                <input class="input" type="number" name="fetch_averages" id="fetch-averages">
+                            </div>
                             <label>Fetch averages interval</label>
                             <br>
-                            <input class="input" placeholder="ms" type="number" name="fetch_minmax" id="fetch-minmax">
+                            <div class="input-container ms">
+                                <input class="input" type="number" name="fetch_minmax" id="fetch-minmax">
+                            </div>
                             <label>Fetch min & max values interval</label>
                         </form>
                     </div>
@@ -125,9 +131,12 @@
                             <br>
                             <br>
                             <input class="input" type="number" min="0" max="500" name="notification_threshold" id="notification-threshold">
+                            <span>(VOC Index)</span>
                             <label>Threshold</label>
                             <br>
-                            <input class="input" placeholder="s" type="number" min="0" name="notification_cooldown" id="notification-cooldown">
+                            <div class="input-container s">
+                                <input class="input" type="number" min="0" name="notification_cooldown" id="notification-cooldown">
+                            </div>
                             <label>Cooldown</label>
                             <br>
                             <input class="input" type="text" name="notification_message" id="notification-message">
@@ -139,9 +148,12 @@
                             <br>
                             <br>
                             <input class="input" type="number" min="0" max="500" name="email_notification_threshold" id="email-notification-threshold">
+                            <span>(VOC Index)</span>
                             <label>Threshold</label>
                             <br>
-                            <input class="input" type="number" min="0" name="email_notification_cooldown" id="email-notification-cooldown">
+                            <div class="input-container s">
+                                <input class="input" type="number" min="0" name="email_notification_cooldown" id="email-notification-cooldown">
+                            </div>
                             <label>Cooldown</label>
                             <br>
                             <input class="input" type="email" name="email_address" id="email-address">

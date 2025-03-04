@@ -455,6 +455,61 @@ body {
     letter-spacing: 2px;
 }
 
+.settings-container-list span {
+    font-family: "Inter";
+    font-size: x-small;
+}
+
+/* Input field in input field display */
+.input-container {
+    display: inline-block;
+    position: relative;
+}
+
+.input-container::after {
+    position: absolute;
+    top: 2px;
+    right: .5em;
+    transition: all .05s ease-in-out;
+  }
+
+  /* move unit more to the left on hover or focus within
+     for arrow buttons will appear to the right of number inputs */
+.input-container:hover::after,
+.input-container:focus-within::after {
+    right: 1.5em;
+  }
+
+  /* handle Firefox (arrows always shown) */
+  @supports (-moz-appearance:none) {
+    .input-container::after {
+      right: 1.5em;
+    }
+  }
+
+.input-container.ms:after {
+    content: "ms";
+    margin-top: 2px;
+    margin-right: 20px;
+    color: gray;
+    font-family: "Inter";
+    font-size: small;
+}
+
+.input-container.s:after {
+    content: "s";
+    margin-top: 2px;
+    margin-right: 20px;
+    color: gray;
+    font-family: "Inter";
+    font-size: small;
+}
+
+.unit {
+    margin-left: 5px;
+    font-size: 14px;
+    color: gray;
+  }
 
 .settings-container,
 .real-time-data-box,

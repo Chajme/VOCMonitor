@@ -11,7 +11,8 @@ import {
 import {
     attachEventHandlers,
     exportChartAsPDF,
-    exportChartAsPNG
+    exportChartAsPNG,
+    pauseFetchingHandler
 } from "./modules/buttonHandlers.js";
 
 import {
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     var humidityData = [];
     var timestamps = [];
     let fetchInterval;
+    let paused = false;
 
     setupMenuHighlighter();
     setupMenuToggle();
@@ -72,6 +74,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initChart(ctx, timestamps, datasets);
     attachEventHandlers(() => myChart.resetZoom());
+    pauseFetchingHandler(() => {
+        if (!paused) {
+            console.log("Pausing fetching...");
+            clearInterval(fetchInterval);
+            fetchInterval = null;
+        } else {
+            console.log("Resuming fetching...");
+            fetchInterval = setInterval(() => {
+                fetchSensorData(
+                    updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                    userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3,
+                    userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
+                );
+            }, userSettingsJson.fetch_sensor);
+        }
+        paused = !paused;
+        console.log("Paused state is now:", paused);
+    });
 
     document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
     document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
@@ -88,11 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             timestamps = [];
 
             updateChart(timestamps, sensorData, temperatureData, humidityData);
-
-            // fetchInterval = setInterval(() => {
-            //     console.log('Calling fetchSensorData...');
-            //     fetchSensorData(updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData);
-            // }, 5000);
 
             fetchInterval = setInterval(() => {
                 console.log('Calling fetchSensorData...');
