@@ -322,7 +322,7 @@ class DatabaseManager:
             return last_row
 
         self.con.close()
-        return "No data in the table"
+        return None
 
     def get_all_rows(self):
         self.con = sqlite3.connect(self.db_name)

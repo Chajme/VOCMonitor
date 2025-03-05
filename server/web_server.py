@@ -60,43 +60,42 @@ class WebServer:
 
         @self.app.route('/data')
         def new_data():
-            """try:"""
-            new_data_row = self.db.get_last_row()
-            print(new_data_row)
+            try:
+                new_data_row = self.db.get_last_row()
 
-            new_data_list = {
-                "timestamp": new_data_row[0],
-                "temperature": new_data_row[1],
-                "humidity": new_data_row[2],
-                "voc_index": new_data_row[3]
-            }
+                if not new_data_row:
+                    return jsonify({'message': 'No data available'}), 404
 
-            (notifications_on,
-             notifications_threshold,
-             cooldown,
-             notification_message,
-             email_notifications_on,
-             email_notification_threshold,
-             email_cooldown,
-             esp_alarm_enabled,
-             alarm_time
-             ) = self.db.get_user_settings_notifications()
+                print(new_data_row)
 
-            if notifications_on == 1 or email_notifications_on == 1:
-                self.check_sensor_data(notifications_on, email_notifications_on,
-                                        int(new_data_row[3]), notifications_threshold, cooldown,
-                                        notification_message, 1000,
-                                        email_notification_threshold, esp_alarm_enabled, alarm_time)
-
-            """except Exception:
                 new_data_list = {
-                    "timestamp": 0,
-                    "temperature": 0,
-                    "humidity": 0,
-                    "voc_index": 0
-                }"""
+                    "timestamp": new_data_row[0],
+                    "temperature": new_data_row[1],
+                    "humidity": new_data_row[2],
+                    "voc_index": new_data_row[3]
+                }
 
-            return jsonify(new_data_list)
+                (notifications_on,
+                 notifications_threshold,
+                 cooldown,
+                 notification_message,
+                 email_notifications_on,
+                 email_notification_threshold,
+                 email_cooldown,
+                 esp_alarm_enabled,
+                 alarm_time
+                 ) = self.db.get_user_settings_notifications()
+
+                if notifications_on == 1 or email_notifications_on == 1 and self.db.get_last_row() is not None:
+                    self.check_sensor_data(notifications_on, email_notifications_on,
+                                            int(new_data_row[3]), notifications_threshold, cooldown,
+                                            notification_message, 1000,
+                                            email_notification_threshold, esp_alarm_enabled, alarm_time)
+                    return jsonify(new_data_list), 200
+
+            except Exception as e:
+                return jsonify({'message': f'Error fetching new data: {str(e)}'}), 500
+
 
         @self.app.route('/avg')
         def get_averages():
@@ -110,14 +109,10 @@ class WebServer:
                     "avg_72h": avg_72h,
                     "avg_7d": avg_7d
                 }
-            except Exception:
-                averages = {
-                    "avg_24h": 0,
-                    "avg_72h": 0,
-                    "avg_7d": 0
-                }
+            except Exception as e:
+                return jsonify({'message': f'Error fetching averages {e}'}), 500
 
-            return jsonify(averages)
+            return jsonify(averages), 200
 
         @self.app.route('/minmax')
         def get_min_max_voc():
@@ -132,15 +127,13 @@ class WebServer:
                     "max_72h": max_72h
                 }
 
-            except Exception:
-                min_max_voc_list = {
-                    "min_24h": 0,
-                    "max_24h": 0,
-                    "min_72h": 0,
-                    "max_72h": 0
-                }
+                if any(value is None for value in min_max_voc_list.values()):
+                    return jsonify({'message': 'No minmax data available'}), 404
 
-            return jsonify(min_max_voc_list)
+            except Exception as e:
+                return jsonify({'message': f'Error fetching minmax {e}'}), 500
+
+            return jsonify(min_max_voc_list), 200
 
         @self.app.route('/update_settings', methods=['POST'])
         def update_settings():

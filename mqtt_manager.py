@@ -65,4 +65,4 @@ class MQTTManager:
 
     def threshold_exceeded_notification(self, payload):
         self.client.publish("alert/testing", payload)
-        print("Led alert sent!!!!")
+        print("LED state changed: ", payload)

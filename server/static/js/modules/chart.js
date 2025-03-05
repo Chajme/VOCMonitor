@@ -115,6 +115,11 @@ async function fetchSensorData(
         const response = await fetch('/data');
         const data = await response.json();
 
+        // Checking the response from the server, displaying the error code and the message
+        if (!response.ok) {
+            throw new Error(`${response.status}: ${data.message}`);
+        }
+
         console.log('Received data:', data);
 
         // Update arrays
@@ -151,7 +156,11 @@ async function fetchAverages() {
         const response = await fetch('/avg');
         const data = await response.json();
 
-        console.log(data);
+        if (!response.ok) {
+            throw new Error(`${response.status}: ${data.message}`);
+        }
+
+        console.log('Received averages: ', data);
 
         document.getElementById('avg-24h').innerHTML = data.avg_24h;
         document.getElementById('avg-72h').innerHTML = data.avg_72h;
@@ -167,7 +176,11 @@ async function fetchMinMaxValues() {
         const response = await fetch('/minmax');
         const data = await response.json();
 
-        console.log(data);
+        if (!response.ok) {
+            throw new Error(`${response.status}: ${data.message}`);
+        }
+
+        console.log('Received minmax: ', data);
 
         document.getElementById('min-24h').innerHTML = data.min_24h;
         document.getElementById('max-24h').innerHTML = data.max_24h;
@@ -175,10 +188,10 @@ async function fetchMinMaxValues() {
         document.getElementById('max-72h').innerHTML = data.max_72h;
     } catch (error) {
         console.error('Error fetching minmax data:', error);
-    } 
+    }
 }
 
- 
+
 function setupIntervals(fetchSensorInterval, fetchAveragesInterval, fetchMinMaxInterval) {
     if (fetchSensorInterval > 0 && fetchAveragesInterval > 0 && fetchMinMaxInterval > 0) {
         // Set the intervals once all values are valid
@@ -245,37 +258,15 @@ function getAdvice(currentVOC, advice_1, advice_2, advice_3, advice_4, advice_5,
     }
 }
 
-export { 
-    myChart, 
-    initChart,  
-    updateChart,  
-    fetchAllData, 
-    fetchSensorData, 
-    getGradient, 
-    fetchAverages, 
-    fetchMinMaxValues, 
+export {
+    myChart,
+    initChart,
+    updateChart,
+    fetchAllData,
+    fetchSensorData,
+    getGradient,
+    fetchAverages,
+    fetchMinMaxValues,
     setCurrentState,
-    setupIntervals 
+    setupIntervals
 };
-
-// function getAdvice(currentVOC) {
-//     if (currentVOC <= 50) {
-//         document.getElementById('advice').innerHTML =
-//         "No action needed.";
-//     } else if (currentVOC > 50 && currentVOC <= 100) {
-//         document.getElementById('advice').innerHTML =
-//         "Current VOC levels are good, no action is necessary.";
-//     } else if (currentVOC > 100 && currentVOC <= 200) {
-//         document.getElementById('advice').innerHTML =
-//         "VOC levels are higher, you should open a window.";
-//     } else if (currentVOC > 200 && currentVOC <= 300) {
-//         document.getElementById('advice').innerHTML =
-//         "Poor air quality, open a window.";
-//     } else if (currentVOC > 300 && currentVOC <= 450) {
-//         document.getElementById('advice').innerHTML =
-//         "Very bad air quality, open a window immediately.";
-//     } else {
-//         document.getElementById('advice').innerHTML =
-//         "Hazardous air quality, open a window and vacate the room immediately.";
-//     }
-// }
