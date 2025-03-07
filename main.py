@@ -8,6 +8,3 @@ mqtt_thread.daemon = True
 mqtt_thread.start()
 
 web_server = WebServer(mqtt_manager)
-
-
-

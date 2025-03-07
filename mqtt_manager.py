@@ -11,7 +11,9 @@ class MQTTManager:
         self.server = "192.168.0.103"
         self.port = 1883
         self.topic = "data"
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5)  #protocol=mqtt.CallbackAPIVersion.VERSION2
+        self.client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5
+        )  # protocol=mqtt.CallbackAPIVersion.VERSION2
 
         self.db_manager = DatabaseManager()
         self.voc_index_array = []
@@ -37,7 +39,7 @@ class MQTTManager:
         curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if len(self.voc_index_array) == 5:
-            #avg_voc = int(sum(self.voc_index_array) / len(self.voc_index_array)) #For testing we only store every 5th value
+            # avg_voc = int(sum(self.voc_index_array) / len(self.voc_index_array)) #For testing we only store every 5th value
             self.db_manager.insert(curr_time, temperature, humidity, voc)
             self.voc_index_array.clear()
 
@@ -46,8 +48,8 @@ class MQTTManager:
             else:
                 self.client.publish("alert/testing", "off")"""
 
-        #curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #self.db_manager.insert(curr_time, temp, humi, voc)
+        # curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # self.db_manager.insert(curr_time, temp, humi, voc)
         print(self.db_manager.get_last_row())
 
     def run_mqtt(self):
