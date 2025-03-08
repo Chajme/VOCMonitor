@@ -2,145 +2,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Compact</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon">
+    <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
 </head>
 <body>
-    <div class="container-grid-basic">
-        <div class="menu-toggle" aria-label="Toggle navigation" role="button" tabindex="0">
-            <i class="material-icons md-light">menu</i>
+<div class="container-grid-basic">
+    <div aria-label="Toggle navigation" class="menu-toggle" role="button" tabindex="0">
+        <i class="material-icons md-light">menu</i>
+    </div>
+
+    <!-- Notification panel to display sent out notifications -->
+    <div class="notifications-container" id="notificationPanel">
+        <button class="close-btn" id="closeNotifications">&times;</button>
+        <h2>Notifications</h2>
+        <div class="clear-all-container">
+            <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+            <label style="color: white;">Clear All</label>
+        </div>
+        <!-- <button class="clear-all" id="clearAll"></button> -->
+        <ul id="notification-list">
+        </ul>
+    </div>
+
+    <div class="menu-section">
+        <div class="menu-div">
+            <div class="menu-section-flex-container">
+                <div class="logo">
+                    <h1>
+                        <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
+                    </h1>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                                <i class="material-icons md-light">home</i>
+                                <h4>Home</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                                <i class="material-icons md-light">analytics</i>
+                                <h4>Graph</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                                <i class="material-icons md-light">smartphone</i>
+                                <h4>Compact</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="toggleNotifications">
+                                <i class="material-icons md-light">notifications</i>
+                                <h4>Notifications</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                                <i class="material-icons md-light">settings</i>
+                                <h4>Settings</h4>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-section-chart">
+        <div class="top-section-flex-container">
+            <div class="real-time-data-box" style="background-color: #CAF0F8;">
+                <h3>Temperature</h3>
+                <h1><span id="temperature"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #CAF0F8;">
+                <h3>Humidity</h3>
+                <h1><span id="humidity"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #90E0EF;">
+                <h3>VOC Index</h3>
+                <h1><span id="voc-index"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #00B4D8;">
+                <h3>Rating</h3>
+                <h1><span id="recommendation"></span></h1>
+            </div>
         </div>
 
-        <!-- Notification panel to display sent out notifications -->
-        <div class="notifications-container" id="notificationPanel">
-            <button class="close-btn" id="closeNotifications">&times;</button>
-            <h2>Notifications</h2>
-            <div class="clear-all-container" >
-                <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
-                <label style="color: white;">Clear All</label>
-            </div>
-            <!-- <button class="clear-all" id="clearAll"></button> -->
-            <ul id="notification-list">
-            </ul>
-        </div>
-
-        <div class="menu-section">
-            <div class="menu-div">
-                <div class="menu-section-flex-container">
-                    <div class="logo">
-                        <h1>
-                            <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
-                        </h1>
+        <div class="top-section-flex-container">
+            <div class="values-box">
+                <h3>Averages</h3>
+                <div class="averages-list">
+                    <div class="record">
+                        <p><b>24h </b>avg</p><b><span id="avg-24h"></span></b>
                     </div>
-                    <nav class="sidebar-nav">
-                        <ul class="nav-list">
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('index') }}">
-                                    <i class="material-icons md-light">home</i>
-                                    <h4>Home</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('chart') }}">
-                                    <i class="material-icons md-light">analytics</i>
-                                    <h4>Graph</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('compact') }}">
-                                    <i class="material-icons md-light">smartphone</i>
-                                    <h4>Compact</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" id="toggleNotifications">
-                                    <i class="material-icons md-light">notifications</i>
-                                    <h4>Notifications</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('settings') }}">
-                                    <i class="material-icons md-light">settings</i>
-                                    <h4>Settings</h4>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-        <div class="main-section-chart">
-            <div class="top-section-flex-container">
-                <div class="real-time-data-box" style="background-color: #CAF0F8;">
-                    <h3>Temperature</h3>
-                    <h1><span id="temperature"></span></h1>
-                </div>
-                <div class="real-time-data-box" style="background-color: #CAF0F8;">
-                    <h3>Humidity</h3>
-                    <h1><span id="humidity"></span></h1>
-                </div>
-                <div class="real-time-data-box" style="background-color: #90E0EF;">
-                    <h3>VOC Index</h3>
-                    <h1><span id="voc-index"></span></h1>
-                </div>
-                <div class="real-time-data-box" style="background-color: #00B4D8;">
-                    <h3>Rating</h3>
-                    <h1><span id="recommendation"></span></h1>
-                </div>
-            </div>
-
-            <div class="top-section-flex-container">
-                <div class="values-box">
-                    <h3>Averages</h3>
-                    <div class="averages-list">
-                        <div class="record">
-                            <p><b>24h </b>avg</p><b><span id="avg-24h"></span></b>
-                        </div>
-                        <div class="record">
-                            <p><b>72h </b>avg</p><b><span id="avg-72h"></span></b>
-                        </div>
-                        <div class="record">
-                            <p><b>7d </b>avg</p><b><span id="avg-7d"></span></b>
-                        </div>
+                    <div class="record">
+                        <p><b>72h </b>avg</p><b><span id="avg-72h"></span></b>
+                    </div>
+                    <div class="record">
+                        <p><b>7d </b>avg</p><b><span id="avg-7d"></span></b>
                     </div>
                 </div>
-                <div class="values-box">
-                    <h3>Min & Max Values</h3>
-                        <div class="averages-list">
-                            <div class="record-maxmin">
-                                <p><b>24h </b></p>
-                                <b><span id="min-24h"></span> <span id="max-24h"></span></b>
-                            </div>
-                            <div class="record-maxmin">
-                                <p><b>72h </b></p>
-                                <b><span id="min-72h"></span> <span id="max-72h"></span></b>
-                            </div>
-                            <!--<div class="record">
-                                <p><b>7d </b></p><b><span id="minmax-7d"></span></b>
-                            </div>-->
-                        </div>
-                </div>
-                <div class="values-box">
-                    <h3>Info</h3>
-                    <div class="advice-box">
-                        <span id="advice"></span>
+            </div>
+            <div class="values-box">
+                <h3>Min & Max Values</h3>
+                <div class="averages-list">
+                    <div class="record-maxmin">
+                        <p><b>24h </b></p>
+                        <b><span id="min-24h"></span> <span id="max-24h"></span></b>
                     </div>
+                    <div class="record-maxmin">
+                        <p><b>72h </b></p>
+                        <b><span id="min-72h"></span> <span id="max-72h"></span></b>
+                    </div>
+                    <!--<div class="record">
+                        <p><b>7d </b></p><b><span id="minmax-7d"></span></b>
+                    </div>-->
+                </div>
+            </div>
+            <div class="values-box">
+                <h3>Info</h3>
+                <div class="advice-box">
+                    <span id="advice"></span>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+        referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-    <script type="module" src="/static/js/compact.js"></script>
+<script src="/static/js/compact.js" type="module"></script>
 </body>
 </html>

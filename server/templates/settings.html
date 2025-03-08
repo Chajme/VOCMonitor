@@ -2,190 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Settings</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon">
+    <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
 </head>
 <body>
-    <div class="container-grid-basic">
-        <div class="menu-toggle" aria-label="Toggle navigation" role="button" tabindex="0">
-            <i class="material-icons md-light">menu</i>
-        </div>
+<div class="container-grid-basic">
+    <div aria-label="Toggle navigation" class="menu-toggle" role="button" tabindex="0">
+        <i class="material-icons md-light">menu</i>
+    </div>
 
-        <!-- Notification panel to display sent out notifications -->
-        <div class="notifications-container" id="notificationPanel">
-            <button class="close-btn" id="closeNotifications">&times;</button>
-            <h2>Notifications</h2>
-            <div class="clear-all-container" >
-                <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
-                <label style="color: white;">Clear All</label>
-            </div>
-            <!-- <button class="clear-all" id="clearAll"></button> -->
-            <ul id="notification-list">
-            </ul>
+    <!-- Notification panel to display sent out notifications -->
+    <div class="notifications-container" id="notificationPanel">
+        <button class="close-btn" id="closeNotifications">&times;</button>
+        <h2>Notifications</h2>
+        <div class="clear-all-container">
+            <i class="material-icons md-light" id="clearAll" style="cursor: pointer;">clear_all</i>
+            <label style="color: white;">Clear All</label>
         </div>
+        <!-- <button class="clear-all" id="clearAll"></button> -->
+        <ul id="notification-list">
+        </ul>
+    </div>
 
-        <div class="menu-section">
-            <div class="menu-div">
-                <div class="menu-section-flex-container">
-                    <div class="logo">
-                        <h1>
-                            <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
-                        </h1>
-                    </div>
-                     <nav class="sidebar-nav">
-                        <ul class="nav-list">
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('index') }}">
-                                    <i class="material-icons md-light">home</i>
-                                    <h4>Home</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('chart') }}">
-                                    <i class="material-icons md-light">analytics</i>
-                                    <h4>Graph</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('compact') }}">
-                                    <i class="material-icons md-light">smartphone</i>
-                                    <h4>Compact</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" id="toggleNotifications">
-                                    <i class="material-icons md-light">notifications</i>
-                                    <h4>Notifications</h4>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-list-link" href="{{ url_for('settings') }}">
-                                    <i class="material-icons md-light">settings</i>
-                                    <h4>Settings</h4>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+    <div class="menu-section">
+        <div class="menu-div">
+            <div class="menu-section-flex-container">
+                <div class="logo">
+                    <h1>
+                        <img class="logo-image" src="/static/images/VOCMonitorLogo.png">
+                    </h1>
                 </div>
-            </div>
-        </div>
-
-        <div class="main-section-chart">
-            <div class="chart-flexbox-container">
-                <div class="settings-container">
-                    <h2>Thresholds & Messages</h2>
-                    <div class="settings-container-list">
-                        <form id="messages-form">
-                            <input class="input" type="text" name="advice_1" id="advice-1">
-                            <label>0 - 50</label>
-                            <br>
-                            <input class="input" type="text" name="advice_2" id="advice-2">
-                            <label>51 - 100</label>
-                            <br>
-                            <input class="input" type="text" name="advice_3" id="advice-3">
-                            <label>101 - 200</label>
-                            <br>
-                            <input class="input" type="text" name="advice_4" id="advice-4">
-                            <label>201 - 300</label>
-                            <br>
-                            <input class="input" type="text" name="advice_5" id="advice-5">
-                            <label>301 - 450</label>
-                            <br>
-                            <input class="input" type="text" name="advice_6" id="advice-6">
-                            <label>451 - 500</label>
-                        </form>
-                    </div>
-                </div>
-                <div class="settings-container">
-                    <h2>Fetching</h2>
-                    <div class="settings-container-list">
-                        <form id="fetching-form">
-                            <div class="input-container ms">
-                                <input class="input" type="number" name="fetch_sensor" id="fetch-sensor">
-                            </div>
-                            <label>Fetch sensor data interval</label>
-                            <br>
-                            <div class="input-container ms">
-                                <input class="input" type="number" name="fetch_averages" id="fetch-averages">
-                            </div>
-                            <label>Fetch averages interval</label>
-                            <br>
-                            <div class="input-container ms">
-                                <input class="input" type="number" name="fetch_minmax" id="fetch-minmax">
-                            </div>
-                            <label>Fetch min & max values interval</label>
-                        </form>
-                    </div>
-                </div>
-                <div class="settings-container">
-                    <h2>Notifications</h2>
-                    <div class="settings-container-list">
-                        <form id="notifications-form">
-                            <input type="checkbox" class="switch" name="notifications_enabled" id="notifications-enabled">
-                            <label>Turn on notifications</label>
-                            <br>
-                            <br>
-                            <input class="input" type="number" min="0" max="500" name="notification_threshold" id="notification-threshold">
-                            <span>(VOC Index)</span>
-                            <label>Threshold</label>
-                            <br>
-                            <div class="input-container s">
-                                <input class="input" type="number" min="0" name="notification_cooldown" id="notification-cooldown">
-                            </div>
-                            <label>Cooldown</label>
-                            <br>
-                            <input class="input" type="text" name="notification_message" id="notification-message">
-                            <label>Message</label>
-                            <br>
-                            <br>
-                            <input type="checkbox" class="switch" name="email_notifications_enabled" id="email-notifications-enabled">
-                            <label>Turn on email notifications</label>
-                            <br>
-                            <br>
-                            <input class="input" type="number" min="0" max="500" name="email_notification_threshold" id="email-notification-threshold">
-                            <span>(VOC Index)</span>
-                            <label>Threshold</label>
-                            <br>
-                            <div class="input-container s">
-                                <input class="input" type="number" min="0" name="email_notification_cooldown" id="email-notification-cooldown">
-                            </div>
-                            <label>Cooldown</label>
-                            <br>
-                            <input class="input" type="email" name="email_address" id="email-address">
-                            <label>Email address</label>
-                            <br>
-                            <br>
-                            <input type="checkbox" class="switch" name="esp_alarm_enabled" id="esp-alarm-enabled">
-                            <label>Turn on ESP32 alarm</label>
-                            <br>
-                            <br>
-                            <div class="input-container s">
-                                <input class="input" type="number" min="0" name="alarm_time" id="alarm-time">
-                            </div>
-                            <label>Alarm time</label>
-                        </form>
-                    </div>
-                </div>
-                <div class="changes-container">
-                    <button class="button-17" id="cancelChanges">Cancel</button>
-                    <button class="button-17" id="resetDefault">Reset Default</button>
-                    <button class="button-17" id="submitForms">Apply Changes</button>
-                </div>
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                                <i class="material-icons md-light">home</i>
+                                <h4>Home</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                                <i class="material-icons md-light">analytics</i>
+                                <h4>Graph</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                                <i class="material-icons md-light">smartphone</i>
+                                <h4>Compact</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="toggleNotifications">
+                                <i class="material-icons md-light">notifications</i>
+                                <h4>Notifications</h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                                <i class="material-icons md-light">settings</i>
+                                <h4>Settings</h4>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <div class="main-section-chart">
+        <div class="chart-flexbox-container">
+            <div class="settings-container">
+                <h2>Thresholds & Messages</h2>
+                <div class="settings-container-list">
+                    <form id="messages-form">
+                        <input class="input" id="advice-1" name="advice_1" type="text">
+                        <label>0 - 50</label>
+                        <br>
+                        <input class="input" id="advice-2" name="advice_2" type="text">
+                        <label>51 - 100</label>
+                        <br>
+                        <input class="input" id="advice-3" name="advice_3" type="text">
+                        <label>101 - 200</label>
+                        <br>
+                        <input class="input" id="advice-4" name="advice_4" type="text">
+                        <label>201 - 300</label>
+                        <br>
+                        <input class="input" id="advice-5" name="advice_5" type="text">
+                        <label>301 - 450</label>
+                        <br>
+                        <input class="input" id="advice-6" name="advice_6" type="text">
+                        <label>451 - 500</label>
+                    </form>
+                </div>
+            </div>
+            <div class="settings-container">
+                <h2>Fetching</h2>
+                <div class="settings-container-list">
+                    <form id="fetching-form">
+                        <div class="input-container ms">
+                            <input class="input" id="fetch-sensor" name="fetch_sensor" type="number">
+                        </div>
+                        <label>Fetch sensor data interval</label>
+                        <br>
+                        <div class="input-container ms">
+                            <input class="input" id="fetch-averages" name="fetch_averages" type="number">
+                        </div>
+                        <label>Fetch averages interval</label>
+                        <br>
+                        <div class="input-container ms">
+                            <input class="input" id="fetch-minmax" name="fetch_minmax" type="number">
+                        </div>
+                        <label>Fetch min & max values interval</label>
+                    </form>
+                </div>
+            </div>
+            <div class="settings-container">
+                <h2>Notifications</h2>
+                <div class="settings-container-list">
+                    <form id="notifications-form">
+                        <input class="switch" id="notifications-enabled" name="notifications_enabled" type="checkbox">
+                        <label>Turn on notifications</label>
+                        <br>
+                        <br>
+                        <input class="input" id="notification-threshold" max="500" min="0" name="notification_threshold"
+                               type="number">
+                        <span>(VOC Index)</span>
+                        <label>Threshold</label>
+                        <br>
+                        <div class="input-container s">
+                            <input class="input" id="notification-cooldown" min="0" name="notification_cooldown"
+                                   type="number">
+                        </div>
+                        <label>Cooldown</label>
+                        <br>
+                        <input class="input" id="notification-message" name="notification_message" type="text">
+                        <label>Message</label>
+                        <br>
+                        <br>
+                        <input class="switch" id="email-notifications-enabled" name="email_notifications_enabled"
+                               type="checkbox">
+                        <label>Turn on email notifications</label>
+                        <br>
+                        <br>
+                        <input class="input" id="email-notification-threshold" max="500" min="0" name="email_notification_threshold"
+                               type="number">
+                        <span>(VOC Index)</span>
+                        <label>Threshold</label>
+                        <br>
+                        <div class="input-container s">
+                            <input class="input" id="email-notification-cooldown" min="0" name="email_notification_cooldown"
+                                   type="number">
+                        </div>
+                        <label>Cooldown</label>
+                        <br>
+                        <input class="input" id="email-address" name="email_address" type="email">
+                        <label>Email address</label>
+                        <br>
+                        <br>
+                        <input class="switch" id="esp-alarm-enabled" name="esp_alarm_enabled" type="checkbox">
+                        <label>Turn on ESP32 alarm</label>
+                        <br>
+                        <br>
+                        <div class="input-container s">
+                            <input class="input" id="alarm-time" min="0" name="alarm_time" type="number">
+                        </div>
+                        <label>Alarm time</label>
+                    </form>
+                </div>
+            </div>
+            <div class="changes-container">
+                <button class="button-17" id="cancelChanges">Cancel</button>
+                <button class="button-17" id="resetDefault">Reset Default</button>
+                <button class="button-17" id="submitForms">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script type="module" src="/static/js/settings.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+        referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+<script src="/static/js/settings.js" type="module"></script>
 </body>
 </html>

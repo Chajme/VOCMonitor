@@ -41,7 +41,6 @@ class DatabaseManager:
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(f"DELETE FROM {table_name}")
-        # self.cur.execute("DELETE FROM user_settings")
         self.con.commit()
         self.con.close()
 

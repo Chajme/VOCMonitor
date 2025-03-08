@@ -1,12 +1,12 @@
+import datetime
 import time
 from socket import SocketIO
 
-import datetime
 from flask import Flask, jsonify, render_template, request
+from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit
 
 from database.db_manager import DatabaseManager
-from flask_mail import Mail, Message
 
 
 class WebServer:
