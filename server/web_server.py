@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit
 
 from database.db_manager import DatabaseManager
+from server.config import Config
 
 
 class WebServer:
@@ -15,7 +16,7 @@ class WebServer:
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app)
 
-        self.set_mail_config()
+        self.set_app_config()
         self.mail = Mail(self.app)
 
         self.db = DatabaseManager()
@@ -326,14 +327,8 @@ class WebServer:
         else:
             self.email_notification_sent = False
 
-    def set_mail_config(self):
-        self.app.config["MAIL_SERVER"] = "smtp.gmail.com"
-        self.app.config["MAIL_PORT"] = 465
-        self.app.config["MAIL_USE_TLS"] = False
-        self.app.config["MAIL_USE_SSL"] = True
-        self.app.config["MAIL_USERNAME"] = "vocmonitorsystem@gmail.com"
-        self.app.config["MAIL_PASSWORD"] = "krrr hqwg bdfw vgfo"
-        self.app.config["MAIL_DEFAULT_SENDER"] = "vocmonitorsystem@gmail.com"
+    def set_app_config(self):
+        self.app.config.from_object(Config)
 
     def send_email(self, receiver, subject, body):
         try:
