@@ -2,13 +2,13 @@ import {
     fetchUserSettings,
     submitForms,
     cancelChanges,
-    resetDefault} from "./modules/settingsHandler.js"
+    resetDefault} from "./modules/settings-handler.js"
 
 import {
     setupMenuHighlighter,
     setupMenuToggle,
     setupNotificationToggle
-} from "./modules/visualElements.js";
+} from "./modules/visual-elements.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 

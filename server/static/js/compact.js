@@ -10,11 +10,11 @@ import {
     setupMenuHighlighter,
     setupMenuToggle,
     setupNotificationToggle
-} from "./modules/visualElements.js";
+} from "./modules/visual-elements.js";
 
 import {
     fetchUserSettingsJson
-} from "./modules/settingsHandler.js"
+} from "./modules/settings-handler.js"
 
 document.addEventListener('DOMContentLoaded', async () => {
     var sensorData = [];

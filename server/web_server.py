@@ -340,7 +340,7 @@ class WebServer:
             with self.app.app_context():
                 message = Message(subject, recipients=[receiver], body=body)
                 self.mail.send(message)
-                print("Email sent successfully!")
+                print("Email sent!")
         except Exception as e:
             print(f"Failed to send email: {e}")
 
