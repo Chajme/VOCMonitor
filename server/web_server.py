@@ -11,7 +11,6 @@ from server.config import Config
 
 
 class WebServer:
-
     def __init__(self, mqtt_manager):
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app)

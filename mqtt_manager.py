@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import paho.mqtt.client as mqtt
 
@@ -6,7 +7,6 @@ from database.db_manager import DatabaseManager
 
 
 class MQTTManager:
-
     def __init__(self):
         self.server = "192.168.0.103"
         self.port = 1883
@@ -43,11 +43,6 @@ class MQTTManager:
             self.db_manager.insert(curr_time, temperature, humidity, voc)
             self.voc_index_array.clear()
 
-            """if self.threshold_exceeded:
-                self.client.publish("alert/testing", "on")
-            else:
-                self.client.publish("alert/testing", "off")"""
-
         # curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # self.db_manager.insert(curr_time, temp, humi, voc)
         print(self.db_manager.get_last_row())
@@ -56,7 +51,16 @@ class MQTTManager:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
 
-        self.client.connect(self.server, self.port, 60)
+        result = None
+
+        while result is None or result != 0:
+            try:
+                result = self.client.connect(self.server, self.port, 60)
+            except Exception as e:
+                print(f"Connection failed: {e}")
+                print("Will try reconnecting in 15 seconds...")
+            time.sleep(15)
+
         self.client.subscribe(self.topic)
 
         try:
