@@ -4,7 +4,7 @@ from socket import SocketIO
 
 from flask import Flask, jsonify, render_template, request
 from flask_mail import Mail, Message
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit  # noqa: F811
 
 from database.db_manager import DatabaseManager
 from server.config import Config
@@ -25,6 +25,10 @@ class WebServer:
         self.notification_sent = False
         self.last_email_notification = 0
         self.email_notification_sent = False
+        self.last_temp_notification = 0
+        self.temp_notification_sent = False
+        self.last_humi_notification = 0
+        self.humi_notification_sent = False
 
         self.socket_connection_established = False
 
@@ -85,6 +89,12 @@ class WebServer:
                     email_cooldown,
                     esp_alarm_enabled,
                     alarm_time,
+                    temp_notifications_enabled,
+                    temp_threshold,
+                    temp_cooldown,
+                    humi_notifications_enabled,
+                    humi_threshold,
+                    humi_cooldown,
                 ) = self.db.get_user_settings_notifications()
 
                 if (
@@ -103,6 +113,14 @@ class WebServer:
                         email_notification_threshold,
                         esp_alarm_enabled,
                         alarm_time,
+                        temp_notifications_enabled,
+                        temp_threshold,
+                        temp_cooldown,
+                        humi_notifications_enabled,
+                        humi_threshold,
+                        humi_cooldown,
+                        int(new_data_row(2)),
+                        int(new_data_row(1)),
                     )
                     return jsonify(new_data_list), 200
 
@@ -146,6 +164,7 @@ class WebServer:
         @self.app.route("/update_settings", methods=["POST"])
         def update_settings():
             try:
+                # Advice settings
                 advice_1 = request.form.get("advice_1")
                 advice_2 = request.form.get("advice_2")
                 advice_3 = request.form.get("advice_3")
@@ -153,10 +172,12 @@ class WebServer:
                 advice_5 = request.form.get("advice_5")
                 advice_6 = request.form.get("advice_6")
 
+                # Fetching settings
                 fetch_sensor = request.form.get("fetch_sensor")
                 fetch_averages = request.form.get("fetch_averages")
                 fetch_minmax = request.form.get("fetch_minmax")
 
+                # Socket notifications settings
                 notifications_enabled = (
                     request.form.get("notifications_enabled") == "true"
                 )
@@ -164,6 +185,7 @@ class WebServer:
                 notification_cooldown = request.form.get("notification_cooldown")
                 notification_message = request.form.get("notification_message")
 
+                # Email notification settings
                 email_notifications_enabled = (
                     request.form.get("email_notifications_enabled") == "true"
                 )
@@ -175,8 +197,23 @@ class WebServer:
                 )
                 email_address = request.form.get("email_address")
 
+                # Alarm notification settings
                 esp_alarm_enabled = request.form.get("esp_alarm_enabled")
                 alarm_time = request.form.get("alarm_time")
+
+                # Temperature notification settings
+                temp_notifications_enabled = request.form.get(
+                    "temp_notifications_enabled"
+                )
+                temp_threshold = request.form.get("temp_threshold")
+                temp_cooldown = request.form.get("temp_cooldown")
+
+                # Humidity notification settings
+                humi_notifications_enabled = request.form.get(
+                    "humi_notifications_enabled"
+                )
+                humi_threshold = request.form.get("humi_threshold")
+                humi_cooldown = request.form.get("humi_cooldown")
 
                 self.db.set_user_settings(
                     advice_1,
@@ -198,6 +235,12 @@ class WebServer:
                     email_address,
                     esp_alarm_enabled,
                     alarm_time,
+                    temp_notifications_enabled,
+                    temp_threshold,
+                    temp_cooldown,
+                    humi_notifications_enabled,
+                    humi_threshold,
+                    humi_cooldown,
                 )
 
                 return jsonify({"message": "Settings updated successfully!"}), 200
@@ -280,6 +323,14 @@ class WebServer:
         email_notification_threshold,
         esp_alarm_enabled,
         alarm_time,
+        temp_notifications_enabled,
+        temp_threshold,
+        temp_cooldown,
+        humi_notifications_enabled,
+        humi_threshold,
+        humi_cooldown,
+        humidity,
+        temperature,
     ):
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -325,6 +376,30 @@ class WebServer:
                 self.last_email_notification = current_time
         else:
             self.email_notification_sent = False
+
+        if temperature > temp_threshold and temp_notifications_enabled == 1:
+            if (
+                not self.temp_notification_sent
+                or (current_time - self.last_temp_notification) > temp_cooldown
+            ):
+                self.socketio.emit(
+                    "alert", {"message": "Temperature exceeded set value."}
+                )
+                self.temp_notification_sent = True
+                self.last_temp_notification = current_time
+        else:
+            self.temp_notification_sent = False
+
+        if humidity > humi_threshold and humi_notifications_enabled == 1:
+            if (
+                not self.humi_notification_sent
+                or (current_time - self.last_humi_notification) > humi_cooldown
+            ):
+                self.socketio.emit("alert", {"message": "Humidity exceeded set value."})
+                self.humi_notification_sent = True
+                self.last_humi_notification = current_time
+        else:
+            self.humi_notification_sent = False
 
     def set_app_config(self):
         self.app.config.from_object(Config)

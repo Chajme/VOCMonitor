@@ -126,53 +126,103 @@
                 <h2>Notifications</h2>
                 <div class="settings-container-list">
                     <form id="notifications-form">
-                        <input class="switch" id="notifications-enabled" name="notifications_enabled" type="checkbox">
+                        <br>
+                        <div class="settings-container-subsection">
+                            <h3>VOC</h3>
+                        </div>
+                        <input type="checkbox" class="switch" name="notifications_enabled" id="notifications-enabled">
                         <label>Turn on notifications</label>
                         <br>
                         <br>
-                        <input class="input" id="notification-threshold" max="500" min="0" name="notification_threshold"
-                               type="number">
+                        <input class="input" type="number" min="0" max="500" name="notification_threshold"
+                               id="notification-threshold">
                         <span>(VOC Index)</span>
                         <label>Threshold</label>
                         <br>
                         <div class="input-container s">
-                            <input class="input" id="notification-cooldown" min="0" name="notification_cooldown"
-                                   type="number">
+                            <input class="input" type="number" min="0" name="notification_cooldown"
+                                   id="notification-cooldown">
                         </div>
                         <label>Cooldown</label>
                         <br>
-                        <input class="input" id="notification-message" name="notification_message" type="text">
+                        <input class="input" type="text" name="notification_message" id="notification-message">
                         <label>Message</label>
                         <br>
                         <br>
-                        <input class="switch" id="email-notifications-enabled" name="email_notifications_enabled"
-                               type="checkbox">
+                        <br>
+                        <input type="checkbox" class="switch" name="email_notifications_enabled"
+                               id="email-notifications-enabled">
                         <label>Turn on email notifications</label>
                         <br>
                         <br>
-                        <input class="input" id="email-notification-threshold" max="500" min="0" name="email_notification_threshold"
-                               type="number">
+                        <input class="input" type="number" min="0" max="500" name="email_notification_threshold"
+                               id="email-notification-threshold">
                         <span>(VOC Index)</span>
                         <label>Threshold</label>
                         <br>
                         <div class="input-container s">
-                            <input class="input" id="email-notification-cooldown" min="0" name="email_notification_cooldown"
-                                   type="number">
+                            <input class="input" type="number" min="0" name="email_notification_cooldown"
+                                   id="email-notification-cooldown">
                         </div>
                         <label>Cooldown</label>
                         <br>
-                        <input class="input" id="email-address" name="email_address" type="email">
+                        <input class="input" type="email" name="email_address" id="email-address">
                         <label>Email address</label>
                         <br>
                         <br>
-                        <input class="switch" id="esp-alarm-enabled" name="esp_alarm_enabled" type="checkbox">
+                        <br>
+                        <input type="checkbox" class="switch" name="esp_alarm_enabled" id="esp-alarm-enabled">
                         <label>Turn on ESP32 alarm</label>
                         <br>
                         <br>
                         <div class="input-container s">
-                            <input class="input" id="alarm-time" min="0" name="alarm_time" type="number">
+                            <input class="input" type="number" min="0" name="alarm_time" id="alarm-time">
                         </div>
                         <label>Alarm time</label>
+                        <br>
+                        <br>
+                        <br>
+
+                        <div class="settings-container-subsection">
+                            <h3>Temperature</h3>
+                        </div>
+                        <input type="checkbox" class="switch" name="temp_notifications_enabled"
+                               id="temp-notifications-enabled">
+                        <label>Turn on temperature socket notifications</label>
+                        <br>
+                        <br>
+                        <div class="input-container c">
+                            <input class="input" type="number" min="0" name="temp_threshold" id="temp-threshold">
+                        </div>
+                        <label>Threshold</label>
+                        <br>
+                        <div class="input-container s">
+                            <input class="input" type="number" min="0" name="temp_cooldown" id="temp-cooldown">
+                        </div>
+                        <label>Cooldown</label>
+                        <br>
+                        <br>
+                        <br>
+
+                        <div class="settings-container-subsection">
+                            <h3>Humidity</h3>
+                        </div>
+                        <input type="checkbox" class="switch" name="humi_notifications_enabled"
+                               id="humi-notifications-enabled">
+                        <label>Turn on humidity socket notifications</label>
+                        <br>
+                        <br>
+                        <div class="input-container percentage">
+                            <input class="input" type="number" min="0" max="100" name="humi_threshold"
+                                   id="humi-threshold">
+                        </div>
+
+                        <label>Threshold</label>
+                        <br>
+                        <div class="input-container s">
+                            <input class="input" type="number" min="0" name="humi_cooldown" id="humi-cooldown">
+                        </div>
+                        <label>Cooldown</label>
                     </form>
                 </div>
             </div>

@@ -18,6 +18,13 @@ let emailNotificationCooldown;
 let emailAddress;
 let espAlarmEnabled;
 let alarmTime;
+let tempNotificationsEnabled;
+let tempThreshold;
+let tempCooldown;
+let humiNotificationsEnabled;
+let humiThreshold;
+let humiCooldown;
+
 
 // Fetching user settings and setting variable values. Setting values to input fields.
 async function fetchUserSettings() {
@@ -55,6 +62,16 @@ async function fetchUserSettings() {
             espAlarmEnabled = data.esp_alarm_enabled;
             alarmTime = data.alarm_time;
 
+            // Temperature notifications
+            tempNotificationsEnabled = data.temp_notifications_enabled;
+            tempThreshold = data.temp_threshold;
+            tempCooldown = data.temp_cooldown;
+
+            // Humidity notifications
+            humiNotificationsEnabled = data.humi_notifications_enabled;
+            humiThreshold = data.humi_threshold;
+            humiCooldown = data.humi_cooldown;
+
             // Assigning the values to elements
             document.getElementById('advice-1').value = advice_1;
             document.getElementById('advice-2').value = advice_2;
@@ -79,6 +96,16 @@ async function fetchUserSettings() {
 
             document.getElementById('esp-alarm-enabled').value = espAlarmEnabled;
             document.getElementById('alarm-time').value = alarmTime;
+
+
+            document.getElementById('temp-notifications-enabled').value = tempNotificationsEnabled;
+            document.getElementById('temp-threshold').value = tempThreshold;
+            document.getElementById('temp-cooldown').value = tempCooldown;
+
+            document.getElementById('humi-notifications-enabled').value = humiNotificationsEnabled;
+            document.getElementById('humi-threshold').value = humiThreshold;
+            document.getElementById('humi-cooldown').value = humiCooldown;
+
         });
 }
 
@@ -130,6 +157,7 @@ function cancelChanges() {
     fetchUserSettings();
 }
 
+// Resetting the settings to default user settings
 function resetDefault() {
     fetch('/default_settings', {
         method: 'POST',

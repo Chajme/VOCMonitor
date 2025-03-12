@@ -2,7 +2,6 @@ import sqlite3
 
 
 class DatabaseManager:
-
     def __init__(self):
         self.db_name = "database/database.db"
 
@@ -114,7 +113,13 @@ class DatabaseManager:
             "email_cooldown INTEGER,"
             "email_address TEXT,"
             "esp_alarm_enabled INTEGER DEFAULT 1,"
-            "alarm_time INTEGER)"
+            "alarm_time INTEGER,"
+            "temp_notifications_enabled INTEGER DEFAULT 0,"
+            "temp_threshold INTEGER,"
+            "temp_cooldown INTEGER,"
+            "humi_notifications_enabled INTEGER DEFAULT 0,"
+            "humi_threshold INTEGER,"
+            "humi_cooldown INTEGER)"
         )
         self.con.commit()
         self.con.close()
@@ -140,6 +145,12 @@ class DatabaseManager:
         email_address,
         esp_alarm_enabled,
         alarm_time,
+        temp_notifications_enabled,
+        temp_threshold,
+        temp_cooldown,
+        humi_notifications_enabled,
+        humi_threshold,
+        humi_cooldown,
     ):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
@@ -165,9 +176,15 @@ class DatabaseManager:
                 email_cooldown,
                 email_address,
                 esp_alarm_enabled,
-                alarm_time  
-) 
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                alarm_time,
+                temp_notifications_enabled,
+                temp_threshold,
+                temp_cooldown,
+                humi_notifications_enabled,
+                humi_threshold,
+                humi_cooldown 
+                ) 
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     advice1 = excluded.advice1,
                     advice2 = excluded.advice2,
@@ -187,7 +204,13 @@ class DatabaseManager:
                     email_cooldown = excluded.email_cooldown,
                     email_address = excluded.email_address,
                     esp_alarm_enabled = excluded.esp_alarm_enabled,
-                    alarm_time = excluded.alarm_time
+                    alarm_time = excluded.alarm_time,
+                    temp_notifications_enabled = excluded.temp_notifications_enabled,
+                    temp_threshold = excluded.temp_threshold,
+                    temp_cooldown = excluded.temp_cooldown,
+                    humi_notifications_enabled = excluded.humi_notifications_enabled,
+                    humi_threshold = excluded.humi_threshold,
+                    humi_cooldown = excluded.humi_cooldown
                 """,
             (
                 advice_1,
@@ -209,6 +232,12 @@ class DatabaseManager:
                 email_address,
                 esp_alarm_enabled,
                 alarm_time,
+                temp_notifications_enabled,
+                temp_threshold,
+                temp_cooldown,
+                humi_notifications_enabled,
+                humi_threshold,
+                humi_cooldown,
             ),
         )
         self.con.commit()
@@ -222,7 +251,8 @@ class DatabaseManager:
                    fetchSensor, fetchAverages, fetchMinmax, notifications,
                    notification_threshold, cooldown, notification_message,
                    email_notifications_on, email_notification_threshold, email_cooldown, email_address, esp_alarm_enabled,
-                   alarm_time 
+                   alarm_time, temp_notifications_enabled, temp_threshold, temp_cooldown, humi_notifications_enabled,
+                   humi_threshold, humi_cooldown 
             FROM user_settings WHERE id=1
         """
         result = self.cur.execute(query).fetchone()
@@ -247,6 +277,12 @@ class DatabaseManager:
                 "email_address": result[16],
                 "esp_alarm_enabled": result[17],
                 "alarm_time": result[18],
+                "temp_notifications_enabled": result[19],
+                "temp_threshold": result[20],
+                "temp_cooldown": result[21],
+                "humi_notifications_enabled": result[22],
+                "humi_threshold": result[23],
+                "humi_cooldown": result[24],
             }
         else:
             return {
@@ -269,6 +305,12 @@ class DatabaseManager:
                 "email_address": "",
                 "esp_alarm_enabled": 0,
                 "alarm_time": 0,
+                "temp_notifications_enabled": False,
+                "temp_threshold": 0,
+                "temp_cooldown": 0,
+                "humi_notifications_enabled": False,
+                "humi_threshold": 0,
+                "humi_cooldown": 0,
             }
 
     def get_user_settings_notifications(self):
@@ -283,7 +325,13 @@ class DatabaseManager:
             "email_notification_threshold, "
             "email_cooldown, "
             "esp_alarm_enabled, "
-            "alarm_time "
+            "alarm_time,"
+            "temp_notifications_enabled,"
+            "temp_threshold,"
+            "temp_cooldown,"
+            "humi_notifications_enabled,"
+            "humi_threshold,"
+            "humi_cooldown,"
             "FROM user_settings WHERE id=1"
         )
         result = self.cur.execute(query).fetchone()
@@ -297,6 +345,12 @@ class DatabaseManager:
             email_cooldown,
             esp_alarm_enabled,
             alarm_time,
+            temp_notifications_enabled,
+            temp_threshold,
+            temp_cooldown,
+            humi_notifications_enabled,
+            humi_threshold,
+            humi_cooldown,
         ) = result
 
         return (
@@ -309,6 +363,12 @@ class DatabaseManager:
             email_cooldown,
             esp_alarm_enabled,
             alarm_time,
+            temp_notifications_enabled,
+            temp_threshold,
+            temp_cooldown,
+            humi_notifications_enabled,
+            humi_threshold,
+            humi_cooldown,
         )
 
     def get_user_email_address(self):
@@ -339,6 +399,12 @@ class DatabaseManager:
             "erikmolitoris60@gmail.com",
             1,
             10,
+            0,
+            0,
+            300,
+            0,
+            50,
+            300,
         )
 
     def print_table(self, table_name):

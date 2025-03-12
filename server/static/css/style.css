@@ -253,7 +253,7 @@ body {
     margin-top: 20px;
     margin-left: 10px;
     position: fixed;
-    min-height: 1000px;
+    min-height: 1010px;
 
     background-color: var(--color-primary);
     border-radius: 30px;
@@ -270,15 +270,10 @@ body {
     align-items: center;
     height: 100%;
     width: 100%;
-    box-sizing: border-box; /* Prevent overflow with padding */
+    box-sizing: border-box;
 }
 
 .logo{
-    /* margin-top: 5%;
-    margin-bottom: 50%; */
-    /* margin-top: 11.5px;
-    margin-right: 11.5px;
-    margin-bottom: 110px; */
     display: flex;
     justify-content: center;
     margin-top: 20px;
@@ -450,6 +445,13 @@ body {
     padding-left: 3%;
     color: rgb(0, 0, 0);
     letter-spacing: 3px;
+    font-family: "Inter";
+}
+
+.settings-container h3 {
+    font-family: "Inter";
+    letter-spacing: 3px;
+    padding-left: 10px;
 }
 
 .settings-container form {
@@ -461,6 +463,12 @@ body {
 .settings-container-list span {
     font-family: "Inter";
     font-size: x-small;
+}
+
+.settings-container-subsection {
+    width: 50%;
+    margin-bottom: 10px;
+    border-bottom: solid black 1px;
 }
 
 /* Changes container with cancel, reset and apply */
@@ -511,6 +519,24 @@ body {
 
 .input-container.s:after {
     content: "s";
+    margin-top: 2px;
+    margin-right: 20px;
+    color: gray;
+    font-family: "Inter";
+    font-size: small;
+}
+
+.input-container.c:after {
+    content: "°C";
+    margin-top: 2px;
+    margin-right: 20px;
+    color: gray;
+    font-family: "Inter";
+    font-size: small;
+}
+
+.input-container.percentage:after {
+    content: "%";
     margin-top: 2px;
     margin-right: 20px;
     color: gray;
