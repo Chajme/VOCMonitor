@@ -11,6 +11,7 @@ class MQTTManager:
         self.server = "192.168.0.103"
         self.port = 1883
         self.topic = "data"
+        self.table_name = "esp"
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5
         )  # protocol=mqtt.CallbackAPIVersion.VERSION2
@@ -22,7 +23,7 @@ class MQTTManager:
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
         if reason_code == 0:
-            print("Connected")
+            print("MQTT connection established")
             client.subscribe(self.topic)
         else:
             print(f"Connection error: {str(reason_code)}")
@@ -40,12 +41,14 @@ class MQTTManager:
 
         if len(self.voc_index_array) == 5:
             # avg_voc = int(sum(self.voc_index_array) / len(self.voc_index_array)) #For testing we only store every 5th value
-            self.db_manager.insert(curr_time, temperature, humidity, voc)
+            self.db_manager.insert(
+                self.table_name, curr_time, temperature, humidity, voc
+            )
             self.voc_index_array.clear()
 
         # curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # self.db_manager.insert(curr_time, temp, humi, voc)
-        print(self.db_manager.get_last_row())
+        print(self.db_manager.get_last_row(self.table_name))
 
     def run_mqtt(self):
         self.client.on_connect = self.on_connect
@@ -68,6 +71,22 @@ class MQTTManager:
             self.client.loop_start()
         except KeyboardInterrupt:
             self.client.disconnect()
+
+    def subscribe(self, topic, device_name):
+        self.set_topic(topic)
+        self.client.subscribe(self.topic)
+        self.set_table_name(device_name)
+        print("Subscribed to new topic: ", self.topic)
+
+    def unsubscribe(self):
+        self.client.unsubscribe(self.topic)
+        print("Unsubscribed from topic: ", self.topic)
+
+    def set_topic(self, topic):
+        self.topic = topic
+
+    def set_table_name(self, table_name):
+        self.table_name = table_name
 
     def threshold_exceeded_notification(self, payload):
         self.client.publish("alert/testing", payload)

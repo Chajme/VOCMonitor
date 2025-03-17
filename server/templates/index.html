@@ -59,6 +59,12 @@
                             </a>
                         </li>
                         <li>
+                            <a class="nav-list-link" href="{{ url_for('devices') }}">
+                                <i class="material-icons md-light">devices</i>
+                                <h4>Devices</h4>
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" id="toggleNotifications">
                                 <i class="material-icons md-light">notifications</i>
                                 <h4>Notifications</h4>
@@ -101,6 +107,13 @@
             <canvas id="myChart"></canvas>
         </div>
         <div class="chart-box-2">
+            <div class="option-box">
+                    <div class="dropdown">
+                        <button id="dropbtn">Select Device</button>
+                        <div class="dropdown-content" id="devices-dropdown">
+                        </div>
+                    </div>
+                </div>
             <div class="option-box">
                 <button class="button-17" id="resetZoom">Reset zoom</button>
             </div>

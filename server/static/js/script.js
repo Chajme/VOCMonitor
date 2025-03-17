@@ -33,13 +33,19 @@ import {
     fetchUserSettingsJson
 } from "./modules/settings-handler.js"
 
+import {
+    fetchDevicesDropdown
+} from "./modules/devices-handler.js"
+
+let sensorData = [];
+let temperatureData = [];
+let humidityData = [];
+let timestamps = [];
+let fetchInterval;
+let paused = false;
+
 document.addEventListener('DOMContentLoaded', async () => {
-    var sensorData = [];
-    var temperatureData = [];
-    var humidityData = [];
-    var timestamps = [];
-    let fetchInterval;
-    let paused = false;
+
 
     initializeSocket();
     setupMenuHighlighter();
@@ -104,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Export buttons listeners
     document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
     document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
+    document.getElementById('dropbtn').addEventListener('click', fetchDevicesDropdown);
 
 
     // ShowAllData button listener, stops fetching data when checked, displays all data from the database. Resumes fetching once unchecked
@@ -171,3 +178,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     //     setupIntervals(fetchSensorInterval, fetchAveragesInterval, fetchMinMaxInterval);
     // });
 });
+
+function clearDatasets() {
+    sensorData.length = 0;
+    temperatureData.length = 0;
+    humidityData.length = 0;
+    timestamps.length = 0;
+    myChart.data.labels.pop();
+    myChart.update();
+}
+
+export {
+    clearDatasets
+}

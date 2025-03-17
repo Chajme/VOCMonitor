@@ -12,25 +12,27 @@ class DatabaseManager:
         self.cur = self.con.cursor()
 
         # Clearing the db and dropping tables
-        self.clear_table("data")
+        self.clear_table("esp_32")
         self.drop_table("user_settings")
-        # self.drop_table("notifications")
+        self.clear_table("devices")
 
         # Create tables
-        self.create_table_data()
+        """self.create_table_data("data")"""
         self.create_table_notification_history()
         self.create_user_settings_table()
+        self.create_table_devices()
 
         # Setting default user settings
         self.set_default_settings()
+        self.new_device("esp", "data")
 
         self.con.close()
 
-    def insert(self, timestamp, temperature, humidity, voc):
+    def insert(self, table_name, timestamp, temperature, humidity, voc):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
-            "INSERT INTO data (timestamp, temperature, humidity, voc) VALUES (?, ?, ?, ?)",
+            f"INSERT INTO {table_name} (timestamp, temperature, humidity, voc) VALUES (?, ?, ?, ?)",
             (timestamp, temperature, humidity, voc),
         )
         self.con.commit()
@@ -43,14 +45,61 @@ class DatabaseManager:
         self.con.commit()
         self.con.close()
 
-    def create_table_data(self):
+    def create_table_data(self, table_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS data (timestamp, temperature, humidity, voc)"
+            f"CREATE TABLE IF NOT EXISTS {table_name} (timestamp, temperature, humidity, voc)"
         )
         self.con.commit()
         self.con.close()
+
+    def create_table_devices(self):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS devices ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT, topic TEXT"
+            ")"
+        )
+        self.con.commit()
+        self.con.close()
+
+    def new_device(self, device_name, topic):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute(
+            "INSERT INTO devices (device_name, topic) VALUES (?, ?)",
+            (device_name, topic),
+        )
+
+        self.cur.execute(
+            f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
+        )
+
+        # Creating a new table with the devices name
+        """self.create_table_data(device_name)"""
+        self.con.commit()
+        self.con.close()
+
+    def delete_device(self, device_id):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute("DELETE FROM devices WHERE id = ?", (device_id,))
+
+        # Dropping the table with the devices data
+        self.drop_table(device_id)
+        self.con.commit()
+        self.con.close()
+
+    def get_all_devices(self):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute("SELECT id, device_name, topic FROM devices")
+        self.con.commit()
+        all_rows = self.cur.fetchall()
+        self.con.close()
+        return all_rows
 
     def create_table_notification_history(self):
         self.con = sqlite3.connect(self.db_name)
@@ -331,7 +380,7 @@ class DatabaseManager:
             "temp_cooldown,"
             "humi_notifications_enabled,"
             "humi_threshold,"
-            "humi_cooldown,"
+            "humi_cooldown "
             "FROM user_settings WHERE id=1"
         )
         result = self.cur.execute(query).fetchone()
@@ -421,45 +470,40 @@ class DatabaseManager:
         self.con.commit()
         self.con.close()
 
-    def get_last_row(self):
+    def get_last_row(self, table_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
 
-        self.cur.execute("SELECT COUNT(*) FROM data")
+        self.cur.execute(f"SELECT COUNT(*) FROM {table_name}")
         result = self.cur.fetchone()
         num_of_rows = result[0]
 
+        """query = "SELECT * FROM {} ORDER BY timestamp DESC LIMIT 1".format(table_name)
+        self.cur.execute(query)
+        last_row = self.cur.fetchone()"""
+
         if num_of_rows > 0:
-            last_row = self.cur.execute("SELECT * FROM data").fetchall()[-1]
+            last_row = self.cur.execute(f"SELECT * FROM {table_name}").fetchall()[-1]
             return last_row
 
         self.con.close()
         return None
 
-    def get_all_rows(self):
+    def get_all_rows(self, table_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
         self.cur.execute(
-            "SELECT timestamp, temperature, humidity, voc FROM data ORDER BY timestamp "
+            f"SELECT timestamp, temperature, humidity, voc FROM {table_name} ORDER BY timestamp "
         )
         all_rows = self.cur.fetchall()
         self.con.close()
         return all_rows
 
-    def print_database(self):
-        self.con = sqlite3.connect(self.db_name)
-        self.cur = self.con.cursor()
-        self.cur.execute("SELECT * FROM data")
-        print(self.cur.fetchall())
-        self.con.close()
-
-    def get_avg(self, time_period):
+    def get_avg(self, time_period, table_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
 
-        query = (
-            "SELECT AVG(voc) AS avg_voc FROM data WHERE timestamp >= datetime('now', ?)"
-        )
+        query = f"SELECT AVG(voc) AS avg_voc FROM {table_name} WHERE timestamp >= datetime('now', ?)"
         self.cur.execute(query, (time_period,))
 
         avg_voc = self.cur.fetchone()[0]
@@ -467,13 +511,11 @@ class DatabaseManager:
         self.con.close()
         return avg_voc
 
-    def get_min_max(self, time_period):
+    def get_min_max(self, time_period, table_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
 
-        query = (
-            "SELECT MIN(voc), MAX(voc) FROM data WHERE timestamp >= datetime('now', ?)"
-        )
+        query = f"SELECT MIN(voc), MAX(voc) FROM {table_name} WHERE timestamp >= datetime('now', ?)"
         self.cur.execute(query, (time_period,))
 
         min_max_voc = self.cur.fetchone()

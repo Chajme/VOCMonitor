@@ -15,12 +15,15 @@ class WebServer:
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app)
 
+        # Setting an app config for mail notifications
         self.set_app_config()
         self.mail = Mail(self.app)
 
+        # Defining managers
         self.db = DatabaseManager()
         self.mqtt = mqtt_manager
 
+        # Notification sent and cooldown tracking
         self.last_notification = 0
         self.notification_sent = False
         self.last_email_notification = 0
@@ -31,6 +34,9 @@ class WebServer:
         self.humi_notification_sent = False
 
         self.socket_connection_established = False
+
+        self.selected_topic = "data"
+        self.selected_device = "esp"
 
         @self.app.route("/")
         def index():
@@ -44,13 +50,17 @@ class WebServer:
         def chart():
             return render_template("chart.html")
 
+        @self.app.route("/devices")
+        def devices():
+            return render_template("devices.html")
+
         @self.app.route("/settings")
         def settings():
             return render_template("settings.html")
 
         @self.app.route("/all-data")
         def all_data():
-            all_data_row = self.db.get_all_rows()
+            all_data_row = self.db.get_all_rows(self.selected_device)
 
             all_data_list = {
                 "timestamp": [row[0] for row in all_data_row],
@@ -65,7 +75,8 @@ class WebServer:
         @self.app.route("/data")
         def new_data():
             try:
-                new_data_row = self.db.get_last_row()
+                new_data_row = self.db.get_last_row(self.selected_device)
+                print("/data new_data_row: ", new_data_row)
 
                 if not new_data_row:
                     return jsonify({"message": "No data available"}), 404
@@ -100,7 +111,7 @@ class WebServer:
                 if (
                     notifications_on == 1
                     or email_notifications_on == 1
-                    and self.db.get_last_row() is not None
+                    and self.db.get_last_row(self.selected_device) is not None
                 ):
                     self.check_sensor_data(
                         notifications_on,
@@ -119,8 +130,8 @@ class WebServer:
                         humi_notifications_enabled,
                         humi_threshold,
                         humi_cooldown,
-                        int(new_data_row(2)),
-                        int(new_data_row(1)),
+                        int(new_data_row[2]),
+                        int(new_data_row[1]),
                     )
                     return jsonify(new_data_list), 200
 
@@ -130,9 +141,9 @@ class WebServer:
         @self.app.route("/avg")
         def get_averages():
             try:
-                avg_24h = self.db.get_avg("-24 hours")
-                avg_72h = self.db.get_avg("-72 hours")
-                avg_7d = self.db.get_avg("-7 days")
+                avg_24h = self.db.get_avg("-24 hours", self.selected_device)
+                avg_72h = self.db.get_avg("-72 hours", self.selected_device)
+                avg_7d = self.db.get_avg("-7 days", self.selected_device)
 
                 averages = {"avg_24h": avg_24h, "avg_72h": avg_72h, "avg_7d": avg_7d}
             except Exception as e:
@@ -143,8 +154,12 @@ class WebServer:
         @self.app.route("/minmax")
         def get_min_max_voc():
             try:
-                min_24h, max_24h = self.db.get_min_max("-24 hours")
-                min_72h, max_72h = self.db.get_min_max("-72 hours")
+                min_24h, max_24h = self.db.get_min_max(
+                    "-24 hours", self.selected_device
+                )
+                min_72h, max_72h = self.db.get_min_max(
+                    "-72 hours", self.selected_device
+                )
 
                 min_max_voc_list = {
                     "min_24h": min_24h,
@@ -262,7 +277,6 @@ class WebServer:
         @self.app.route("/notification_history")
         def get_notifications():
             all_notifications = self.db.get_notification_history()
-            print(all_notifications)
 
             """all_notifications_json = {
                 "id": [row[0] for row in all_notifications],   
@@ -299,6 +313,71 @@ class WebServer:
             except Exception as e:
                 return (
                     jsonify({"message": f"Error deleting notifications: {str(e)}"}),
+                    500,
+                )
+
+        @self.app.route("/devices_list")
+        def get_devices():
+            all_devices = self.db.get_all_devices()
+
+            all_devices_json = [
+                {"id": row[0], "device_name": row[1], "topic": row[2]}
+                for row in all_devices
+            ]
+
+            return jsonify(all_devices_json)
+
+        @self.app.route("/new_device", methods=["POST"])
+        def new_device():
+            try:
+                device_name = request.form.get("device_name")
+                topic = request.form.get("topic")
+
+                self.db.new_device(device_name, topic)
+
+                return jsonify({"message": "New device added!"}), 200
+            except Exception as e:
+                return {"message": f"Error adding device: {str(e)}"}, 500
+
+        @self.app.route("/devices_clear", methods=["POST"])
+        def clear_devices():
+            try:
+                self.db.clear_table("devices")
+                return jsonify({"message": "Notifications successfully cleared!"}), 200
+            except Exception as e:
+                return (
+                    jsonify({"message": f"Error clearing notifications: {str(e)}"}),
+                    500,
+                )
+
+        @self.app.route("/delete_device", methods=["POST"])
+        def delete_device():
+            device_id = request.json.get("id")
+            print("Device id: ", device_id)
+            try:
+                self.db.delete_device(device_id)
+                return jsonify({"message": "Device successfully deleted!"}), 200
+            except Exception as e:
+                return (
+                    jsonify({"message": f"Error deleting device: {str(e)}"}),
+                    500,
+                )
+
+        @self.app.route("/select_device", methods=["POST"])
+        def select_device():
+            device_id = request.json.get("id")
+            topic = request.json.get("topic")
+            device_name = request.json.get("device_name")
+            print("Select device params: ", device_id, topic, device_name)
+            try:
+                self.mqtt.unsubscribe()
+                self.mqtt.subscribe(topic, device_name)
+                self.selected_topic = topic
+                self.selected_device = device_name
+                return jsonify({"message": "New device selected!"}), 200
+            except Exception as e:
+                return (
+                    jsonify({"message": f"Error selecting the device: {str(e)}"}),
                     500,
                 )
 
