@@ -25,11 +25,15 @@ import {
     fetchUserSettingsJson
 } from "./modules/settings-handler.js";
 
+import {
+    fetchDevicesDropdown
+} from "./modules/devices-handler.js";
+
 document.addEventListener('DOMContentLoaded', async () => {
-    var sensorData = [];
-    var temperatureData = [];
-    var humidityData = [];
-    var timestamps = [];
+    let sensorData = [];
+    let temperatureData = [];
+    let humidityData = [];
+    let timestamps = [];
     let fetchInterval;
     let paused = false;
 
@@ -95,6 +99,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
     document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
+    document.getElementById('dropbtn').addEventListener('click', () => {
+        fetchDevicesDropdown(clearDatasets);
+    });
 
     document.getElementById('showAllData').addEventListener('change', async (event) => {
         if (event.target.checked) {
@@ -128,12 +135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
         );
     }, userSettingsJson.fetch_sensor);
-
-
-
-    // fetchInterval = setInterval(() => {
-    //     console.log('Calling fetchSensorData...');
-    //     fetchSensorData(updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData);
-    // }, 5000);
-
 });
+
+function clearDatasets() {
+    sensorData.length = 0;
+    temperatureData.length = 0;
+    humidityData.length = 0;
+    timestamps.length = 0;
+    myChart.data.labels.pop();
+    myChart.update();
+}

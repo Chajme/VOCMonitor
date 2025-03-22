@@ -1,5 +1,3 @@
-import { clearDatasets } from "../script.js";
-
 // Function to fetch all devices from the db
 async function fetchDevices() {
     try {
@@ -47,7 +45,7 @@ async function fetchDevices() {
     }
 }
 
-async function fetchDevicesDropdown() {
+async function fetchDevicesDropdown(callback) {
     try {
         const response = await fetch('/devices_list');
         const data = await response.json();
@@ -64,9 +62,10 @@ async function fetchDevicesDropdown() {
 
             // Make the whole <a> clickable
             listItem.addEventListener('click', () => {
+                if (callback) callback();
+
                 document.getElementById("dropbtn").textContent = device.device_name;
                 selectDevice(device.id, device.device_name, device.topic);
-                clearDatasets();
                 // updateChart(device.device_name);
             });
 
