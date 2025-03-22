@@ -175,6 +175,8 @@ body {
 }
 
 .chart-box {
+    display: flex;
+    justify-content: center;
     border-radius: 30px;
     background-color: var(--color-container);
     width: 98%;
@@ -402,6 +404,8 @@ body {
 }
 
 .chart-box-chart-page {
+    display: flex;
+    justify-content: center;
     border-radius: 30px;
     background-color: var(--color-container);
     width: 95%;
@@ -834,6 +838,7 @@ body {
 
     .main-values-flex-container {
         flex-direction: column;
+        justify-content: center;
     }
 
     .main-values-flex-container {
@@ -905,12 +910,29 @@ body {
 
     .chart-box-2 {
         height: auto;
-        min-height: 125px;
+        min-height: 185px;
+    }
+
+    .chart-box-2-chart-page {
+        height: auto;
+        min-height: 185px;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1745px) {
+    .chart-box-2 {
+        height: auto;
+        min-height: 150px;
+    }
 
+    .chart-box-2-chart-page {
+        height: auto;
+        min-height: 150px;
+    }
+
+    .chart-box-chart-page {
+        height: auto;
+    }
 }
 
 /*-------------------------------------------------------------------------------*/
