@@ -84,17 +84,17 @@
                 <h2>Add new device</h2>
                 <div class="settings-container-list">
                     <form id="devices-form">
-                        <input class="input" type="text" name="device_name" id="device_name">
-                        <label>Device name</label>
-                        <br>
-                        <input class="input" type="text" name="topic" id="topic">
-                        <label>Topic</label>
-                        <br>
-                        <br>
-                        <br>
-                        <button class="button-17" id="cancelChanges">Cancel</button>
-                        <button class="button-17" id="addNewDevice">Add new device</button>
-                    </form>
+                            <input class="input" type="text" pattern="[A-Za-z]+" name="device_name" id="device_name" required>
+                            <label>Device name</label>
+                            <br>
+                            <input class="input" type="text" pattern="[A-Za-z]+" name="topic" id="topic" required>
+                            <label>Topic</label>
+                            <br>
+                            <br>
+                            <br>
+                            <button class="button-17" id="cancelChanges">Cancel</button>
+                            <button class="button-17" id="addNewDevice">Add new device</button>
+                        </form>
                 </div>
             </div>
 

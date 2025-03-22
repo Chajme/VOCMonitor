@@ -17,10 +17,18 @@ function initChart(context, labels, datasets) {
                     beginAtZero: true,
                     max: 500,
                     display: true,
+                    title: {
+                        display: true,
+                        text: 'VOC, °C, %',
+                    },
                 },
                 x: {
                     beginAtZero: true,
                     display: true,
+                    title: {
+                        display: true,
+                        text: 'Time',
+                    },
                     ticks: {
                         callback: function (val, index) {
                             return index % 4 === 0 ? this.getLabelForValue(val) : '';
@@ -64,14 +72,32 @@ function toggleDatasetVisibility(legendItem, chart) {
 
     const maxValues = [500, 50, 100];
     let newMax = 0;
+    let activeLabel = -1;
 
     chart.data.datasets.forEach((dataset, i) => {
         if (!chart.getDatasetMeta(i).hidden) {
             newMax = Math.max(newMax, maxValues[i]);
+            activeIndices.push(i);
+            activeLabel = i;
         }
     });
 
     chart.options.scales.y.max = newMax || 10;
+
+    const axisTitles = [
+        { x: 'Time', y: 'VOC Index' },       // Dataset 0
+        { x: 'Time', y: 'Temperature (°C)' }, // Dataset 1
+        { x: 'Time', y: 'Humidity (%)' }      // Dataset 2
+    ];
+
+    if (activeIndex !== -1) {
+        chart.options.scales.y.title.text = axisTitles[activeIndex].y;
+        chart.options.scales.x.title.text = axisTitles[activeIndex].x;
+    } else {
+        chart.options.scales.y.title.text = 'Y-Axis Label';
+        chart.options.scales.x.title.text = 'X-Axis Label';
+    }
+
     chart.update();
 }
 

@@ -35,6 +35,9 @@ class WebServer:
 
         self.socket_connection_established = False
 
+        self.db.new_device("esp", "data")
+        self.db.new_device("device", "new/topic")
+
         self.selected_topic = "data"
         self.selected_device = "esp"
 
@@ -353,9 +356,10 @@ class WebServer:
         @self.app.route("/delete_device", methods=["POST"])
         def delete_device():
             device_id = request.json.get("id")
+            device_name = request.json.get("device_name")
             print("Device id: ", device_id)
             try:
-                self.db.delete_device(device_id)
+                self.db.delete_device(device_id, device_name)
                 return jsonify({"message": "Device successfully deleted!"}), 200
             except Exception as e:
                 return (
@@ -369,17 +373,11 @@ class WebServer:
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
-            try:
-                self.mqtt.unsubscribe()
-                self.mqtt.subscribe(topic, device_name)
-                self.selected_topic = topic
-                self.selected_device = device_name
-                return jsonify({"message": "New device selected!"}), 200
-            except Exception as e:
-                return (
-                    jsonify({"message": f"Error selecting the device: {str(e)}"}),
-                    500,
-                )
+            self.mqtt.unsubscribe()
+            self.mqtt.subscribe(topic, device_name)
+            self.selected_topic = topic
+            self.selected_device = device_name
+            return jsonify({"message": "New device selected!"}), 200
 
         @self.socketio.on("connect")
         def test_connect():

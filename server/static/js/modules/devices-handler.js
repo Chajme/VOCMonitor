@@ -11,16 +11,20 @@ async function fetchDevices() {
         const devicesList = document.getElementById('devices-list');
         devicesList.innerHTML = '';
 
+        var count = 1;
+
         data.forEach(device => {
             const listItem = document.createElement('li');
             listItem.setAttribute("data-id", device.id);
             // listItem.textContent = notification.message;  // Correctly access message field
 
             listItem.innerHTML = `
-                <strong>${device.id}</strong>
+                <strong>${count}</strong>
                 <strong>${device.device_name}</strong>
                 ${device.topic} <br>
             `;
+
+            count++;
 
             const deleteDeviceBtn = document.createElement('button');
             deleteDeviceBtn.textContent = 'remove';
@@ -28,7 +32,7 @@ async function fetchDevices() {
 
             // Check if ID exists before binding event
             if (device.id) {
-                deleteDeviceBtn.addEventListener('click', () => deleteDevice(device.id));
+                deleteDeviceBtn.addEventListener('click', () => deleteDevice(device.id, device.device_name));
             } else {
                 console.error("Device missing ID:", device);
             }
@@ -75,11 +79,11 @@ async function fetchDevicesDropdown() {
 }
 
 // Ability to remove devices one by one
-async function deleteDevice(id) {
+async function deleteDevice(id, device_name) {
     let response = await fetch('/delete_device', {
         method: 'POST',
         headers: {'content-type': 'application/json'},
-        body: JSON.stringify({id: id})
+        body: JSON.stringify({id: id, device_name: device_name})
     });
 
     console.log("Device id: ", id);
@@ -101,12 +105,12 @@ async function selectDevice(id, device_name, topic) {
         body: JSON.stringify({id: id, topic: topic, device_name: device_name})
     });
 
-    let result = await response.json();
-    if (response.ok && result.message === "Device successfully selected!") {
-        console.log("Device selected...", result.error)
-    } else {
-        alert("Failed to select the device.")
-    }
+    // let result = await response.json();
+    // if (response.ok && result.message === "Device successfully selected!") {
+    //     console.log("Device selected...", result.error)
+    // } else {
+    //     alert("Failed to select the device.")
+    // }
 }
 
 
@@ -125,11 +129,7 @@ function addNewDevice() {
 
     fetch('/new_device', {
         method: 'POST',
-        body: formData,
-        // headers: {
-        //     'Content-Type': 'application/json',
-        // },
-        // body: JSON.stringify(formData),
+        body: formData
     })
         .then((response) => response.json())
         .then((data) => {

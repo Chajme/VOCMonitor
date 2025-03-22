@@ -432,6 +432,8 @@ body {
     border-radius: 30px;
     background-color: var(--color-container);
     width: 98%;
+    max-width: 98%;
+    overflow: hidden;
     /* height: 30%; */
     /* min-height: 280px; */
     min-height: 240px;
@@ -486,22 +488,23 @@ body {
     flex-direction: column;
     width: 100%;
     height: auto;
-    margin-left: 20px;
+    margin-left: 30px;
 }
 
 .devices-list-c {
     display: flex;
     flex-direction: column;
-    width: 94%;
+    width: calc(100% - 140px);
     list-style-type: decimal;
     gap: 20px;
 }
+
 
 .devices-list-c li {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 50px;
+    width: auto;
     border-bottom: solid lightgray 1px;
     padding-bottom: 10px;
 }
@@ -771,7 +774,7 @@ body {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    width: auto;
+    width: 145px;
     will-change: transform,opacity;
     z-index: 0;
 }

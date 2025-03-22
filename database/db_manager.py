@@ -1,3 +1,4 @@
+import re
 import sqlite3
 
 
@@ -12,9 +13,11 @@ class DatabaseManager:
         self.cur = self.con.cursor()
 
         # Clearing the db and dropping tables
-        self.clear_table("esp_32")
         self.drop_table("user_settings")
         self.clear_table("devices")
+
+        # self.clear_table("esp")
+        # self.clear_table("device")
 
         # Create tables
         """self.create_table_data("data")"""
@@ -24,7 +27,6 @@ class DatabaseManager:
 
         # Setting default user settings
         self.set_default_settings()
-        self.new_device("esp", "data")
 
         self.con.close()
 
@@ -68,27 +70,36 @@ class DatabaseManager:
     def new_device(self, device_name, topic):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
-        self.cur.execute(
-            "INSERT INTO devices (device_name, topic) VALUES (?, ?)",
-            (device_name, topic),
-        )
 
-        self.cur.execute(
-            f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
-        )
+        if self.is_valid_device_name(device_name):
+            self.cur.execute(
+                "INSERT OR IGNORE INTO devices (device_name, topic) VALUES (?, ?)",
+                (device_name, topic),
+            )
 
-        # Creating a new table with the devices name
-        """self.create_table_data(device_name)"""
+            self.cur.execute(
+                f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
+            )
+
         self.con.commit()
         self.con.close()
 
-    def delete_device(self, device_id):
+    def delete_device(self, device_id, device_name):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
+
+        self.cur.execute("SELECT id FROM devices WHERE id = ?", (device_id,))
+        if not self.cur.fetchone():
+            raise ValueError(f"Device ID {device_id} not found in the database")
+
         self.cur.execute("DELETE FROM devices WHERE id = ?", (device_id,))
 
         # Dropping the table with the devices data
-        self.drop_table(device_id)
+        try:
+            self.cur.execute(f"DROP TABLE IF EXISTS {device_name}")
+        except Exception as e:
+            print(f"Error dropping table: {e}")
+
         self.con.commit()
         self.con.close()
 
@@ -97,6 +108,14 @@ class DatabaseManager:
         self.cur = self.con.cursor()
         self.cur.execute("SELECT id, device_name, topic FROM devices")
         self.con.commit()
+        all_rows = self.cur.fetchall()
+        self.con.close()
+        return all_rows
+
+    def get_device_topics(self):
+        self.con = sqlite3.connect(self.db_name)
+        self.cur = self.con.cursor()
+        self.cur.execute("SELECT topic, device_name FROM devices")
         all_rows = self.cur.fetchall()
         self.con.close()
         return all_rows
@@ -523,3 +542,8 @@ class DatabaseManager:
 
         self.con.close()
         return min_voc, max_voc
+
+    @staticmethod
+    def is_valid_device_name(device_name):
+        pattern = r"^[a-z_][a-z0-9_]*$"
+        return bool(re.match(pattern, device_name))
