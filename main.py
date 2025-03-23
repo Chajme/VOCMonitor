@@ -1,6 +1,7 @@
-from mqtt_manager import MQTTManager
-from server.web_server import WebServer
 import threading
+
+from app.web_server import WebServer
+from mqtt_manager import MQTTManager
 
 mqtt_manager = MQTTManager()
 mqtt_thread = threading.Thread(target=mqtt_manager.run_mqtt)

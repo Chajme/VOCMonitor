@@ -10,6 +10,7 @@ class MQTTManager:
     def __init__(self):
         self.server = "192.168.0.103"
         self.port = 1883
+        self.selected_device = "esp"
         """self.topic = "data"
         self.table_name = "esp"""
         self.client = mqtt.Client(

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Compact</title>
+    <meta content="max-age=31536000, immutable" http-equiv="cache-control">
+    <title>VOC Monitor</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
@@ -11,7 +12,7 @@
     <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
 </head>
 <body>
-<div class="container-grid-basic">
+<div class="container-grid">
     <div aria-label="Toggle navigation" class="menu-toggle" role="button" tabindex="0">
         <i class="material-icons md-light">menu</i>
     </div>
@@ -40,25 +41,25 @@
                 <nav class="sidebar-nav">
                     <ul class="nav-list">
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.index') }}">
                                 <i class="material-icons md-light">home</i>
                                 <h4>Home</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.chart') }}">
                                 <i class="material-icons md-light">analytics</i>
                                 <h4>Graph</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.compact') }}">
                                 <i class="material-icons md-light">smartphone</i>
                                 <h4>Compact</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('devices') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.devices') }}">
                                 <i class="material-icons md-light">devices</i>
                                 <h4>Devices</h4>
                             </a>
@@ -70,7 +71,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.settings') }}">
                                 <i class="material-icons md-light">settings</i>
                                 <h4>Settings</h4>
                             </a>
@@ -79,9 +80,9 @@
                 </nav>
             </div>
         </div>
-    </div>
 
-    <div class="main-section-chart">
+    </div>
+    <div class="top-section">
         <div class="top-section-flex-container">
             <div class="real-time-data-box" style="background-color: #CAF0F8;">
                 <h3>Temperature</h3>
@@ -100,8 +101,41 @@
                 <h1><span id="recommendation"></span></h1>
             </div>
         </div>
-
-        <div class="top-section-flex-container">
+    </div>
+    <div class="main-section-chart">
+        <div class="chart-box">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="chart-box-2">
+            <div class="option-box">
+                    <div class="dropdown">
+                        <button id="dropbtn">Select Device</button>
+                        <div class="dropdown-content" id="devices-dropdown">
+                        </div>
+                    </div>
+                </div>
+            <div class="option-box">
+                <button class="button-17" id="resetZoom">Reset zoom</button>
+            </div>
+            <div class="option-box">
+                <button class="button-17" id="pauseFetching">Pause/Resume Updates</button>
+            </div>
+            <div class="option-box">
+                <div class="checkbox-wrapper-14">
+                    <input class="switch" id="showAllData" type="checkbox">
+                    <label for="showAllData">Show All Data</label>
+                </div>
+            </div>
+            <div class="option-box">
+                <button class="button-17" id="exportChartAsPDF">Export as PDF</button>
+            </div>
+            <div class="option-box">
+                <button class="button-17" id="exportChartAsPNG">Export as PNG</button>
+            </div>
+        </div>
+    </div>
+    <div class="main-section-values">
+        <div class="main-values-flex-container">
             <div class="values-box">
                 <h3>Averages</h3>
                 <div class="averages-list">
@@ -141,6 +175,7 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
@@ -149,6 +184,6 @@
         referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-<script src="/static/js/compact.js" type="module"></script>
+<script src="/static/js/script.js" type="module"></script>
 </body>
 </html>

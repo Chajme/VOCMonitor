@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Devices</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Compact</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon">
+    <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
 </head>
 <body>
 <div class="container-grid-basic">
@@ -40,25 +40,25 @@
                 <nav class="sidebar-nav">
                     <ul class="nav-list">
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.index') }}">
                                 <i class="material-icons md-light">home</i>
                                 <h4>Home</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.chart') }}">
                                 <i class="material-icons md-light">analytics</i>
                                 <h4>Graph</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.compact') }}">
                                 <i class="material-icons md-light">smartphone</i>
                                 <h4>Compact</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('devices') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.devices') }}">
                                 <i class="material-icons md-light">devices</i>
                                 <h4>Devices</h4>
                             </a>
@@ -70,7 +70,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.settings') }}">
                                 <i class="material-icons md-light">settings</i>
                                 <h4>Settings</h4>
                             </a>
@@ -82,41 +82,65 @@
     </div>
 
     <div class="main-section-chart">
-        <div class="chart-flexbox-container">
-            <div class="settings-container">
-                <h2>Add new device</h2>
-                <div class="settings-container-list">
-                    <form id="devices-form">
-                            <input class="input" type="text" pattern="[A-Za-z]+" name="device_name" id="device_name" required>
-                            <label>Device name</label>
-                            <br>
-                            <input class="input" type="text" pattern="[A-Za-z]+" name="topic" id="topic" required>
-                            <label>Topic</label>
-                            <br>
-                            <br>
-                            <br>
-                            <button class="button-17" id="cancelChanges">Cancel</button>
-                            <button class="button-17" id="addNewDevice">Add new device</button>
-                        </form>
+        <div class="top-section-flex-container">
+            <div class="real-time-data-box" style="background-color: #CAF0F8;">
+                <h3>Temperature</h3>
+                <h1><span id="temperature"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #CAF0F8;">
+                <h3>Humidity</h3>
+                <h1><span id="humidity"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #90E0EF;">
+                <h3>VOC Index</h3>
+                <h1><span id="voc-index"></span></h1>
+            </div>
+            <div class="real-time-data-box" style="background-color: #00B4D8;">
+                <h3>Rating</h3>
+                <h1><span id="recommendation"></span></h1>
+            </div>
+        </div>
+
+        <div class="top-section-flex-container">
+            <div class="values-box">
+                <h3>Averages</h3>
+                <div class="averages-list">
+                    <div class="record">
+                        <p><b>24h </b>avg</p><b><span id="avg-24h"></span></b>
+                    </div>
+                    <div class="record">
+                        <p><b>72h </b>avg</p><b><span id="avg-72h"></span></b>
+                    </div>
+                    <div class="record">
+                        <p><b>7d </b>avg</p><b><span id="avg-7d"></span></b>
+                    </div>
                 </div>
             </div>
-
-            <div class="settings-container">
-                <h2>Devices</h2>
-                <div class="devices-container">
-                    <div class="clear-all-container">
-                        <i class="material-icons md-dark" id="clearAllDevices" style="cursor: pointer;">clear_all</i>
-                        <label style="color: black;">Clear All</label>
+            <div class="values-box">
+                <h3>Min & Max Values</h3>
+                <div class="averages-list">
+                    <div class="record-maxmin">
+                        <p><b>24h </b></p>
+                        <b><span id="min-24h"></span> <span id="max-24h"></span></b>
                     </div>
-                    <ul class="devices-list-c" id="devices-list">
-                    </ul>
+                    <div class="record-maxmin">
+                        <p><b>72h </b></p>
+                        <b><span id="min-72h"></span> <span id="max-72h"></span></b>
+                    </div>
+                    <!--<div class="record">
+                        <p><b>7d </b></p><b><span id="minmax-7d"></span></b>
+                    </div>-->
                 </div>
-
+            </div>
+            <div class="values-box">
+                <h3>Info</h3>
+                <div class="advice-box">
+                    <span id="advice"></span>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
@@ -125,7 +149,6 @@
         referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-<script src="/static/js/devices-page.js" type="module"></script>
-
+<script src="/static/js/compact.js" type="module"></script>
 </body>
 </html>

@@ -4,11 +4,14 @@ import sqlite3
 
 class DatabaseManager:
     def __init__(self):
-        self.db_name = "database/database.db"
+        self.db_name = "E:\Bakalarka\WebServer\pythonProject\database\database.db"
 
         self.con = None
         self.cur = None
 
+        self.selected_device = "esp"
+
+    def initialize_db(self):
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
 
@@ -29,6 +32,12 @@ class DatabaseManager:
         self.set_default_settings()
 
         self.con.close()
+
+    def get_selected_device(self):
+        return self.selected_device
+
+    def set_selected_device(self, new_device):
+        self.selected_device = new_device
 
     def insert(self, table_name, timestamp, temperature, humidity, voc):
         self.con = sqlite3.connect(self.db_name)

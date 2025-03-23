@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="max-age=31536000, immutable" http-equiv="cache-control">
-    <title>VOC Monitor</title>
+    <meta content="max-age=31536000, immutable" http-equiv="content-type">
+    <title>Chart</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
@@ -12,7 +12,7 @@
     <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
 </head>
 <body>
-<div class="container-grid">
+<div class="container-grid-basic">
     <div aria-label="Toggle navigation" class="menu-toggle" role="button" tabindex="0">
         <i class="material-icons md-light">menu</i>
     </div>
@@ -41,25 +41,25 @@
                 <nav class="sidebar-nav">
                     <ul class="nav-list">
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.index') }}">
                                 <i class="material-icons md-light">home</i>
                                 <h4>Home</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.chart') }}">
                                 <i class="material-icons md-light">analytics</i>
                                 <h4>Graph</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.compact') }}">
                                 <i class="material-icons md-light">smartphone</i>
                                 <h4>Compact</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('devices') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.devices') }}">
                                 <i class="material-icons md-light">devices</i>
                                 <h4>Devices</h4>
                             </a>
@@ -71,7 +71,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.settings') }}">
                                 <i class="material-icons md-light">settings</i>
                                 <h4>Settings</h4>
                             </a>
@@ -80,96 +80,38 @@
                 </nav>
             </div>
         </div>
+    </div>
 
-    </div>
-    <div class="top-section">
-        <div class="top-section-flex-container">
-            <div class="real-time-data-box" style="background-color: #CAF0F8;">
-                <h3>Temperature</h3>
-                <h1><span id="temperature"></span></h1>
-            </div>
-            <div class="real-time-data-box" style="background-color: #CAF0F8;">
-                <h3>Humidity</h3>
-                <h1><span id="humidity"></span></h1>
-            </div>
-            <div class="real-time-data-box" style="background-color: #90E0EF;">
-                <h3>VOC Index</h3>
-                <h1><span id="voc-index"></span></h1>
-            </div>
-            <div class="real-time-data-box" style="background-color: #00B4D8;">
-                <h3>Rating</h3>
-                <h1><span id="recommendation"></span></h1>
-            </div>
-        </div>
-    </div>
     <div class="main-section-chart">
-        <div class="chart-box">
-            <canvas id="myChart"></canvas>
-        </div>
-        <div class="chart-box-2">
-            <div class="option-box">
+        <div class="chart-flexbox-container">
+            <div class="chart-box-chart-page">
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="chart-box-2-chart-page">
+                <div class="option-box">
                     <div class="dropdown">
                         <button id="dropbtn">Select Device</button>
                         <div class="dropdown-content" id="devices-dropdown">
                         </div>
                     </div>
                 </div>
-            <div class="option-box">
-                <button class="button-17" id="resetZoom">Reset zoom</button>
-            </div>
-            <div class="option-box">
-                <button class="button-17" id="pauseFetching">Pause/Resume Updates</button>
-            </div>
-            <div class="option-box">
-                <div class="checkbox-wrapper-14">
-                    <input class="switch" id="showAllData" type="checkbox">
-                    <label for="showAllData">Show All Data</label>
+                <div class="option-box">
+                    <button class="button-17" id="resetZoom">Reset zoom</button>
                 </div>
-            </div>
-            <div class="option-box">
-                <button class="button-17" id="exportChartAsPDF">Export as PDF</button>
-            </div>
-            <div class="option-box">
-                <button class="button-17" id="exportChartAsPNG">Export as PNG</button>
-            </div>
-        </div>
-    </div>
-    <div class="main-section-values">
-        <div class="main-values-flex-container">
-            <div class="values-box">
-                <h3>Averages</h3>
-                <div class="averages-list">
-                    <div class="record">
-                        <p><b>24h </b>avg</p><b><span id="avg-24h"></span></b>
-                    </div>
-                    <div class="record">
-                        <p><b>72h </b>avg</p><b><span id="avg-72h"></span></b>
-                    </div>
-                    <div class="record">
-                        <p><b>7d </b>avg</p><b><span id="avg-7d"></span></b>
+                <div class="option-box">
+                    <button class="button-17" id="pauseFetching">Pause/Resume Updates</button>
+                </div>
+                <div class="option-box">
+                    <div class="checkbox-wrapper-14">
+                        <input class="switch" id="showAllData" type="checkbox">
+                        <label for="showAllData">Show All Data</label>
                     </div>
                 </div>
-            </div>
-            <div class="values-box">
-                <h3>Min & Max Values</h3>
-                <div class="averages-list">
-                    <div class="record-maxmin">
-                        <p><b>24h </b></p>
-                        <b><span id="min-24h"></span> <span id="max-24h"></span></b>
-                    </div>
-                    <div class="record-maxmin">
-                        <p><b>72h </b></p>
-                        <b><span id="min-72h"></span> <span id="max-72h"></span></b>
-                    </div>
-                    <!--<div class="record">
-                        <p><b>7d </b></p><b><span id="minmax-7d"></span></b>
-                    </div>-->
+                <div class="option-box">
+                    <button class="button-17" id="exportChartAsPDF">Export as PDF</button>
                 </div>
-            </div>
-            <div class="values-box">
-                <h3>Info</h3>
-                <div class="advice-box">
-                    <span id="advice"></span>
+                <div class="option-box">
+                    <button class="button-17" id="exportChartAsPNG">Export as PNG</button>
                 </div>
             </div>
         </div>
@@ -184,6 +126,6 @@
         referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-<script src="/static/js/script.js" type="module"></script>
+<script src="/static/js/chart-page.js" type="module"></script>
 </body>
 </html>

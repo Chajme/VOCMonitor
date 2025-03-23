@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="max-age=31536000, immutable" http-equiv="content-type">
-    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devices</title>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="/static/css/style.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon">
-    <link as="image" href="/static/images/VOCMonitorLogo.png" rel="preload">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="preload" href="/static/images/VOCMonitorLogo.png" as="image">
 </head>
 <body>
 <div class="container-grid-basic">
@@ -41,25 +40,25 @@
                 <nav class="sidebar-nav">
                     <ul class="nav-list">
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('index') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.index') }}">
                                 <i class="material-icons md-light">home</i>
                                 <h4>Home</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('chart') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.chart') }}">
                                 <i class="material-icons md-light">analytics</i>
                                 <h4>Graph</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('compact') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.compact') }}">
                                 <i class="material-icons md-light">smartphone</i>
                                 <h4>Compact</h4>
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('devices') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.devices') }}">
                                 <i class="material-icons md-light">devices</i>
                                 <h4>Devices</h4>
                             </a>
@@ -71,7 +70,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="nav-list-link" href="{{ url_for('settings') }}">
+                            <a class="nav-list-link" href="{{ url_for('routes.settings') }}">
                                 <i class="material-icons md-light">settings</i>
                                 <h4>Settings</h4>
                             </a>
@@ -84,35 +83,35 @@
 
     <div class="main-section-chart">
         <div class="chart-flexbox-container">
-            <div class="chart-box-chart-page">
-                <canvas id="myChart"></canvas>
+            <div class="settings-container">
+                <h2>Add new device</h2>
+                <div class="settings-container-list">
+                    <form id="devices-form">
+                            <input class="input" type="text" pattern="[A-Za-z]+" name="device_name" id="device_name" required>
+                            <label>Device name</label>
+                            <br>
+                            <input class="input" type="text" pattern="[A-Za-z]+" name="topic" id="topic" required>
+                            <label>Topic</label>
+                            <br>
+                            <br>
+                            <br>
+                            <button class="button-17" id="cancelChanges">Cancel</button>
+                            <button class="button-17" id="addNewDevice">Add new device</button>
+                        </form>
+                </div>
             </div>
-            <div class="chart-box-2-chart-page">
-                <div class="option-box">
-                    <div class="dropdown">
-                        <button id="dropbtn">Select Device</button>
-                        <div class="dropdown-content" id="devices-dropdown">
-                        </div>
+
+            <div class="settings-container">
+                <h2>Devices</h2>
+                <div class="devices-container">
+                    <div class="clear-all-container">
+                        <i class="material-icons md-dark" id="clearAllDevices" style="cursor: pointer;">clear_all</i>
+                        <label style="color: black;">Clear All</label>
                     </div>
+                    <ul class="devices-list-c" id="devices-list">
+                    </ul>
                 </div>
-                <div class="option-box">
-                    <button class="button-17" id="resetZoom">Reset zoom</button>
-                </div>
-                <div class="option-box">
-                    <button class="button-17" id="pauseFetching">Pause/Resume Updates</button>
-                </div>
-                <div class="option-box">
-                    <div class="checkbox-wrapper-14">
-                        <input class="switch" id="showAllData" type="checkbox">
-                        <label for="showAllData">Show All Data</label>
-                    </div>
-                </div>
-                <div class="option-box">
-                    <button class="button-17" id="exportChartAsPDF">Export as PDF</button>
-                </div>
-                <div class="option-box">
-                    <button class="button-17" id="exportChartAsPNG">Export as PNG</button>
-                </div>
+
             </div>
         </div>
     </div>
@@ -126,6 +125,7 @@
         referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-<script src="/static/js/chart-page.js" type="module"></script>
+<script src="/static/js/devices-page.js" type="module"></script>
+
 </body>
 </html>

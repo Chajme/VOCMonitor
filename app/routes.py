@@ -1,29 +1,19 @@
 import datetime
 import time
-from socket import SocketIO
 
-from flask import Flask, jsonify, render_template, request
-from flask_mail import Mail, Message
-from flask_socketio import SocketIO, emit  # noqa: F811
-
-from database.db_manager import DatabaseManager
-from server.config import Config
+from flask import Blueprint, render_template, jsonify, request, current_app
+from flask_mail import Message
 
 
-class WebServer:
-    def __init__(self, mqtt_manager):
-        self.app = Flask(__name__)
-        self.socketio = SocketIO(self.app)
+class Routes:
+    def __init__(self, db, mqtt, socketio, mail):
+        self.db = db
+        self.mqtt = mqtt
+        self.socketio = socketio
+        self.mail = mail
 
-        # Setting an app config for mail notifications
-        self.set_app_config()
-        self.mail = Mail(self.app)
+        self.routes = Blueprint("routes", __name__)
 
-        # Defining managers
-        self.db = DatabaseManager()
-        self.mqtt = mqtt_manager
-
-        # Notification sent and cooldown tracking
         self.last_notification = 0
         self.notification_sent = False
         self.last_email_notification = 0
@@ -35,35 +25,36 @@ class WebServer:
 
         self.socket_connection_established = False
 
-        self.db.new_device("esp", "data")
-        self.db.new_device("device", "new/topic")
-
-        self.selected_topic = "data"
         self.selected_device = "esp"
 
-        @self.app.route("/")
+        self.create_routes()
+
+    def create_routes(self):
+        selected_device = None
+
+        @self.routes.route("/")
         def index():
             return render_template("index.html")
 
-        @self.app.route("/compact")
+        @self.routes.route("/compact")
         def compact():
             return render_template("compact.html")
 
-        @self.app.route("/chart")
+        @self.routes.route("/chart")
         def chart():
             return render_template("chart.html")
 
-        @self.app.route("/devices")
+        @self.routes.route("/devices")
         def devices():
             return render_template("devices.html")
 
-        @self.app.route("/settings")
+        @self.routes.route("/settings")
         def settings():
             return render_template("settings.html")
 
-        @self.app.route("/all-data")
+        @self.routes.route("/all-data")
         def all_data():
-            all_data_row = self.db.get_all_rows(self.selected_device)
+            all_data_row = self.db.get_all_rows(selected_device)
 
             all_data_list = {
                 "timestamp": [row[0] for row in all_data_row],
@@ -75,10 +66,10 @@ class WebServer:
             data_json = jsonify(all_data_list)
             return data_json
 
-        @self.app.route("/data")
+        @self.routes.route("/data")
         def new_data():
             try:
-                new_data_row = self.db.get_last_row(self.selected_device)
+                new_data_row = self.db.get_last_row(self.db.get_selected_device())
                 print("/data new_data_row: ", new_data_row)
 
                 if not new_data_row:
@@ -141,12 +132,12 @@ class WebServer:
             except Exception as e:
                 return jsonify({"message": f"Error fetching new data: {str(e)}"}), 500
 
-        @self.app.route("/avg")
+        @self.routes.route("/avg")
         def get_averages():
             try:
-                avg_24h = self.db.get_avg("-24 hours", self.selected_device)
-                avg_72h = self.db.get_avg("-72 hours", self.selected_device)
-                avg_7d = self.db.get_avg("-7 days", self.selected_device)
+                avg_24h = self.db.get_avg("-24 hours", self.db.get_selected_device())
+                avg_72h = self.db.get_avg("-72 hours", self.db.get_selected_device())
+                avg_7d = self.db.get_avg("-7 days", self.db.get_selected_device())
 
                 averages = {"avg_24h": avg_24h, "avg_72h": avg_72h, "avg_7d": avg_7d}
             except Exception as e:
@@ -154,14 +145,14 @@ class WebServer:
 
             return jsonify(averages), 200
 
-        @self.app.route("/minmax")
+        @self.routes.route("/minmax")
         def get_min_max_voc():
             try:
                 min_24h, max_24h = self.db.get_min_max(
-                    "-24 hours", self.selected_device
+                    "-24 hours", self.db.get_selected_device()
                 )
                 min_72h, max_72h = self.db.get_min_max(
-                    "-72 hours", self.selected_device
+                    "-72 hours", self.db.get_selected_device()
                 )
 
                 min_max_voc_list = {
@@ -179,7 +170,7 @@ class WebServer:
 
             return jsonify(min_max_voc_list), 200
 
-        @self.app.route("/update_settings", methods=["POST"])
+        @self.routes.route("/update_settings", methods=["POST"])
         def update_settings():
             try:
                 # Advice settings
@@ -265,11 +256,11 @@ class WebServer:
             except Exception as e:
                 return {"message": f"Error updating settings: {str(e)}"}, 500
 
-        @self.app.route("/get_settings")
+        @self.routes.route("/get_settings")
         def get_settings():
             return self.db.get_user_settings()
 
-        @self.app.route("/default_settings", methods=["POST"])
+        @self.routes.route("/default_settings", methods=["POST"])
         def set_default_settings():
             try:
                 self.db.set_default_settings()
@@ -277,7 +268,7 @@ class WebServer:
             except Exception as e:
                 return {"message": f"Error resetting settings: {str(e)}"}, 500
 
-        @self.app.route("/notification_history")
+        @self.routes.route("/notification_history")
         def get_notifications():
             all_notifications = self.db.get_notification_history()
 
@@ -295,7 +286,7 @@ class WebServer:
 
             return jsonify(all_notifications_json)
 
-        @self.app.route("/notification_clear", methods=["POST"])
+        @self.routes.route("/notification_clear", methods=["POST"])
         def clear_notifications():
             try:
                 self.db.clear_table("notifications")
@@ -306,7 +297,7 @@ class WebServer:
                     500,
                 )
 
-        @self.app.route("/delete_notification", methods=["POST"])
+        @self.routes.route("/delete_notification", methods=["POST"])
         def delete_notification():
             notification_id = request.json.get("id")
             print("Notification id: ", notification_id)
@@ -319,7 +310,7 @@ class WebServer:
                     500,
                 )
 
-        @self.app.route("/devices_list")
+        @self.routes.route("/devices_list")
         def get_devices():
             all_devices = self.db.get_all_devices()
 
@@ -330,7 +321,7 @@ class WebServer:
 
             return jsonify(all_devices_json)
 
-        @self.app.route("/new_device", methods=["POST"])
+        @self.routes.route("/new_device", methods=["POST"])
         def new_device():
             try:
                 device_name = request.form.get("device_name")
@@ -342,7 +333,7 @@ class WebServer:
             except Exception as e:
                 return {"message": f"Error adding device: {str(e)}"}, 500
 
-        @self.app.route("/devices_clear", methods=["POST"])
+        @self.routes.route("/devices_clear", methods=["POST"])
         def clear_devices():
             try:
                 self.db.clear_table("devices")
@@ -353,7 +344,7 @@ class WebServer:
                     500,
                 )
 
-        @self.app.route("/delete_device", methods=["POST"])
+        @self.routes.route("/delete_device", methods=["POST"])
         def delete_device():
             device_id = request.json.get("id")
             device_name = request.json.get("device_name")
@@ -367,26 +358,26 @@ class WebServer:
                     500,
                 )
 
-        @self.app.route("/select_device", methods=["POST"])
+        @self.routes.route("/select_device", methods=["POST"])
         def select_device():
             device_id = request.json.get("id")
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
-            self.mqtt.unsubscribe()
-            self.mqtt.subscribe(topic, device_name)
-            self.selected_topic = topic
-            self.selected_device = device_name
+            self.db.set_selected_device(device_name)
             return jsonify({"message": "New device selected!"}), 200
 
+        return self.routes
+
+    def register_socekt_events(self):
         @self.socketio.on("connect")
         def test_connect():
             if self.socket_connection_established is not True:
                 print("Client connected!")
-                emit("alert", {"message": "Welcome! Server is connected."})
+                self.socketio.emit(
+                    "alert", {"message": "Welcome! Server is connected."}
+                )
                 self.socket_connection_established = True
-
-        self.app.run()
 
     def check_sensor_data(
         self,
@@ -478,12 +469,9 @@ class WebServer:
         else:
             self.humi_notification_sent = False
 
-    def set_app_config(self):
-        self.app.config.from_object(Config)
-
     def send_email(self, receiver, subject, body):
         try:
-            with self.app.app_context():
+            with current_app.app_context():
                 message = Message(subject, recipients=[receiver], body=body)
                 self.mail.send(message)
                 print("Email sent!")
