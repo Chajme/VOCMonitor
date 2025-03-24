@@ -130,13 +130,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 updateChart(timestamps, sensorData, temperatureData, humidityData);
 
-                fetchInterval = setInterval(() => {
-                    console.log('Calling fetchSensorData...');
-                    fetchSensorData(
-                        updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
-                        userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
-                    );
-                }, userSettingsJson.fetch_sensor);
+                if (!paused) {
+                    fetchInterval = setInterval(() => {
+                        console.log('Calling fetchSensorData...');
+                        fetchSensorData(
+                            updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                            userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
+                        );
+                    }, userSettingsJson.fetch_sensor);
+                }
             }
         });
 

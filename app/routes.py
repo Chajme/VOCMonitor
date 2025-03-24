@@ -326,6 +326,7 @@ class Routes:
                 topic = request.form.get("topic")
 
                 self.db.new_device(device_name, topic)
+                self.mqtt.subscribe(topic, device_name)
 
                 return jsonify({"message": "New device added!"}), 200
             except Exception as e:
@@ -346,9 +347,11 @@ class Routes:
         def delete_device():
             device_id = request.json.get("id")
             device_name = request.json.get("device_name")
+            topic = request.json.get("topic")
             print("Device id: ", device_id)
             try:
                 self.db.delete_device(device_id, device_name)
+                self.mqtt.unsubscribe(topic)
                 return jsonify({"message": "Device successfully deleted!"}), 200
             except Exception as e:
                 return (

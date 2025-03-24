@@ -30,7 +30,7 @@ async function fetchDevices() {
 
             // Check if ID exists before binding event
             if (device.id) {
-                deleteDeviceBtn.addEventListener('click', () => deleteDevice(device.id, device.device_name));
+                deleteDeviceBtn.addEventListener('click', () => deleteDevice(device.id, device.device_name, device.topic));
             } else {
                 console.error("Device missing ID:", device);
             }
@@ -78,11 +78,11 @@ async function fetchDevicesDropdown(callback) {
 }
 
 // Ability to remove devices one by one
-async function deleteDevice(id, device_name) {
+async function deleteDevice(id, device_name, topic) {
     let response = await fetch('/delete_device', {
         method: 'POST',
         headers: {'content-type': 'application/json'},
-        body: JSON.stringify({id: id, device_name: device_name})
+        body: JSON.stringify({id: id, device_name: device_name, topic: topic})
     });
 
     console.log("Device id: ", id);

@@ -357,9 +357,11 @@ class WebServer:
         def delete_device():
             device_id = request.json.get("id")
             device_name = request.json.get("device_name")
+            topic = request.json.get("topic")
             print("Device id: ", device_id)
             try:
                 self.db.delete_device(device_id, device_name)
+                self.mqtt.unsubscribe(topic)
                 return jsonify({"message": "Device successfully deleted!"}), 200
             except Exception as e:
                 return (
@@ -373,7 +375,6 @@ class WebServer:
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
-            self.mqtt.unsubscribe()
             self.mqtt.subscribe(topic, device_name)
             self.selected_topic = topic
             self.selected_device = device_name

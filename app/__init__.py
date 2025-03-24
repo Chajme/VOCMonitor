@@ -17,7 +17,6 @@ def create_app(mqtt):
     socketio = SocketIO(app)
 
     db = DatabaseManager()
-
     db.initialize_db()
 
     db.new_device("esp", "data")

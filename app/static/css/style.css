@@ -799,6 +799,22 @@ body {
 }
 
 /*--Media layouts-------------------------------------------------------------------------------*/
+@media (max-width: 1745px) {
+    .chart-box-2 {
+        height: auto;
+        min-height: 150px;
+    }
+
+    .chart-box-2-chart-page {
+        height: auto;
+        min-height: 150px;
+    }
+
+    .chart-box-chart-page {
+        height: auto;
+    }
+}
+
 @media (max-width: 1024px) {
 
     html, body {
@@ -839,6 +855,7 @@ body {
     .main-values-flex-container {
         flex-direction: column;
         justify-content: center;
+        align-items: center;
     }
 
     .main-values-flex-container {
@@ -910,28 +927,12 @@ body {
 
     .chart-box-2 {
         height: auto;
-        min-height: 185px;
+        min-height: 200px;
     }
 
     .chart-box-2-chart-page {
         height: auto;
         min-height: 185px;
-    }
-}
-
-@media (max-width: 1745px) {
-    .chart-box-2 {
-        height: auto;
-        min-height: 150px;
-    }
-
-    .chart-box-2-chart-page {
-        height: auto;
-        min-height: 150px;
-    }
-
-    .chart-box-chart-page {
-        height: auto;
     }
 }
 

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Button listeners for handling changes in settings
     document.getElementById("addNewDevice").addEventListener("click", function (event) {
         event.preventDefault(); // Prevent form from submitting and refreshing
-        const deviceName = document.getElementById("device-name").value;
+        const deviceName = document.getElementById("device_name").value;
         const topic = document.getElementById("topic").value;
 
         addNewDevice();
