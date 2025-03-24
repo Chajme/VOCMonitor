@@ -30,8 +30,6 @@ class Routes:
         self.create_routes()
 
     def create_routes(self):
-        selected_device = None
-
         @self.routes.route("/")
         def index():
             return render_template("index.html")
@@ -54,7 +52,7 @@ class Routes:
 
         @self.routes.route("/all-data")
         def all_data():
-            all_data_row = self.db.get_all_rows(selected_device)
+            all_data_row = self.db.get_all_rows(self.selected_device)
 
             all_data_list = {
                 "timestamp": [row[0] for row in all_data_row],
@@ -69,7 +67,7 @@ class Routes:
         @self.routes.route("/data")
         def new_data():
             try:
-                new_data_row = self.db.get_last_row(self.db.get_selected_device())
+                new_data_row = self.db.get_last_row(self.selected_device)
                 print("/data new_data_row: ", new_data_row)
 
                 if not new_data_row:
@@ -135,9 +133,9 @@ class Routes:
         @self.routes.route("/avg")
         def get_averages():
             try:
-                avg_24h = self.db.get_avg("-24 hours", self.db.get_selected_device())
-                avg_72h = self.db.get_avg("-72 hours", self.db.get_selected_device())
-                avg_7d = self.db.get_avg("-7 days", self.db.get_selected_device())
+                avg_24h = self.db.get_avg("-24 hours", self.selected_device)
+                avg_72h = self.db.get_avg("-72 hours", self.selected_device)
+                avg_7d = self.db.get_avg("-7 days", self.selected_device)
 
                 averages = {"avg_24h": avg_24h, "avg_72h": avg_72h, "avg_7d": avg_7d}
             except Exception as e:
@@ -149,10 +147,10 @@ class Routes:
         def get_min_max_voc():
             try:
                 min_24h, max_24h = self.db.get_min_max(
-                    "-24 hours", self.db.get_selected_device()
+                    "-24 hours", self.selected_device
                 )
                 min_72h, max_72h = self.db.get_min_max(
-                    "-72 hours", self.db.get_selected_device()
+                    "-72 hours", self.selected_device
                 )
 
                 min_max_voc_list = {
@@ -364,12 +362,12 @@ class Routes:
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
-            self.db.set_selected_device(device_name)
+            self.selected_device = device_name
             return jsonify({"message": "New device selected!"}), 200
 
         return self.routes
 
-    def register_socekt_events(self):
+    def register_socket_events(self):
         @self.socketio.on("connect")
         def test_connect():
             if self.socket_connection_established is not True:

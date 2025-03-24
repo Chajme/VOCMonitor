@@ -27,7 +27,7 @@ def create_app(mqtt):
 
     routes = Routes(db, mqtt, socketio, mail)
     app.register_blueprint(routes.routes)
-    routes.register_socekt_events()
+    routes.register_socket_events()
 
     return app
 
