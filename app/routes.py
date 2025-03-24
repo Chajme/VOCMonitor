@@ -401,17 +401,24 @@ class Routes:
         humidity,
         temperature,
     ):
+        print(
+            f"Temp notifications: {temp_notifications_enabled}, "
+            f"Humi notifications: {humi_notifications_enabled}, "
+            f"Temperature: {temperature} Humidity: {humidity}, "
+            f"Humi cooldown: {humi_cooldown}"
+        )
+
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if voc > set_threshold and notifications_on == 1:
+        if voc > set_threshold and notifications_on:
             if (
                 not self.notification_sent
                 or (current_time - self.last_notification) > cooldown
             ):
                 self.socketio.emit("alert", {"message": notification_message})
 
-                if esp_alarm_enabled == 1:
+                if esp_alarm_enabled:
                     self.mqtt.threshold_exceeded_notification("on")
 
                 self.db.new_notification(timestamp, notification_message, voc)
@@ -422,13 +429,13 @@ class Routes:
                 """self.send_email_voc_threshold_exceeded(timestamp, voc, message)"""
             if (
                 current_time - self.last_notification
-            ) > alarm_time and esp_alarm_enabled == 1:
+            ) > alarm_time and esp_alarm_enabled:
                 self.mqtt.threshold_exceeded_notification("off")
                 print("Setting threshold exceeded to off")
         else:
             self.notification_sent = False
 
-        if voc > email_notification_threshold and email_notifications_on == 1:
+        if voc > email_notification_threshold and email_notifications_on:
             if (
                 not self.email_notification_sent
                 or (current_time - self.last_email_notification) > email_cooldown
@@ -446,7 +453,7 @@ class Routes:
         else:
             self.email_notification_sent = False
 
-        if temperature > temp_threshold and temp_notifications_enabled == 1:
+        if temperature > temp_threshold and temp_notifications_enabled:
             if (
                 not self.temp_notification_sent
                 or (current_time - self.last_temp_notification) > temp_cooldown
@@ -459,7 +466,7 @@ class Routes:
         else:
             self.temp_notification_sent = False
 
-        if humidity > humi_threshold and humi_notifications_enabled == 1:
+        if humidity > humi_threshold and humi_notifications_enabled:
             if (
                 not self.humi_notification_sent
                 or (current_time - self.last_humi_notification) > humi_cooldown

@@ -11,8 +11,6 @@ class MQTTManager:
         self.server = "192.168.0.103"
         self.port = 1883
         self.selected_device = "esp"
-        """self.topic = "data"
-        self.table_name = "esp"""
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5
         )
@@ -129,12 +127,6 @@ class MQTTManager:
             del self.topics[topic]
             del self.voc_index[table_name]
             print(f"Unsubscribed from topic: {topic}, Removed table: {table_name}")
-
-    def set_topic(self, topic):
-        self.topic = topic
-
-    def set_table_name(self, table_name):
-        self.table_name = table_name
 
     def load_topics_from_db(self):
         rows = self.db_manager.get_device_topics()

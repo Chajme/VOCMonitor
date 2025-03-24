@@ -98,11 +98,11 @@ async function fetchUserSettings() {
             document.getElementById('alarm-time').value = alarmTime;
 
 
-            document.getElementById('temp-notifications-enabled').value = tempNotificationsEnabled;
+            document.getElementById('temp-notifications-enabled').checked = tempNotificationsEnabled;
             document.getElementById('temp-threshold').value = tempThreshold;
             document.getElementById('temp-cooldown').value = tempCooldown;
 
-            document.getElementById('humi-notifications-enabled').value = humiNotificationsEnabled;
+            document.getElementById('humi-notifications-enabled').checked = humiNotificationsEnabled;
             document.getElementById('humi-threshold').value = humiThreshold;
             document.getElementById('humi-cooldown').value = humiCooldown;
 
