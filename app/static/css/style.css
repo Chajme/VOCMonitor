@@ -1011,9 +1011,9 @@ body {
     border: 1px solid var(--bc, var(--border));
     background: var(--b, var(--background));
     transition: 0.3s, border-color 0.3s, box-shadow 0.2s;
-    /* appearance: none;
+    appearance: none;
     -webkit-appearance: none;
-    -moz-appearance: none; */
+    -moz-appearance: none;
 }
 .checkbox-wrapper-14 input[type=checkbox]:after {
     content: "";

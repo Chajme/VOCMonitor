@@ -1,15 +1,23 @@
+"""Module handles database querries and connection."""
+
 import re
 import sqlite3
 
 
 class DatabaseManager:
+    """Class represents a database manager."""
+
     def __init__(self):
+        """Defined the db_name and attributes like connection and cursor."""
+
         self.db_name = "E:\Bakalarka\WebServer\pythonProject\database\database.db"
 
         self.con = None
         self.cur = None
 
     def initialize_db(self):
+        """Initialize the db connection, cursor, create tables and set default user settings."""
+
         self.con = sqlite3.connect(self.db_name)
         self.cur = self.con.cursor()
 
@@ -32,9 +40,13 @@ class DatabaseManager:
         self.con.close()
 
     def _connect(self):
+        """Connects to the db and returns the connection."""
+
         return sqlite3.connect(self.db_name)
 
     def insert(self, table_name, timestamp, temperature, humidity, voc):
+        """Insert data into the specified data table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -44,12 +56,16 @@ class DatabaseManager:
             self.con.commit()
 
     def clear_table(self, table_name):
+        """Clear the specified table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(f"DELETE FROM {table_name}")
             self.con.commit()
 
     def create_table_data(self, table_name):
+        """Create a table with the specified table_name."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -58,6 +74,8 @@ class DatabaseManager:
             self.con.commit()
 
     def create_table_devices(self):
+        """Create table devices."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -68,6 +86,8 @@ class DatabaseManager:
             self.con.commit()
 
     def new_device(self, device_name, topic):
+        """Add a new device to the devices table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
 
@@ -83,6 +103,8 @@ class DatabaseManager:
             self.con.commit()
 
     def delete_device(self, device_id, device_name):
+        """Remove a device from the devices table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
 
@@ -101,6 +123,8 @@ class DatabaseManager:
             self.con.commit()
 
     def get_all_devices(self):
+        """Return all the devices in the devices table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute("SELECT id, device_name, topic FROM devices")
@@ -109,6 +133,8 @@ class DatabaseManager:
             return all_rows
 
     def get_device_topics(self):
+        """Get all the device topics in the devices table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute("SELECT topic, device_name FROM devices")
@@ -116,6 +142,8 @@ class DatabaseManager:
             return all_rows
 
     def create_table_notification_history(self):
+        """Create a table to story all the notifications."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -124,6 +152,8 @@ class DatabaseManager:
             self.con.commit()
 
     def new_notification(self, timestamp, message, voc):
+        """Add a new notification to the notifications table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -133,6 +163,8 @@ class DatabaseManager:
             self.con.commit()
 
     def delete_notification(self, notification_id):
+        """Remove a notification from the notifications table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -141,6 +173,8 @@ class DatabaseManager:
             self.con.commit()
 
     def get_notification_history(self):
+        """Get all the notifications in the notifications table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -151,6 +185,8 @@ class DatabaseManager:
             return all_rows
 
     def create_user_settings_table(self):
+        """Create a table to store user settings."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -212,6 +248,8 @@ class DatabaseManager:
         humi_threshold,
         humi_cooldown,
     ):
+        """Set user settings in the user settings table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -303,6 +341,8 @@ class DatabaseManager:
             self.con.commit()
 
     def get_user_settings(self):
+        """Get all the user settings from the user settings table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             query = """
@@ -373,6 +413,8 @@ class DatabaseManager:
                 }
 
     def get_user_settings_notifications(self):
+        """Get user settings, specifically the setting about the notifications."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             query = (
@@ -431,6 +473,8 @@ class DatabaseManager:
             )
 
     def get_user_email_address(self):
+        """Getting the user set email address."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute("SELECT email_address from user_settings where id=1")
@@ -438,6 +482,8 @@ class DatabaseManager:
             return email_address
 
     def set_default_settings(self):
+        """Setting the default user settings."""
+
         self.set_user_settings(
             "No action needed.",
             "Current VOC levels are good, no action is necessary.",
@@ -467,18 +513,24 @@ class DatabaseManager:
         )
 
     def print_table(self, table_name):
+        """Printing a table with the specified table name."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(f"SELECT * FROM {table_name}")
             print(self.cur.fetchall())
 
     def drop_table(self, table_name):
+        """Dropping a table with the specified table name."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(f"DROP TABLE IF EXISTS {table_name}")
             self.con.commit()
 
     def get_last_row(self, table_name):
+        """Returning the last row from the specified table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(f"SELECT COUNT(*) FROM {table_name}")
@@ -497,6 +549,8 @@ class DatabaseManager:
             return None
 
     def get_all_rows(self, table_name):
+        """Returning all the rows from the specified table."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
             self.cur.execute(
@@ -507,6 +561,8 @@ class DatabaseManager:
             return all_rows
 
     def get_avg(self, time_period, table_name):
+        """Return the average for the data from the specified table withing the specified time range."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
 
@@ -518,6 +574,8 @@ class DatabaseManager:
             return avg_voc
 
     def get_min_max(self, time_period, table_name):
+        """Get the minimum and maximum from the specified table within the specified timerange."""
+
         with self._connect() as self.con:
             self.cur = self.con.cursor()
 
@@ -531,5 +589,7 @@ class DatabaseManager:
 
     @staticmethod
     def is_valid_device_name(device_name):
+        """Check if the specified device name is valid and return true or false."""
+
         pattern = r"^[a-z_][a-z0-9_]*$"
         return bool(re.match(pattern, device_name))

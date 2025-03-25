@@ -1,3 +1,5 @@
+"""Modules stores routes used for webserver navigation and handling of requests."""
+
 import datetime
 import time
 
@@ -6,7 +8,16 @@ from flask_mail import Message
 
 
 class Routes:
+    """Represents routes used by the server for navigation handling requests and handling notifications."""
+
     def __init__(self, db, mqtt, socketio, mail):
+        """
+        Constructor of the routes class.
+
+        Takes db, mqtt, socketio and mail as parameters,
+        defines routes as a blueprint and keeps track of notifications.
+        """
+
         self.db = db
         self.mqtt = mqtt
         self.socketio = socketio
@@ -30,6 +41,8 @@ class Routes:
         self.create_routes()
 
     def create_routes(self):
+        """Function to create all defined routes, returns the defined routes."""
+
         @self.routes.route("/")
         def index():
             return render_template("index.html")
@@ -68,12 +81,10 @@ class Routes:
         def new_data():
             try:
                 new_data_row = self.db.get_last_row(self.selected_device)
-                print("/data new_data_row: ", new_data_row)
 
+                # If there's no data in the db yet, throw a response with the code 404
                 if not new_data_row:
                     return jsonify({"message": "No data available"}), 404
-
-                print(new_data_row)
 
                 new_data_list = {
                     "timestamp": new_data_row[0],
@@ -82,6 +93,7 @@ class Routes:
                     "voc_index": new_data_row[3],
                 }
 
+                # Getting the user set notification settings
                 (
                     notifications_on,
                     notifications_threshold,
@@ -100,9 +112,10 @@ class Routes:
                     humi_cooldown,
                 ) = self.db.get_user_settings_notifications()
 
+                # If notifications are on, pass the data from the db to check_sensor_data function
                 if (
-                    notifications_on == 1
-                    or email_notifications_on == 1
+                    notifications_on
+                    or email_notifications_on
                     and self.db.get_last_row(self.selected_device) is not None
                 ):
                     self.check_sensor_data(
@@ -222,6 +235,7 @@ class Routes:
                 humi_threshold = request.form.get("humi_threshold")
                 humi_cooldown = request.form.get("humi_cooldown")
 
+                # Setting the received new settings
                 self.db.set_user_settings(
                     advice_1,
                     advice_2,
@@ -261,6 +275,7 @@ class Routes:
         @self.routes.route("/default_settings", methods=["POST"])
         def set_default_settings():
             try:
+                # Setting the default settings
                 self.db.set_default_settings()
                 return ({"message": "Settings reset successfully!"}), 200
             except Exception as e:
@@ -270,13 +285,7 @@ class Routes:
         def get_notifications():
             all_notifications = self.db.get_notification_history()
 
-            """all_notifications_json = {
-                "id": [row[0] for row in all_notifications],   
-                "timestamp": [row[1] for row in all_notifications],
-                "message": [row[2] for row in all_notifications],
-                "voc": [row[3] for row in all_notifications],
-            }"""
-
+            # Converting notifications from the db into a json format
             all_notifications_json = [
                 {"id": row[0], "timestamp": row[1], "message": row[2], "voc": row[3]}
                 for row in all_notifications
@@ -287,6 +296,7 @@ class Routes:
         @self.routes.route("/notification_clear", methods=["POST"])
         def clear_notifications():
             try:
+                # Clearing table with the notifications
                 self.db.clear_table("notifications")
                 return jsonify({"message": "Notifications successfully cleared!"}), 200
             except Exception as e:
@@ -312,6 +322,7 @@ class Routes:
         def get_devices():
             all_devices = self.db.get_all_devices()
 
+            # Converting received list of devices from the db into a json format
             all_devices_json = [
                 {"id": row[0], "device_name": row[1], "topic": row[2]}
                 for row in all_devices
@@ -325,6 +336,7 @@ class Routes:
                 device_name = request.form.get("device_name")
                 topic = request.form.get("topic")
 
+                # Adding a new device and subscribing to the new topic in mqtt_manager
                 self.db.new_device(device_name, topic)
                 self.mqtt.subscribe(topic, device_name)
 
@@ -335,7 +347,9 @@ class Routes:
         @self.routes.route("/devices_clear", methods=["POST"])
         def clear_devices():
             try:
+                # Clearing the table with all the devices and clearing topics in mqtt_manager
                 self.db.clear_table("devices")
+                self.mqtt.clear_topics()
                 return jsonify({"message": "Notifications successfully cleared!"}), 200
             except Exception as e:
                 return (
@@ -350,7 +364,9 @@ class Routes:
             topic = request.json.get("topic")
             print("Device id: ", device_id)
             try:
+                # Deleting a device based on it's name and id
                 self.db.delete_device(device_id, device_name)
+                # Unsubscribing from the topic of the deleted device
                 self.mqtt.unsubscribe(topic)
                 return jsonify({"message": "Device successfully deleted!"}), 200
             except Exception as e:
@@ -365,6 +381,7 @@ class Routes:
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
+            # Setting the selected device to the device user has clicked on
             self.selected_device = device_name
             return jsonify({"message": "New device selected!"}), 200
 
@@ -373,6 +390,7 @@ class Routes:
     def register_socket_events(self):
         @self.socketio.on("connect")
         def test_connect():
+            # If a socket connection isn't established yet, we establish it and notify the user
             if self.socket_connection_established is not True:
                 print("Client connected!")
                 self.socketio.emit(
@@ -401,49 +419,56 @@ class Routes:
         humidity,
         temperature,
     ):
-        print(
-            f"Temp notifications: {temp_notifications_enabled}, "
-            f"Humi notifications: {humi_notifications_enabled}, "
-            f"Temperature: {temperature} Humidity: {humidity}, "
-            f"Humi cooldown: {humi_cooldown}"
-        )
+        """
+        Checking passed parameter and handling the notifications
+
+        Getting the current time, defining a timestamp, checking the parameters one by one and handling
+        the notification logic.
+        """
 
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        # If the voc is higher than user set threshold and the notifications are turned on
         if voc > set_threshold and notifications_on:
             if (
                 not self.notification_sent
                 or (current_time - self.last_notification) > cooldown
             ):
+                # Sending a socket message with the user set notification message
                 self.socketio.emit("alert", {"message": notification_message})
 
+                # If an esp alarm is enabled we send a message using mqtt turning the alarm on
                 if esp_alarm_enabled:
                     self.mqtt.threshold_exceeded_notification("on")
 
+                # Adding the notification to our table of notification in the db
                 self.db.new_notification(timestamp, notification_message, voc)
 
+                # Setting the notification sent to True and last_notification to the current_time
                 self.notification_sent = True
                 self.last_notification = current_time
 
-                """self.send_email_voc_threshold_exceeded(timestamp, voc, message)"""
+            # If the user set alarm notification time passed, turn off the alarm
             if (
                 current_time - self.last_notification
             ) > alarm_time and esp_alarm_enabled:
                 self.mqtt.threshold_exceeded_notification("off")
-                print("Setting threshold exceeded to off")
         else:
             self.notification_sent = False
 
+        # If voc exceeded the threshold for an email notification and email notifications are on
         if voc > email_notification_threshold and email_notifications_on:
             if (
                 not self.email_notification_sent
                 or (current_time - self.last_email_notification) > email_cooldown
             ):
+                # Sending an email with the message
                 self.send_email_voc_threshold_exceeded(
                     timestamp, voc, notification_message
                 )
 
+                # Adding the notification to the db with the email-- prefix
                 self.db.new_notification(
                     "email--" + timestamp, notification_message, voc
                 )
@@ -453,31 +478,39 @@ class Routes:
         else:
             self.email_notification_sent = False
 
+        # If temperature has exceeded the user set limit and the temperature notification are on
         if temperature > temp_threshold and temp_notifications_enabled:
             if (
                 not self.temp_notification_sent
                 or (current_time - self.last_temp_notification) > temp_cooldown
             ):
+                # Sending a socket message with the specified message
                 self.socketio.emit(
                     "alert", {"message": "Temperature exceeded set value."}
                 )
+
                 self.temp_notification_sent = True
                 self.last_temp_notification = current_time
         else:
             self.temp_notification_sent = False
 
+        # If humidity has exceeded the user set limit and humidity notifications are on
         if humidity > humi_threshold and humi_notifications_enabled:
             if (
                 not self.humi_notification_sent
                 or (current_time - self.last_humi_notification) > humi_cooldown
             ):
+                # Sending a socket message with the specified message
                 self.socketio.emit("alert", {"message": "Humidity exceeded set value."})
+
                 self.humi_notification_sent = True
                 self.last_humi_notification = current_time
         else:
             self.humi_notification_sent = False
 
     def send_email(self, receiver, subject, body):
+        """Sends an email with the specified parameters."""
+
         try:
             with current_app.app_context():
                 message = Message(subject, recipients=[receiver], body=body)
@@ -487,6 +520,8 @@ class Routes:
             print(f"Failed to send email: {e}")
 
     def send_email_voc_threshold_exceeded(self, timestamp, voc_level, message):
+        """Sends a specific email about exceeded voc threshold to a user set email address."""
+
         receiver_address = self.db.get_user_email_address()
         subject = "VOC Warning"
         body = f"{timestamp} \n Current VOC level: {voc_level}, set threshold exceeded. \n {message}"
