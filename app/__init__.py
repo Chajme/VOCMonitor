@@ -9,33 +9,36 @@ from database.db_manager import DatabaseManager
 from mqtt_manager import MQTTManager
 
 
-def create_app(mqtt):
+def create_app(mqtt, db_manager):
     app = Flask(__name__)
     app.config.from_object(Config)
 
     mail = Mail(app)
-    socketio = SocketIO(app)
+    """socketio = SocketIO(app)"""
 
-    db = DatabaseManager()
-    db.initialize_db()
+    socketio = SocketIO(app, async_mode="gevent")
 
-    db.new_device("esp", "data")
-    db.new_device("device", "new/topic")
+    db_manager = db_manager
+    db_manager.initialize_db()
+
+    db_manager.new_device("esp", "data")
+    db_manager.new_device("device", "new/topic")
 
     from app.routes import Routes
 
-    routes = Routes(db, mqtt, socketio, mail)
+    routes = Routes(db_manager, mqtt, socketio, mail)
     app.register_blueprint(routes.routes)
     routes.register_socket_events()
 
-    return app
+    return app, socketio
 
 
 if __name__ == "__main__":
-    mqtt_manager = MQTTManager()
+    db = DatabaseManager()
+    mqtt_manager = MQTTManager(db)
     mqtt_thread = threading.Thread(target=mqtt_manager.run_mqtt)
     mqtt_thread.daemon = True
     mqtt_thread.start()
 
-    app = create_app(mqtt_manager)
-    app.run()
+    flask_app, socketio_t = create_app(mqtt_manager, db)
+    flask_app.run()
