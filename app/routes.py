@@ -65,6 +65,8 @@ class Routes:
 
         @self.routes.route("/all-data")
         def all_data():
+            """Sends all data from the db for the selected device."""
+
             all_data_row = self.db.get_all_rows(self.selected_device)
 
             all_data_list = {
@@ -79,6 +81,8 @@ class Routes:
 
         @self.routes.route("/data")
         def new_data():
+            """Sends new data from the db and checks for notifications."""
+
             try:
                 new_data_row = self.db.get_last_row(self.selected_device)
 
@@ -116,6 +120,8 @@ class Routes:
                 if (
                     notifications_on
                     or email_notifications_on
+                    or temp_notifications_enabled
+                    or humi_notifications_enabled
                     and self.db.get_last_row(self.selected_device) is not None
                 ):
                     self.check_sensor_data(
@@ -145,6 +151,8 @@ class Routes:
 
         @self.routes.route("/avg")
         def get_averages():
+            """Sends averages from the db for the specified device and time."""
+
             try:
                 avg_24h = self.db.get_avg("-24 hours", self.selected_device)
                 avg_72h = self.db.get_avg("-72 hours", self.selected_device)
@@ -158,6 +166,8 @@ class Routes:
 
         @self.routes.route("/minmax")
         def get_min_max_voc():
+            """Sends min and max value from the db for the specified device and time."""
+
             try:
                 min_24h, max_24h = self.db.get_min_max(
                     "-24 hours", self.selected_device
@@ -183,6 +193,8 @@ class Routes:
 
         @self.routes.route("/update_settings", methods=["POST"])
         def update_settings():
+            """Updates user settings in the db."""
+
             try:
                 # Advice settings
                 advice_1 = request.form.get("advice_1")
@@ -270,10 +282,14 @@ class Routes:
 
         @self.routes.route("/get_settings")
         def get_settings():
+            """Returns all user settings from the db."""
+
             return self.db.get_user_settings()
 
         @self.routes.route("/default_settings", methods=["POST"])
         def set_default_settings():
+            """Sets the default user settings."""
+
             try:
                 # Setting the default settings
                 self.db.set_default_settings()
@@ -283,6 +299,8 @@ class Routes:
 
         @self.routes.route("/notification_history")
         def get_notifications():
+            """Returns all notifications from the db."""
+
             all_notifications = self.db.get_notification_history()
 
             # Converting notifications from the db into a json format
@@ -295,6 +313,8 @@ class Routes:
 
         @self.routes.route("/notification_clear", methods=["POST"])
         def clear_notifications():
+            """Clears all notifications."""
+
             try:
                 # Clearing table with the notifications
                 self.db.clear_table("notifications")
@@ -307,6 +327,7 @@ class Routes:
 
         @self.routes.route("/delete_notification", methods=["POST"])
         def delete_notification():
+            """Deletes a selected notification using the id."""
             notification_id = request.json.get("id")
             print("Notification id: ", notification_id)
             try:
@@ -320,6 +341,8 @@ class Routes:
 
         @self.routes.route("/devices_list")
         def get_devices():
+            """Returns a json list of all the devices in the db."""
+
             all_devices = self.db.get_all_devices()
 
             # Converting received list of devices from the db into a json format
@@ -332,6 +355,8 @@ class Routes:
 
         @self.routes.route("/new_device", methods=["POST"])
         def new_device():
+            """Adds a new device to the db."""
+
             try:
                 device_name = request.form.get("device_name")
                 topic = request.form.get("topic")
@@ -346,6 +371,8 @@ class Routes:
 
         @self.routes.route("/devices_clear", methods=["POST"])
         def clear_devices():
+            """Clears all devices from the db."""
+
             try:
                 # Clearing the table with all the devices and clearing topics in mqtt_manager
                 self.db.clear_table("devices")
@@ -359,6 +386,8 @@ class Routes:
 
         @self.routes.route("/delete_device", methods=["POST"])
         def delete_device():
+            """Deletes the specified device from the db."""
+
             device_id = request.json.get("id")
             device_name = request.json.get("device_name")
             topic = request.json.get("topic")
@@ -377,6 +406,8 @@ class Routes:
 
         @self.routes.route("/select_device", methods=["POST"])
         def select_device():
+            """Selects a device."""
+
             device_id = request.json.get("id")
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
@@ -388,8 +419,12 @@ class Routes:
         return self.routes
 
     def register_socket_events(self):
+        """Registers used socket events."""
+
         @self.socketio.on("connect")
         def test_connect():
+            """Tests the socket connection."""
+
             # If a socket connection isn't established yet, we establish it and notify the user
             if self.socket_connection_established is not True:
                 print("Client connected!")
