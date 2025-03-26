@@ -45,6 +45,12 @@ async function fetchDevices() {
     }
 }
 
+/**
+ * Fetched all the devices stored in the db and displayes them in a dropdown.
+ *
+ * @async
+ * @param {*} callback
+ */
 async function fetchDevicesDropdown(callback) {
     try {
         const response = await fetch('/devices_list');
@@ -77,7 +83,16 @@ async function fetchDevicesDropdown(callback) {
     }
 }
 
-// Ability to remove devices one by one
+
+/**
+ * Ability to remove devices one by one
+ *
+ * @async
+ * @param {*} id
+ * @param {*} device_name
+ * @param {*} topic
+ * @returns {*}
+ */
 async function deleteDevice(id, device_name, topic) {
     let response = await fetch('/delete_device', {
         method: 'POST',
@@ -96,7 +111,14 @@ async function deleteDevice(id, device_name, topic) {
     }
 }
 
-// Ability to remove devices one by one
+/**
+ * Ability to remove devices one by one
+ *
+ * @async
+ * @param {*} id
+ * @param {*} device_name
+ * @param {*} topic
+ */
 async function selectDevice(id, device_name, topic) {
     let response = await fetch('/select_device', {
         method: 'POST',
@@ -113,6 +135,7 @@ async function selectDevice(id, device_name, topic) {
 }
 
 
+/** Adds a new devices both visually to the form and sents a request to the server with the device info to add the device to the db. */
 function addNewDevice() {
     const devicesForm = new FormData(
         document.getElementById('devices-form')
@@ -141,7 +164,8 @@ function addNewDevice() {
         });
 }
 
-// Canceling the changes in the fields. Doesn't work when changes have been applied already.
+
+/** Canceling the changes in the fields. Doesn't work when changes have been applied already. */
 function cancelChanges() {
     fetchDevices();
 }

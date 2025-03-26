@@ -1,3 +1,8 @@
+/**
+ * Messages for different voc thresholds.
+ *
+ * @type {*}
+ */
 let advice_1;
 let advice_2;
 let advice_3;
@@ -5,24 +10,109 @@ let advice_4;
 let advice_5;
 let advice_6;
 
+/**
+ * Fetching interval in ms.
+ *
+ * @type {*}
+ */
 let fetchSensorInterval;
 let fetchAveragesInterval;
 let fetchMinMaxInterval;
+/**
+ * Stores whether notifications are enabled.
+ *
+ * @type {*}
+ */
 let notificationsOn;
+/**
+ * Threshold for a notification.
+ *
+ * @type {*}
+ */
 let notificationsThreshold;
+/**
+ * Cooldown for notifications.
+ *
+ * @type {*}
+ */
 let notificationCooldown;
+/**
+ * Message that gets sent for a socket notification.
+ *
+ * @type {*}
+ */
 let notificationMessage;
+/**
+ * Email notifications enabled.
+ *
+ * @type {*}
+ */
 let emailNotificationOn;
+/**
+ * Threshold for email notifiations.
+ *
+ * @type {*}
+ */
 let emailNotificationThreshold;
+/**
+ * Cooldown for email notifications.
+ *
+ * @type {*}
+ */
 let emailNotificationCooldown;
+/**
+ * Email address.
+ *
+ * @type {*}
+ */
 let emailAddress;
+/**
+ * ESP alarm enabled.
+ *
+ * @type {*}
+ */
 let espAlarmEnabled;
+/**
+ * Length of time for the alarm in s.
+ *
+ * @type {*}
+ */
 let alarmTime;
+/**
+ * Temperature notifiactions enabled.
+ *
+ * @type {*}
+ */
 let tempNotificationsEnabled;
+/**
+ * Temperature notifications threshold.
+ *
+ * @type {*}
+ */
 let tempThreshold;
+/**
+ * Temperature notifications cooldown.
+ *
+ * @type {*}
+ */
 let tempCooldown;
+/**
+ * Humidity notifications enabled.
+ *
+ * @type {*}
+ */
 let humiNotificationsEnabled;
+/**
+ * Humidity threshold.
+ *
+ * @type {*}
+ */
 let humiThreshold;
+/**
+ * Humidity notifications cooldown.
+ *
+ * @type {*}
+ */
 let humiCooldown;
 
 
@@ -109,14 +199,21 @@ async function fetchUserSettings() {
         });
 }
 
-// Fetching user settings, returning the fetched JSON.
+
+/**
+ * // Fetching user settings, returning the fetched JSON.
+ *
+ * @async
+ * @returns {response}
+ */
 async function fetchUserSettingsJson() {
     return fetch('/get_settings')
         .then((response)=>response.json())
         .then((responseJson)=>{return responseJson});
 }
 
-// Handling information from all forms on the settings page. Sending it to the server and setting the changed user settings.
+
+/** Handling information from all forms on the settings page. Sending it to the server and setting the changed user settings. */
 function submitForms() {
     const messagesForm = new FormData(document.getElementById('messages-form'));
     const fetchingForm = new FormData(document.getElementById('fetching-form'));
@@ -138,6 +235,7 @@ function submitForms() {
     console.log(fetchingForm);
     console.log(notificationsForm);
 
+    // Sends a message to the server to update the settings
     fetch('/update_settings', {
         method: 'POST',
         body: formData,
@@ -152,12 +250,14 @@ function submitForms() {
         });
 }
 
-// Canceling the changes in the fields. Doesn't work when changes have been applied already.
+
+/** Canceling the changes in the fields. Doesn't work when changes have been applied already. */
 function cancelChanges() {
     fetchUserSettings();
 }
 
-// Resetting the settings to default user settings
+
+/** Resetting the settings to default user settings  */
 function resetDefault() {
     fetch('/default_settings', {
         method: 'POST',

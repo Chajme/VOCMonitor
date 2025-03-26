@@ -1,5 +1,4 @@
-
-// Exporting chart as a PDF.
+/** Exporting chart as a PDF. */
 function exportChartAsPDF() {
     const canvas = document.getElementById('myChart');
 
@@ -11,7 +10,8 @@ function exportChartAsPDF() {
     pdf.save('voc-chart.pdf');
 }
 
-// Exporting chart as an image.
+
+/** Exporting chart as an image. */
 function exportChartAsPNG() {
     const canvas = document.getElementById('myChart');
     const canvasImage = canvas.toDataURL('image/png', 1.0);
@@ -22,11 +22,21 @@ function exportChartAsPNG() {
     downloadLink.click();
 }
 
-// Button listener to reset chart zoom.
+
+/**
+ * Button listener to reset chart zoom.
+ *
+ * @param {*} resetZoomFunction
+ */
 function attachEventHandlers(resetZoomFunction) {
     document.getElementById('resetZoom').addEventListener('click', resetZoomFunction);
 }
 
+/**
+ * Pauses fetching of new data.
+ *
+ * @param {*} pauseFetchingFunction
+ */
 function pauseFetchingHandler(pauseFetchingFunction) {
     document.getElementById('pauseFetching').addEventListener('click', pauseFetchingFunction);
 }

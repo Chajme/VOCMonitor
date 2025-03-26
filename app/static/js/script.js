@@ -31,18 +31,13 @@ import {
 
 import {
     fetchUserSettingsJson
-} from "./modules/settings-handler.js"
+} from "./modules/settings-handler.js";
 
 import {
     fetchDevicesDropdown
-} from "./modules/devices-handler.js"
+} from "./modules/devices-handler.js";
 
-let sensorData = [];
-let temperatureData = [];
-let humidityData = [];
-let timestamps = [];
-let fetchInterval;
-let paused = false;
+import dataStorage from "./modules/data-storage.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     initializeSocket();
@@ -57,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const datasets = [
             {
                 label: 'VOC Index',
-                data: sensorData,
+                data: dataStorage.sensorData,
                 borderWidth: 5,
                 borderColor: (context) => {
                     const chart = context.chart;
@@ -70,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             {
                 label: 'Temperature',
-                data: temperatureData,
+                data: dataStorage.temperatureData,
                 borderWidth: 5,
                 borderColor: '#ffa600',
                 backgroundColor: '#ffa600',
@@ -78,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             {
                 label: 'Humidity',
-                data: humidityData,
+                data: dataStorage.humidityData,
                 borderWidth: 5,
                 borderColor: '#ff0000',
                 backgroundColor: '#ff0000',
@@ -86,26 +81,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
         ];
 
-        initChart(ctx, timestamps, datasets);
+        initChart(ctx, dataStorage.timestamps, datasets);
         attachEventHandlers(() => myChart.resetZoom());
 
         pauseFetchingHandler(() => {
-            if (!paused) {
+            if (!dataStorage.paused) {
                 console.log("Pausing fetching...");
-                clearInterval(fetchInterval);
-                fetchInterval = null;
+                clearInterval(dataStorage.fetchInterval);
+                dataStorage.fetchInterval = null;
             } else {
                 console.log("Resuming fetching...");
-                fetchInterval = setInterval(() => {
+                dataStorage.fetchInterval = setInterval(() => {
                     fetchSensorData(
-                        updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                        updateChart, setCurrentState, dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData,
                         userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3,
                         userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
                     );
                 }, userSettingsJson.fetch_sensor);
             }
-            paused = !paused;
-            console.log("Paused state is now:", paused);
+            dataStorage.paused = !dataStorage.paused;
+            console.log("Paused state is now:", dataStorage.paused);
         });
 
         // Export buttons listeners
@@ -121,20 +116,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (event.target.checked) {
                 myChart.data.labels.pop();
                 await fetchAllData(updateChart);
-                clearInterval(fetchInterval);
+                clearInterval(dataStorage.fetchInterval);
             } else {
-                sensorData = [];
-                temperatureData = [];
-                humidityData = [];
-                timestamps = [];
+                dataStorage.sensorData = [];
+                dataStorage.temperatureData = [];
+                dataStorage.humidityData = [];
+                dataStorage.timestamps = [];
 
-                updateChart(timestamps, sensorData, temperatureData, humidityData);
+                updateChart(dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData);
 
-                if (!paused) {
-                    fetchInterval = setInterval(() => {
+                if (!dataStorage.paused) {
+                    dataStorage.fetchInterval = setInterval(() => {
                         console.log('Calling fetchSensorData...');
                         fetchSensorData(
-                            updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                            updateChart, setCurrentState, dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData,
                             userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
                         );
                     }, userSettingsJson.fetch_sensor);
@@ -145,11 +140,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Waiting for user settings to get fetched, then setting the intervals
         const userSettingsJson = await fetchUserSettingsJson();
-        fetchInterval = setInterval(() => {
+        dataStorage.fetchInterval = setInterval(() => {
             console.log('Calling fetchSensorData...');
             console.log(userSettingsJson)
             fetchSensorData(
-                updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+                updateChart, setCurrentState, dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData,
                 userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
             );
         }, userSettingsJson.fetch_sensor);
@@ -164,11 +159,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+/** Clears the relevant datasets displayed in a chart. */
 function clearDatasets() {
-    sensorData.length = 0;
-    temperatureData.length = 0;
-    humidityData.length = 0;
-    timestamps.length = 0;
+    dataStorage.sensorData.length = 0;
+    dataStorage.temperatureData.length = 0;
+    dataStorage.humidityData.length = 0;
+    dataStorage.timestamps.length = 0;
     myChart.data.labels.pop();
     myChart.update();
 }

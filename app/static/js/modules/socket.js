@@ -1,7 +1,16 @@
-
+/**
+ * Defines a socket.
+ *
+ * @type {*}
+ */
 const socket = io();
 
-// Function to handle notification logic
+
+/**
+ * Handles a notification permission.
+ *
+ * @param {*} message
+ */
 function handleNotification(message) {
     if (Notification.permission === 'granted') {
         new Notification(message);
@@ -14,7 +23,8 @@ function handleNotification(message) {
     }
 }
 
-// Function to initialize WebSocket listeners
+
+/** Function to initialize WebSocket listeners */
 function initializeSocket() {
     socket.on('alert', function(data) {
         console.log('Alert received:', data.message);
@@ -22,7 +32,13 @@ function initializeSocket() {
     });
 }
 
-// Function to fetch notification history from the db
+
+/**
+ * Function to fetch notification history from the db.
+ *
+ * @async
+ * @returns {*}
+ */
 async function fetchNotifications() {
     try {
         const response = await fetch('/notification_history');
@@ -67,6 +83,7 @@ async function fetchNotifications() {
     }
 }
 
+// Ability to remove notifications one by one
 window.deleteNotification = async function(id) {
     let response = await fetch('/delete_notification', {
         method: 'POST',

@@ -2,7 +2,8 @@ import {
     fetchNotifications
 } from "./socket.js";
 
-// Setting up a visual element for the navigation showing which page the user is on.
+
+/** Sets up a visual element for the navigation showing which page the user is on. */
 const setupMenuHighlighter = () => {
     const menuOptions = document.querySelectorAll(".nav-list-link");
 
@@ -10,6 +11,7 @@ const setupMenuHighlighter = () => {
         menuOptions.forEach((option) => {
             if (option === selectedOption) {
                 option.setAttribute("data-selected", "true");
+
                 localStorage.setItem("selectedMenuOption", [...menuOptions].indexOf(option));
             } else {
                 option.removeAttribute("data-selected");
@@ -53,7 +55,9 @@ const setupMenuHighlighter = () => {
     });
 };
 
-// Visual element for a menu toggle when the width of the screen goes below 1024 pixels. Solves the problem of displaying the navigation on smaller screens.
+
+/** Visual element for a menu toggle when the width of the screen goes below 1024 pixels.
+ * Solves the problem of displaying the navigation on smaller screens. */
 const setupMenuToggle = () => {
     const menuToggle = document.querySelector('.menu-toggle');
     const menuSection = document.querySelector('.menu-section');
@@ -78,6 +82,7 @@ const setupMenuToggle = () => {
     updateMenuState();
 }
 
+/** Sets up a notification toggle for notification panel. */
 const setupNotificationToggle = () => {
     const notificationPanel = document.getElementById("notificationPanel");
     const toggleButton = document.getElementById("toggleNotifications");
@@ -107,6 +112,7 @@ const setupNotificationToggle = () => {
         // notificationPanel.classList.remove("active");
     });
 
+    // Clear all notifications button
     clearAll.addEventListener("click", function () {
         // let list = document.getElementById("notification-list");
         // while (list.firstChild) {
