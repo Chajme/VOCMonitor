@@ -18,6 +18,7 @@ mqtt_thread.start()
 app, socketio = create_app(mqtt_manager, db)
 socketio.init_app(app, async_mode="eventlet", ping_interval=25, ping_timeout=60)
 
+# If the main is run and main, start a server on the specified address
 if __name__ == "__main__":
     print("Starting production server with eventlet on port 8000...")
     eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 8000)), app)
