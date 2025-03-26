@@ -12,14 +12,14 @@ class DatabaseManager:
 
         self.db_name = "E:\Bakalarka\WebServer\pythonProject\database\database.db"
 
-        self.con = None
-        self.cur = None
+        con = None
+        cur = None
 
     def initialize_db(self):
         """Initialize the db connection, cursor, create tables and set default user settings."""
 
-        self.con = sqlite3.connect(self.db_name)
-        self.cur = self.con.cursor()
+        con = sqlite3.connect(self.db_name)
+        cur = con.cursor()
 
         # Clearing the db and dropping tables
         self.drop_table("user_settings")
@@ -37,7 +37,7 @@ class DatabaseManager:
         # Setting default user settings
         self.set_default_settings()
 
-        self.con.close()
+        con.close()
 
     def _connect(self):
         """Connects to the db and returns the connection."""
@@ -47,149 +47,147 @@ class DatabaseManager:
     def insert(self, table_name, timestamp, temperature, humidity, voc):
         """Insert data into the specified data table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 f"INSERT INTO {table_name} (timestamp, temperature, humidity, voc) VALUES (?, ?, ?, ?)",
                 (timestamp, temperature, humidity, voc),
             )
-            self.con.commit()
+            con.commit()
 
     def clear_table(self, table_name):
         """Clear the specified table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(f"DELETE FROM {table_name}")
-            self.con.commit()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(f"DELETE FROM {table_name}")
+            con.commit()
 
     def create_table_data(self, table_name):
         """Create a table with the specified table_name."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 f"CREATE TABLE IF NOT EXISTS {table_name} (timestamp, temperature, humidity, voc)"
             )
-            self.con.commit()
+            con.commit()
 
     def create_table_devices(self):
         """Create table devices."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 "CREATE TABLE IF NOT EXISTS devices ("
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT, topic TEXT"
                 ")"
             )
-            self.con.commit()
+            con.commit()
 
     def new_device(self, device_name, topic):
         """Add a new device to the devices table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
 
             if self.is_valid_device_name(device_name):
-                self.cur.execute(
+                cur.execute(
                     "INSERT OR IGNORE INTO devices (device_name, topic) VALUES (?, ?)",
                     (device_name, topic),
                 )
 
-                self.cur.execute(
+                cur.execute(
                     f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
                 )
-            self.con.commit()
+            con.commit()
 
     def delete_device(self, device_id, device_name):
         """Remove a device from the devices table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
 
-            self.cur.execute("SELECT id FROM devices WHERE id = ?", (device_id,))
-            if not self.cur.fetchone():
+            cur.execute("SELECT id FROM devices WHERE id = ?", (device_id,))
+            if not cur.fetchone():
                 raise ValueError(f"Device ID {device_id} not found in the database")
 
-            self.cur.execute("DELETE FROM devices WHERE id = ?", (device_id,))
+            cur.execute("DELETE FROM devices WHERE id = ?", (device_id,))
 
             # Dropping the table with the devices data
             try:
-                self.cur.execute(f"DROP TABLE IF EXISTS {device_name}")
+                cur.execute(f"DROP TABLE IF EXISTS {device_name}")
             except Exception as e:
                 print(f"Error dropping table: {e}")
 
-            self.con.commit()
+            con.commit()
 
     def get_all_devices(self):
         """Return all the devices in the devices table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute("SELECT id, device_name, topic FROM devices")
-            self.con.commit()
-            all_rows = self.cur.fetchall()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute("SELECT id, device_name, topic FROM devices")
+            con.commit()
+            all_rows = cur.fetchall()
             return all_rows
 
     def get_device_topics(self):
         """Get all the device topics in the devices table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute("SELECT topic, device_name FROM devices")
-            all_rows = self.cur.fetchall()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute("SELECT topic, device_name FROM devices")
+            all_rows = cur.fetchall()
             return all_rows
 
     def create_table_notification_history(self):
         """Create a table to story all the notifications."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 "CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp TEXT, message TEXT, voc INTEGER)"
             )
-            self.con.commit()
+            con.commit()
 
     def new_notification(self, timestamp, message, voc):
         """Add a new notification to the notifications table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 "INSERT INTO notifications (timestamp, message, voc) VALUES (?, ?, ?)",
                 (timestamp, message, voc),
             )
-            self.con.commit()
+            con.commit()
 
     def delete_notification(self, notification_id):
         """Remove a notification from the notifications table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
-                "DELETE FROM notifications WHERE id = ?", (notification_id,)
-            )
-            self.con.commit()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute("DELETE FROM notifications WHERE id = ?", (notification_id,))
+            con.commit()
 
     def get_notification_history(self):
         """Get all the notifications in the notifications table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 "SELECT id, timestamp, message, voc FROM notifications ORDER BY timestamp DESC"
             )
-            self.con.commit()
-            all_rows = self.cur.fetchall()
+            con.commit()
+            all_rows = cur.fetchall()
             return all_rows
 
     def create_user_settings_table(self):
         """Create a table to store user settings."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 "CREATE TABLE IF NOT EXISTS user_settings ("
                 "id INTEGER PRIMARY KEY,"
                 "advice1 TEXT,"
@@ -218,7 +216,7 @@ class DatabaseManager:
                 "humi_threshold INTEGER,"
                 "humi_cooldown INTEGER)"
             )
-            self.con.commit()
+            con.commit()
 
     def set_user_settings(
         self,
@@ -250,9 +248,9 @@ class DatabaseManager:
     ):
         """Set user settings in the user settings table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 """
                     INSERT INTO user_settings (
                     id,
@@ -338,13 +336,13 @@ class DatabaseManager:
                     humi_cooldown,
                 ),
             )
-            self.con.commit()
+            con.commit()
 
     def get_user_settings(self):
         """Get all the user settings from the user settings table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
             query = """
                 SELECT advice1, advice2, advice3, advice4, advice5, advice6,
                        fetchSensor, fetchAverages, fetchMinmax, notifications,
@@ -354,7 +352,7 @@ class DatabaseManager:
                        humi_threshold, humi_cooldown 
                 FROM user_settings WHERE id=1
             """
-            result = self.cur.execute(query).fetchone()
+            result = cur.execute(query).fetchone()
             if result:
                 return {
                     "advice1": result[0],
@@ -415,8 +413,8 @@ class DatabaseManager:
     def get_user_settings_notifications(self):
         """Get user settings, specifically the setting about the notifications."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
             query = (
                 "SELECT notifications, "
                 "notification_threshold, "
@@ -435,7 +433,7 @@ class DatabaseManager:
                 "humi_cooldown "
                 "FROM user_settings WHERE id=1"
             )
-            result = self.cur.execute(query).fetchone()
+            result = cur.execute(query).fetchone()
             (
                 notifications_on,
                 notification_threshold,
@@ -475,10 +473,10 @@ class DatabaseManager:
     def get_user_email_address(self):
         """Getting the user set email address."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute("SELECT email_address from user_settings where id=1")
-            email_address = self.cur.fetchone()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute("SELECT email_address from user_settings where id=1")
+            email_address = cur.fetchone()
             return email_address
 
     def set_default_settings(self):
@@ -515,74 +513,72 @@ class DatabaseManager:
     def print_table(self, table_name):
         """Printing a table with the specified table name."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(f"SELECT * FROM {table_name}")
-            print(self.cur.fetchall())
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(f"SELECT * FROM {table_name}")
+            print(cur.fetchall())
 
     def drop_table(self, table_name):
         """Dropping a table with the specified table name."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(f"DROP TABLE IF EXISTS {table_name}")
-            self.con.commit()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(f"DROP TABLE IF EXISTS {table_name}")
+            con.commit()
 
     def get_last_row(self, table_name):
         """Returning the last row from the specified table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(f"SELECT COUNT(*) FROM {table_name}")
-            result = self.cur.fetchone()
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(f"SELECT COUNT(*) FROM {table_name}")
+            result = cur.fetchone()
             num_of_rows = result[0]
 
             """query = "SELECT * FROM {} ORDER BY timestamp DESC LIMIT 1".format(table_name)
-            self.cur.execute(query)
-            last_row = self.cur.fetchone()"""
+            cur.execute(query)
+            last_row = cur.fetchone()"""
 
             if num_of_rows > 0:
-                last_row = self.cur.execute(f"SELECT * FROM {table_name}").fetchall()[
-                    -1
-                ]
+                last_row = cur.execute(f"SELECT * FROM {table_name}").fetchall()[-1]
                 return last_row
             return None
 
     def get_all_rows(self, table_name):
         """Returning all the rows from the specified table."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
-            self.cur.execute(
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
                 f"SELECT timestamp, temperature, humidity, voc FROM {table_name} ORDER BY timestamp "
             )
-            all_rows = self.cur.fetchall()
+            all_rows = cur.fetchall()
 
             return all_rows
 
     def get_avg(self, time_period, table_name):
         """Return the average for the data from the specified table withing the specified time range."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
 
             query = f"SELECT AVG(voc) AS avg_voc FROM {table_name} WHERE timestamp >= datetime('now', ?)"
-            self.cur.execute(query, (time_period,))
+            cur.execute(query, (time_period,))
 
-            avg_voc = self.cur.fetchone()[0]
+            avg_voc = cur.fetchone()[0]
             avg_voc = round(avg_voc, 2)
             return avg_voc
 
     def get_min_max(self, time_period, table_name):
         """Get the minimum and maximum from the specified table within the specified timerange."""
 
-        with self._connect() as self.con:
-            self.cur = self.con.cursor()
+        with self._connect() as con:
+            cur = con.cursor()
 
             query = f"SELECT MIN(voc), MAX(voc) FROM {table_name} WHERE timestamp >= datetime('now', ?)"
-            self.cur.execute(query, (time_period,))
+            cur.execute(query, (time_period,))
 
-            min_max_voc = self.cur.fetchone()
+            min_max_voc = cur.fetchone()
             min_voc, max_voc = min_max_voc
 
             return min_voc, max_voc

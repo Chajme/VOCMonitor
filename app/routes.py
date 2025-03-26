@@ -545,10 +545,9 @@ class Routes:
 
     def send_email(self, receiver, subject, body):
         """Sends an email with the specified parameters."""
-
         try:
             with current_app.app_context():
-                message = Message(subject, recipients=[receiver], body=body)
+                message = Message(subject, recipients=receiver, body=body)
                 self.mail.send(message)
                 print("Email sent!")
         except Exception as e:

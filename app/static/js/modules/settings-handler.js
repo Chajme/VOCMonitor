@@ -184,7 +184,7 @@ async function fetchUserSettings() {
             document.getElementById('email-notification-cooldown').value = emailNotificationCooldown;
             document.getElementById('email-address').value = emailAddress;
 
-            document.getElementById('esp-alarm-enabled').value = espAlarmEnabled;
+            document.getElementById('esp-alarm-enabled').checked = espAlarmEnabled;
             document.getElementById('alarm-time').value = alarmTime;
 
 

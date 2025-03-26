@@ -112,17 +112,17 @@
                 <div class="settings-container-list">
                     <form id="fetching-form">
                         <div class="input-container ms">
-                            <input class="input" id="fetch-sensor" name="fetch_sensor" type="number">
+                            <input class="input" id="fetch-sensor" step="250" name="fetch_sensor" type="number">
                         </div>
                         <label>Fetch sensor data interval</label>
                         <br>
                         <div class="input-container ms">
-                            <input class="input" id="fetch-averages" name="fetch_averages" type="number">
+                            <input class="input" id="fetch-averages" step="250" name="fetch_averages" type="number">
                         </div>
                         <label>Fetch averages interval</label>
                         <br>
                         <div class="input-container ms">
-                            <input class="input" id="fetch-minmax" name="fetch_minmax" type="number">
+                            <input class="input" id="fetch-minmax" step="250" name="fetch_minmax" type="number">
                         </div>
                         <label>Fetch min & max values interval</label>
                     </form>
@@ -167,7 +167,7 @@
                         <label>Threshold</label>
                         <br>
                         <div class="input-container s">
-                            <input class="input" type="number" min="0" name="email_notification_cooldown"
+                            <input class="input" type="number" min="0" step="60" name="email_notification_cooldown"
                                    id="email-notification-cooldown">
                         </div>
                         <label>Cooldown</label>
@@ -203,7 +203,7 @@
                         <label>Threshold</label>
                         <br>
                         <div class="input-container s">
-                            <input class="input" type="number" min="0" name="temp_cooldown" id="temp-cooldown">
+                            <input class="input" type="number" min="0" step="30" name="temp_cooldown" id="temp-cooldown">
                         </div>
                         <label>Cooldown</label>
                         <br>
@@ -226,7 +226,7 @@
                         <label>Threshold</label>
                         <br>
                         <div class="input-container s">
-                            <input class="input" type="number" min="0" name="humi_cooldown" id="humi-cooldown">
+                            <input class="input" type="number" min="0" step="30" name="humi_cooldown" id="humi-cooldown">
                         </div>
                         <label>Cooldown</label>
                     </form>

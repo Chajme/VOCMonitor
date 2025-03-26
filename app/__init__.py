@@ -13,8 +13,8 @@ def create_app(mqtt, db_manager):
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    mail = Mail(app)
     socketio = SocketIO(app, async_mode="threading")
+    mail = Mail(app)
 
     db_manager = db_manager
     db_manager.initialize_db()
