@@ -10,28 +10,6 @@ from mqtt_manager import MQTTManager
 
 
 def create_app(mqtt, db_manager):
-    """app = Flask(__name__)
-    app.config.from_object(Config)
-
-    socketio = SocketIO(app, async_mode="gevent")
-    mail = Mail(app)
-
-    db_manager = db_manager
-    db_manager.initialize_db()
-
-    db_manager.new_device("esp", "data")
-    db_manager.new_device("device", "new/topic")
-
-    db_manager.clear_table("esp")
-    db_manager.clear_table("device")
-
-    from app.routes import Routes
-
-    routes = Routes(db_manager, mqtt, socketio, mail)
-    app.register_blueprint(routes.routes)
-    routes.register_socket_events()
-
-    return app, socketio"""
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -42,8 +20,8 @@ def create_app(mqtt, db_manager):
     db_manager.initialize_db()
     db_manager.new_device("esp", "data")
     db_manager.new_device("device", "new/topic")
-    db_manager.clear_table("esp")
-    db_manager.clear_table("device")
+    """db_manager.clear_table("esp")
+    db_manager.clear_table("device")"""
 
     from app.routes import Routes
 
