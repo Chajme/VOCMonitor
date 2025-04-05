@@ -34,7 +34,8 @@ import {
 } from "./modules/settings-handler.js";
 
 import {
-    fetchDevicesDropdown
+    fetchDevicesDropdown,
+    fetchSelectedDevice
 } from "./modules/devices-handler.js";
 
 import dataStorage from "./modules/data-storage.js";
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMenuHighlighter();
     setupMenuToggle();
     setupNotificationToggle();
+    fetchSelectedDevice(dataStorage);
 
     const chartElement = document.getElementById('myChart');
     if (chartElement) {
@@ -107,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
         document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
         document.getElementById('dropbtn').addEventListener('click', () => {
-            fetchDevicesDropdown(clearDatasets);
+            fetchDevicesDropdown(clearDatasets, dataStorage);
         });
 
 

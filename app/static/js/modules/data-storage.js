@@ -10,6 +10,7 @@ const dataStorage = {
     timestamps: [],
     fetchInterval: null,
     paused: false,
+    selectedDevice: "",
 };
 
 export default dataStorage;

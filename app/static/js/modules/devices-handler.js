@@ -51,7 +51,7 @@ async function fetchDevices() {
  * @async
  * @param {*} callback
  */
-async function fetchDevicesDropdown(callback) {
+async function fetchDevicesDropdown(callback, dataStorage) {
     try {
         const response = await fetch('/devices_list');
         const data = await response.json();
@@ -64,15 +64,15 @@ async function fetchDevicesDropdown(callback) {
         data.forEach(device => {
             const listItem = document.createElement('a');
             listItem.setAttribute("data-id", device.id);
+            dataStorage.selectedDevice = device.device_name;
             listItem.textContent = device.device_name;
 
             // Make the whole <a> clickable
             listItem.addEventListener('click', () => {
                 if (callback) callback();
-
+                dataStorage.selectedDevice = device.device_name;
                 document.getElementById("dropbtn").textContent = device.device_name;
                 selectDevice(device.id, device.device_name, device.topic);
-                // updateChart(device.device_name);
             });
 
             devicesList.appendChild(listItem);
@@ -134,6 +134,14 @@ async function selectDevice(id, device_name, topic) {
     // }
 }
 
+async function fetchSelectedDevice(dataStorage) {
+    const response = await fetch('/current_device');
+    const data = await response.json();
+
+    // dataStorage.selectedDevice = data.selected_device;
+    document.getElementById('dropbtn').textContent = data.selected_device;
+}
+
 
 /** Adds a new devices both visually to the form and sents a request to the server with the device info to add the device to the db. */
 function addNewDevice() {
@@ -175,5 +183,6 @@ export {
     deleteDevice,
     fetchDevices,
     fetchDevicesDropdown,
-    cancelChanges
+    cancelChanges,
+    fetchSelectedDevice
 }

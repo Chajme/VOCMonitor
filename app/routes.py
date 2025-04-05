@@ -416,6 +416,10 @@ class Routes:
             self.selected_device = device_name
             return jsonify({"message": "New device selected!"}), 200
 
+        @self.routes.route("/current_device")
+        def get_current_device():
+            return jsonify({"selected_device": self.selected_device})
+
         return self.routes
 
     def register_socket_events(self):

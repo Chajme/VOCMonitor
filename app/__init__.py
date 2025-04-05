@@ -14,14 +14,14 @@ def create_app(mqtt, db_manager):
     app.config.from_object(Config)
 
     # Initialize Socket.IO only once
-    socketio = SocketIO(app, async_mode="eventlet")
+    socketio = SocketIO(app, async_mode="gevent")
     mail = Mail(app)
 
     db_manager.initialize_db()
     db_manager.new_device("esp", "data")
     db_manager.new_device("device", "new/topic")
-    """db_manager.clear_table("esp")
-    db_manager.clear_table("device")"""
+    db_manager.clear_table("esp")
+    db_manager.clear_table("device")
 
     from app.routes import Routes
 
@@ -40,4 +40,8 @@ if __name__ == "__main__":
     mqtt_thread.start()
 
     flask_app, socketio_t = create_app(mqtt_manager, db)
-    flask_app.run()
+    try:
+        socketio_t.run(flask_app, debug=True, use_reloader=False)
+    except KeyboardInterrupt:
+        print("Stopping the server...")
+        socketio_t.stop()

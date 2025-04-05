@@ -26,7 +26,8 @@ import {
 } from "./modules/settings-handler.js";
 
 import {
-    fetchDevicesDropdown
+    fetchDevicesDropdown,
+    fetchSelectedDevice
 } from "./modules/devices-handler.js";
 
 import dataStorage from "./modules/data-storage.js";
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMenuHighlighter();
     setupMenuToggle();
     setupNotificationToggle();
+    fetchSelectedDevice(dataStorage);
 
     // Setting up a chart and initializing it
     const ctx = document.getElementById('myChart').getContext('2d');
@@ -95,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('exportChartAsPDF').addEventListener('click', exportChartAsPDF);
     document.getElementById('exportChartAsPNG').addEventListener('click', exportChartAsPNG);
     document.getElementById('dropbtn').addEventListener('click', () => {
-        fetchDevicesDropdown(clearDatasets);
+        fetchDevicesDropdown(clearDatasets, dataStorage);
     });
 
     document.getElementById('showAllData').addEventListener('change', async (event) => {
