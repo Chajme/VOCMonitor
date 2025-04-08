@@ -132,7 +132,7 @@ class Routes:
                     humi_notifications_enabled,
                     email_cooldown,
                     email_notification_threshold,
-                    notification_message,
+                    notification_message
                 )
                 self.notification_manager.check_for_notifications(
                     voc,
