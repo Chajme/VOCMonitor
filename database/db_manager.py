@@ -12,8 +12,13 @@ class DatabaseManager:
 
         self.db_name = "E:\Bakalarka\WebServer\pythonProject\database\database.db"
 
-        con = None
-        cur = None
+        self.selected_device = None
+
+    def set_selected_device(self, new_device):
+        self.selected_device = new_device
+
+    def get_selected_device(self):
+        return self.selected_device
 
     def initialize_db(self):
         """Initialize the db connection, cursor, create tables and set default user settings."""

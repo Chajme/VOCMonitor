@@ -1,16 +1,19 @@
 """Modules stores routes used for webserver navigation and handling of requests."""
 
-import datetime
-import time
-
-from flask import Blueprint, render_template, jsonify, request, current_app
-from flask_mail import Message
+from flask import Blueprint, jsonify, render_template, request
 
 
 class Routes:
     """Represents routes used by the server for navigation handling requests and handling notifications."""
 
-    def __init__(self, db, mqtt, socketio, mail):
+    def __init__(
+        self,
+        db,
+        mqtt,
+        notification_manager,
+        socketio,
+        mail,
+    ):
         """
         Constructor of the routes class.
 
@@ -20,23 +23,24 @@ class Routes:
 
         self.db = db
         self.mqtt = mqtt
+        self.notification_manager = notification_manager
         self.socketio = socketio
         self.mail = mail
 
         self.routes = Blueprint("routes", __name__)
 
-        self.last_notification = 0
+        """self.last_notification = 0
         self.notification_sent = False
         self.last_email_notification = 0
         self.email_notification_sent = False
         self.last_temp_notification = 0
         self.temp_notification_sent = False
         self.last_humi_notification = 0
-        self.humi_notification_sent = False
+        self.humi_notification_sent = False"""
 
         self.socket_connection_established = False
 
-        self.selected_device = "esp"
+        self.selected_device = self.db.get_selected_device()
 
         self.create_routes()
 
@@ -97,6 +101,10 @@ class Routes:
                     "voc_index": new_data_row[3],
                 }
 
+                voc = int(new_data_row[3])
+                humidity = int(new_data_row[2])
+                temperature = int(new_data_row[1])
+
                 # Getting the user set notification settings
                 (
                     notifications_on,
@@ -116,35 +124,32 @@ class Routes:
                     humi_cooldown,
                 ) = self.db.get_user_settings_notifications()
 
-                # If notifications are on, pass the data from the db to check_sensor_data function
-                if (
-                    notifications_on
-                    or email_notifications_on
-                    or temp_notifications_enabled
-                    or humi_notifications_enabled
-                    and self.db.get_last_row(self.selected_device) is not None
-                ):
-                    self.check_sensor_data(
-                        notifications_on,
-                        email_notifications_on,
-                        int(new_data_row[3]),
-                        notifications_threshold,
-                        cooldown,
-                        notification_message,
-                        1000,
-                        email_notification_threshold,
-                        esp_alarm_enabled,
-                        alarm_time,
-                        temp_notifications_enabled,
-                        temp_threshold,
-                        temp_cooldown,
-                        humi_notifications_enabled,
-                        humi_threshold,
-                        humi_cooldown,
-                        int(new_data_row[2]),
-                        int(new_data_row[1]),
-                    )
-                    return jsonify(new_data_list), 200
+                self.notification_manager.set_notification_settings(
+                    notifications_on,
+                    email_notifications_on,
+                    esp_alarm_enabled,
+                    temp_notifications_enabled,
+                    humi_notifications_enabled,
+                    email_cooldown,
+                    email_notification_threshold,
+                    notification_message,
+                )
+                self.notification_manager.check_for_notifications(
+                    voc,
+                    notifications_threshold,
+                    cooldown,
+                    notification_message,
+                    alarm_time,
+                    email_cooldown,
+                    email_notification_threshold,
+                    temp_threshold,
+                    temp_cooldown,
+                    humi_threshold,
+                    humi_cooldown,
+                    humidity,
+                    temperature,
+                )
+                return jsonify(new_data_list), 200
 
             except Exception as e:
                 return jsonify({"message": f"Error fetching new data: {str(e)}"}), 500
@@ -414,10 +419,13 @@ class Routes:
             print("Select device params: ", device_id, topic, device_name)
             # Setting the selected device to the device user has clicked on
             self.selected_device = device_name
+            self.db.set_selected_device(self.selected_device)
             return jsonify({"message": "New device selected!"}), 200
 
         @self.routes.route("/current_device")
         def get_current_device():
+            """Returns the currently selected device."""
+
             return jsonify({"selected_device": self.selected_device})
 
         return self.routes
@@ -436,131 +444,3 @@ class Routes:
                     "alert", {"message": "Welcome! Server is connected."}
                 )
                 self.socket_connection_established = True
-
-    def check_sensor_data(
-        self,
-        notifications_on,
-        email_notifications_on,
-        voc,
-        set_threshold,
-        cooldown,
-        notification_message,
-        email_cooldown,
-        email_notification_threshold,
-        esp_alarm_enabled,
-        alarm_time,
-        temp_notifications_enabled,
-        temp_threshold,
-        temp_cooldown,
-        humi_notifications_enabled,
-        humi_threshold,
-        humi_cooldown,
-        humidity,
-        temperature,
-    ):
-        """
-        Checking passed parameter and handling the notifications
-
-        Getting the current time, defining a timestamp, checking the parameters one by one and handling
-        the notification logic.
-        """
-
-        current_time = time.time()
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # If the voc is higher than user set threshold and the notifications are turned on
-        if voc > set_threshold and notifications_on:
-            if (
-                not self.notification_sent
-                or (current_time - self.last_notification) > cooldown
-            ):
-                # Sending a socket message with the user set notification message
-                self.socketio.emit("alert", {"message": notification_message})
-
-                # If an esp alarm is enabled we send a message using mqtt turning the alarm on
-                if esp_alarm_enabled:
-                    self.mqtt.threshold_exceeded_notification("on")
-
-                # Adding the notification to our table of notification in the db
-                self.db.new_notification(timestamp, notification_message, voc)
-
-                # Setting the notification sent to True and last_notification to the current_time
-                self.notification_sent = True
-                self.last_notification = current_time
-
-            # If the user set alarm notification time passed, turn off the alarm
-            if (
-                current_time - self.last_notification
-            ) > alarm_time and esp_alarm_enabled:
-                self.mqtt.threshold_exceeded_notification("off")
-        else:
-            self.notification_sent = False
-
-        # If voc exceeded the threshold for an email notification and email notifications are on
-        if voc > email_notification_threshold and email_notifications_on:
-            if (
-                not self.email_notification_sent
-                or (current_time - self.last_email_notification) > email_cooldown
-            ):
-                # Sending an email with the message
-                self.send_email_voc_threshold_exceeded(
-                    timestamp, voc, notification_message
-                )
-
-                # Adding the notification to the db with the email-- prefix
-                self.db.new_notification(
-                    "email--" + timestamp, notification_message, voc
-                )
-
-                self.email_notification_sent = True
-                self.last_email_notification = current_time
-        else:
-            self.email_notification_sent = False
-
-        # If temperature has exceeded the user set limit and the temperature notification are on
-        if temperature > temp_threshold and temp_notifications_enabled:
-            if (
-                not self.temp_notification_sent
-                or (current_time - self.last_temp_notification) > temp_cooldown
-            ):
-                # Sending a socket message with the specified message
-                self.socketio.emit(
-                    "alert", {"message": "Temperature exceeded set value."}
-                )
-
-                self.temp_notification_sent = True
-                self.last_temp_notification = current_time
-        else:
-            self.temp_notification_sent = False
-
-        # If humidity has exceeded the user set limit and humidity notifications are on
-        if humidity > humi_threshold and humi_notifications_enabled:
-            if (
-                not self.humi_notification_sent
-                or (current_time - self.last_humi_notification) > humi_cooldown
-            ):
-                # Sending a socket message with the specified message
-                self.socketio.emit("alert", {"message": "Humidity exceeded set value."})
-
-                self.humi_notification_sent = True
-                self.last_humi_notification = current_time
-        else:
-            self.humi_notification_sent = False
-
-    def send_email(self, receiver, subject, body):
-        """Sends an email with the specified parameters."""
-        try:
-            with current_app.app_context():
-                message = Message(subject, recipients=receiver, body=body)
-                self.mail.send(message)
-                print("Email sent!")
-        except Exception as e:
-            print(f"Failed to send email: {e}")
-
-    def send_email_voc_threshold_exceeded(self, timestamp, voc_level, message):
-        """Sends a specific email about exceeded voc threshold to a user set email address."""
-
-        receiver_address = self.db.get_user_email_address()
-        subject = "VOC Warning"
-        body = f"{timestamp} \n Current VOC level: {voc_level}, set threshold exceeded. \n {message}"
-        self.send_email(receiver_address, subject, body)

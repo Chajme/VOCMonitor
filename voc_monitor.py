@@ -1,16 +1,47 @@
 import threading
 
-import eventlet
+from flask import Flask
+from flask_mail import Mail
+from flask_socketio import SocketIO
 
-from app import create_app
+from app import Config
 from database.db_manager import DatabaseManager
 from mqtt_manager import MQTTManager
+from notification_manager import NotificationManager
 
 
 class VOCMonitor:
     def __init__(self):
+        self.app = Flask(__name__)
+        self.app.config.from_object(Config)
+
+        self.socketio = SocketIO(self.app, async_mode="gevent")
+        self.mail = Mail(self.app)
+
         self.db = DatabaseManager()
-        self.mqtt_manager = MQTTManager(self.db)
+        self.notification_manager = NotificationManager(
+            self.socketio, self.mail, self.db
+        )
+        self.mqtt_manager = MQTTManager(self.db, self.notification_manager)
+
+    def initialize_app(self):
+        self.db.initialize_db()
+        self.db.new_device("esp", "data")
+        self.db.new_device("device", "new/topic")
+        self.db.clear_table("esp")
+        self.db.clear_table("device")
+
+        from app.routes import Routes
+
+        routes = Routes(
+            self.db,
+            self.mqtt_manager,
+            self.notification_manager,
+            self.socketio,
+            self.mail,
+        )
+        self.app.register_blueprint(routes.routes)
+        routes.register_socket_events()
 
     def run(self):
         # Start MQTT before creating Flask app
@@ -18,8 +49,14 @@ class VOCMonitor:
         mqtt_thread.start()
 
         # Create Flask app and Socket.IO
-        app, socketio = create_app(self.mqtt_manager, self.db)
-        socketio.init_app(app, async_mode="eventlet")
+        self.initialize_app()
+        self.socketio.init_app(self.app, async_mode="gevent")
 
         print("Starting production server on port 8000...")
-        eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 8000)), app)
+        """eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 8000)), app)"""
+
+        try:
+            self.socketio.run(self.app, debug=True, use_reloader=False)
+        except KeyboardInterrupt:
+            print("Stopping the server...")
+            self.socketio.stop()

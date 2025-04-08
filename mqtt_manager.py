@@ -9,17 +9,17 @@ import paho.mqtt.client as mqtt
 class MQTTManager:
     """Represents a manager for mqtt connections with the server."""
 
-    def __init__(self, db):
+    def __init__(self, db, notification_manager):
         """Receives db as a parameter, sets the server ip, port and selected device. Creates a client."""
 
         self.server = "192.168.0.103"
         self.port = 1883
-        self.selected_device = "esp"
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5
         )
 
         self.db_manager = db
+        self.notification_manager = notification_manager
 
         self.topics = {}
         self.voc_index = {}
@@ -58,6 +58,8 @@ class MQTTManager:
             # Save the received voc to the correct voc index array
             self.voc_index[table_name].append(int(voc))
             curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            self.notification_manager.check_email_notif(int(voc), table_name)
 
             # If the voc index array with the specified table_name has 5 elements
             if len(self.voc_index[table_name]) == 5:
@@ -149,3 +151,9 @@ class MQTTManager:
 
         self.client.publish("alert/testing", payload)
         print("LED state changed: ", payload)
+
+    def esp_notif_alarm(self):
+        if self.notification_manager.send_esp_alarm_notif():
+            self.threshold_exceeded_notification("on")
+        else:
+            self.threshold_exceeded_notification("off")
