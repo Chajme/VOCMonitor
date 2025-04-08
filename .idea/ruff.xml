@@ -4,6 +4,7 @@
     <option name="globalRuffExecutablePath" value="C:\Users\Erik Molitoris\AppData\Local\Programs\Python\Python313\Scripts\ruff.exe" />
     <option name="runRuffOnSave" value="true" />
     <option name="useRuffFormat" value="true" />
+    <option name="useRuffImportOptimizer" value="true" />
     <option name="useRuffServer" value="true" />
   </component>
 </project>
