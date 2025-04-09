@@ -154,7 +154,10 @@ class NotificationManager:
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if voc > self.email_notification_threshold and self.email_notifications_on:
+        if (
+            voc > self.email_notification_threshold
+            and self.email_notifications_on
+        ):
             if (
                 not self.email_notification_sent
                 or (current_time - self.last_email_notification) > self.email_cooldown
