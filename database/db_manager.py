@@ -10,7 +10,7 @@ class DatabaseManager:
     def __init__(self):
         """Defined the db_name and attributes like connection and cursor."""
 
-        self.db_name = "E:\Bakalarka\WebServer\pythonProject\database\database.db"
+        self.db_name = r"E:\Bakalarka\WebServer\pythonProject\database\database.db"
 
         self.selected_device = None
 

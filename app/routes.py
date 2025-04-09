@@ -29,15 +29,6 @@ class Routes:
 
         self.routes = Blueprint("routes", __name__)
 
-        """self.last_notification = 0
-        self.notification_sent = False
-        self.last_email_notification = 0
-        self.email_notification_sent = False
-        self.last_temp_notification = 0
-        self.temp_notification_sent = False
-        self.last_humi_notification = 0
-        self.humi_notification_sent = False"""
-
         self.socket_connection_established = False
 
         self.selected_device = self.db.get_selected_device()
@@ -105,47 +96,10 @@ class Routes:
                 humidity = int(new_data_row[2])
                 temperature = int(new_data_row[1])
 
-                # Getting the user set notification settings
-                (
-                    notifications_on,
-                    notifications_threshold,
-                    cooldown,
-                    notification_message,
-                    email_notifications_on,
-                    email_notification_threshold,
-                    email_cooldown,
-                    esp_alarm_enabled,
-                    alarm_time,
-                    temp_notifications_enabled,
-                    temp_threshold,
-                    temp_cooldown,
-                    humi_notifications_enabled,
-                    humi_threshold,
-                    humi_cooldown,
-                ) = self.db.get_user_settings_notifications()
+                self.notification_manager.update_notification_settings()
 
-                self.notification_manager.set_notification_settings(
-                    notifications_on,
-                    email_notifications_on,
-                    esp_alarm_enabled,
-                    temp_notifications_enabled,
-                    humi_notifications_enabled,
-                    email_cooldown,
-                    email_notification_threshold,
-                    notification_message
-                )
                 self.notification_manager.check_for_notifications(
                     voc,
-                    notifications_threshold,
-                    cooldown,
-                    notification_message,
-                    alarm_time,
-                    email_cooldown,
-                    email_notification_threshold,
-                    temp_threshold,
-                    temp_cooldown,
-                    humi_threshold,
-                    humi_cooldown,
                     humidity,
                     temperature,
                 )
@@ -280,6 +234,8 @@ class Routes:
                     humi_threshold,
                     humi_cooldown,
                 )
+
+                self.notification_manager.update_notification_settings()
 
                 return jsonify({"message": "Settings updated successfully!"}), 200
             except Exception as e:

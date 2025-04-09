@@ -31,6 +31,7 @@ def create_app(mqtt, db_manager):
 
     return app, socketio
 
+
 if __name__ == "__main__":
     db = DatabaseManager()
     mqtt_manager = MQTTManager(db)

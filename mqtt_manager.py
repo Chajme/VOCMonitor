@@ -25,6 +25,7 @@ class MQTTManager:
         self.voc_index = {}
 
         self.threshold_exceeded = False
+        self.last_alarm_state = None
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
         """Callback function to handle connecting to mqtt broker. Once connected loads topics and subscribes."""
@@ -59,7 +60,8 @@ class MQTTManager:
             self.voc_index[table_name].append(int(voc))
             curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            self.notification_manager.check_email_notif(int(voc), table_name)
+            self.notification_manager.check_email_notif(int(voc))
+            self.esp_notif_alarm(int(voc))
 
             # If the voc index array with the specified table_name has 5 elements
             if len(self.voc_index[table_name]) == 5:
@@ -152,8 +154,12 @@ class MQTTManager:
         self.client.publish("alert/testing", payload)
         print("LED state changed: ", payload)
 
-    def esp_notif_alarm(self):
-        if self.notification_manager.send_esp_alarm_notif():
-            self.threshold_exceeded_notification("on")
-        else:
-            self.threshold_exceeded_notification("off")
+    def esp_notif_alarm(self, voc):
+        if self.notification_manager.is_esp_alarm_enabled():
+            current_state = self.notification_manager.send_esp_alarm_notif(voc)
+            if current_state != self.last_alarm_state:
+                if current_state:
+                    self.threshold_exceeded_notification("on")
+                else:
+                    self.threshold_exceeded_notification("off")
+            self.last_alarm_state = current_state

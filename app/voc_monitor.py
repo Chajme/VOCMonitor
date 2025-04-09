@@ -5,9 +5,9 @@ from flask_mail import Mail
 from flask_socketio import SocketIO
 
 from app import Config
+from app.notification_manager import NotificationManager
 from database.db_manager import DatabaseManager
 from mqtt_manager import MQTTManager
-from notification_manager import NotificationManager
 
 
 class VOCMonitor:
@@ -20,7 +20,7 @@ class VOCMonitor:
 
         self.db = DatabaseManager()
         self.notification_manager = NotificationManager(
-            self.socketio, self.mail, self.db
+            self.app, self.socketio, self.mail, self.db
         )
         self.mqtt_manager = MQTTManager(self.db, self.notification_manager)
 
@@ -30,6 +30,8 @@ class VOCMonitor:
         self.db.new_device("device", "new/topic")
         self.db.clear_table("esp")
         self.db.clear_table("device")
+
+        self.db.set_selected_device("esp")
 
         from app.routes import Routes
 

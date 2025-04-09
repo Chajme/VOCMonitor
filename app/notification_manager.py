@@ -1,14 +1,15 @@
 import datetime
 import time
 
-from flask import current_app
 from flask_mail import Message
 
 
 class NotificationManager:
-    def __init__(self, socketio, mail, db):
+    def __init__(self, app, socketio, mail, db):
         self.last_notification = 0
         self.notification_sent = False
+        self.last_esp_notification = 0
+        self.esp_notification_sent = False
         self.last_email_notification = 0
         self.email_notification_sent = False
         self.last_temp_notification = 0
@@ -17,64 +18,55 @@ class NotificationManager:
         self.humi_notification_sent = False
 
         self.notifications_on = None
+        self.notification_message = None
+        self.notifications_threshold = None
+        self.cooldown = None
+
         self.email_notifications_on = None
+        self.email_cooldown = None
+        self.email_notification_threshold = None
 
         self.esp_alarm_enabled = None
+        self.alarm_time = None
         self.send_esp_alarm = False
 
         self.temp_notifications_enabled = None
+        self.temp_threshold = None
+        self.temp_cooldown = None
         self.humi_notifications_enabled = None
+        self.humi_threshold = None
+        self.humi_cooldown = None
 
-        self.email_cooldown = None
-        self.email_notification_threshold = None
-        self.notification_message = None
-
-        self.selected_device = None
-
+        self.app = app
         self.socketio = socketio
         self.mail = mail
         self.db = db
 
-    def set_notification_settings(
-        self,
-        notifications_on,
-        email_notifications_on,
-        esp_alarm_enabled,
-        temp_notifications_enabled,
-        humi_notifications_enabled,
-        email_cooldown,
-        email_notification_threshold,
-        notification_message,
-    ):
-        self.notifications_on = notifications_on
-        self.email_notifications_on = email_notifications_on
-        self.esp_alarm_enabled = esp_alarm_enabled
-        self.temp_notifications_enabled = temp_notifications_enabled
-        self.humi_notifications_enabled = humi_notifications_enabled
-
-        self.email_cooldown = email_cooldown
-        self.email_notification_threshold = email_notification_threshold
-        self.notification_message = notification_message
+        self.update_notification_settings()
 
     def is_esp_alarm_enabled(self):
         return self.esp_alarm_enabled
 
-    def check_for_notifications(
-        self,
-        voc,
-        set_threshold,
-        cooldown,
-        notification_message,
-        alarm_time,
-        email_cooldown,
-        email_notification_threshold,
-        temp_threshold,
-        temp_cooldown,
-        humi_threshold,
-        humi_cooldown,
-        humidity,
-        temperature,
-    ):
+    def update_notification_settings(self):
+        (
+            self.notifications_on,
+            self.notifications_threshold,
+            self.cooldown,
+            self.notification_message,
+            self.email_notifications_on,
+            self.email_notification_threshold,
+            self.email_cooldown,
+            self.esp_alarm_enabled,
+            self.alarm_time,
+            self.temp_notifications_enabled,
+            self.temp_threshold,
+            self.temp_cooldown,
+            self.humi_notifications_enabled,
+            self.humi_threshold,
+            self.humi_cooldown,
+        ) = self.db.get_user_settings_notifications()
+
+    def check_for_notifications(self, voc, temperature, humidity):
         """
         Checking passed parameter and handling the notifications
 
@@ -86,59 +78,28 @@ class NotificationManager:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # If the voc is higher than user set threshold and the notifications are turned on
-        if voc > set_threshold and self.notifications_on:
+        if voc > self.notifications_threshold and self.notifications_on:
             if (
                 not self.notification_sent
-                or (current_time - self.last_notification) > cooldown
+                or (current_time - self.last_notification) > self.cooldown
             ):
                 # Sending a socket message with the user set notification message
-                self.socketio.emit("alert", {"message": notification_message})
-
-                # If an esp alarm is enabled we send a message using mqtt turning the alarm on
-                if self.esp_alarm_enabled:
-                    self.send_esp_alarm = True
+                self.socketio.emit("alert", {"message": self.notification_message})
 
                 # Adding the notification to our table of notification in the db
-                self.db.new_notification(timestamp, notification_message, voc)
+                self.db.new_notification(timestamp, self.notification_message, voc)
 
                 # Setting the notification sent to True and last_notification to the current_time
                 self.notification_sent = True
                 self.last_notification = current_time
-
-            # If the user set alarm notification time passed, turn off the alarm
-            if (
-                current_time - self.last_notification
-            ) > alarm_time and self.esp_alarm_enabled:
-                self.send_esp_alarm = False
         else:
             self.notification_sent = False
 
-        # If voc exceeded the threshold for an email notification and email notifications are on
-        if voc > email_notification_threshold and self.email_notifications_on:
-            if (
-                not self.email_notification_sent
-                or (current_time - self.last_email_notification) > email_cooldown
-            ):
-                # Sending an email with the message
-                self.send_email_voc_threshold_exceeded(
-                    timestamp, voc, notification_message
-                )
-
-                # Adding the notification to the db with the email-- prefix
-                self.db.new_notification(
-                    "email--" + timestamp, notification_message, voc
-                )
-
-                self.email_notification_sent = True
-                self.last_email_notification = current_time
-        else:
-            self.email_notification_sent = False
-
         # If temperature has exceeded the user set limit and the temperature notification are on
-        if temperature > temp_threshold and self.temp_notifications_enabled:
+        if temperature > self.temp_threshold and self.temp_notifications_enabled:
             if (
                 not self.temp_notification_sent
-                or (current_time - self.last_temp_notification) > temp_cooldown
+                or (current_time - self.last_temp_notification) > self.temp_cooldown
             ):
                 # Sending a socket message with the specified message
                 self.socketio.emit(
@@ -151,10 +112,10 @@ class NotificationManager:
             self.temp_notification_sent = False
 
         # If humidity has exceeded the user set limit and humidity notifications are on
-        if humidity > humi_threshold and self.humi_notifications_enabled:
+        if humidity > self.humi_threshold and self.humi_notifications_enabled:
             if (
                 not self.humi_notification_sent
-                or (current_time - self.last_humi_notification) > humi_cooldown
+                or (current_time - self.last_humi_notification) > self.humi_cooldown
             ):
                 # Sending a socket message with the specified message
                 self.socketio.emit("alert", {"message": "Humidity exceeded set value."})
@@ -164,18 +125,36 @@ class NotificationManager:
         else:
             self.humi_notification_sent = False
 
-    def send_esp_alarm_notif(self, voc, device):
+    def send_esp_alarm_notif(self, voc):
+        current_time = time.time()
+
+        if voc > self.notifications_threshold and self.notifications_on:
+            if (
+                not self.esp_notification_sent
+                or (current_time - self.last_esp_notification) > self.cooldown
+            ):
+                # If an esp alarm is enabled we send a message using mqtt turning the alarm on
+                if self.esp_alarm_enabled:
+                    self.send_esp_alarm = True
+
+                # Setting the notification sent to True and last_notification to the current_time
+                self.esp_notification_sent = True
+                self.last_esp_notification = current_time
+            # If the user set alarm notification time passed, turn off the alarm
+            if (
+                current_time - self.last_esp_notification
+            ) > self.alarm_time and self.esp_alarm_enabled:
+                self.send_esp_alarm = False
+        else:
+            self.esp_notification_sent = False
+
         return self.send_esp_alarm
 
-    def check_email_notif(self, voc, device):
+    def check_email_notif(self, voc):
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if (
-            voc > self.email_notification_threshold
-            and self.email_notifications_on
-            and self.db.get_selected_device() == device
-        ):
+        if voc > self.email_notification_threshold and self.email_notifications_on:
             if (
                 not self.email_notification_sent
                 or (current_time - self.last_email_notification) > self.email_cooldown
@@ -198,7 +177,7 @@ class NotificationManager:
     def send_email(self, receiver, subject, body):
         """Sends an email with the specified parameters."""
         try:
-            with current_app.app_context():
+            with self.app.app_context():
                 message = Message(subject, recipients=receiver, body=body)
                 self.mail.send(message)
                 print("Email sent!")
