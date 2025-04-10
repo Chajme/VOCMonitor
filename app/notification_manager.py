@@ -128,11 +128,7 @@ class NotificationManager:
     def send_esp_alarm_notif(self, voc, device):
         current_time = time.time()
 
-        if (
-            voc > self.notifications_threshold
-            and self.notifications_on
-            and device == self.db.get_selected_device()
-        ):
+        if voc > self.notifications_threshold and self.notifications_on and device == self.db.get_selected_device():
             if (
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
