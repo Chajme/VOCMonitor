@@ -254,6 +254,7 @@ class Routes:
             try:
                 # Setting the default settings
                 self.db.set_default_settings()
+                self.notification_manager.update_notification_settings()
                 return ({"message": "Settings reset successfully!"}), 200
             except Exception as e:
                 return {"message": f"Error resetting settings: {str(e)}"}, 500

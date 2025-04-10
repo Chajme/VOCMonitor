@@ -125,10 +125,14 @@ class NotificationManager:
         else:
             self.humi_notification_sent = False
 
-    def send_esp_alarm_notif(self, voc):
+    def send_esp_alarm_notif(self, voc, device):
         current_time = time.time()
 
-        if voc > self.notifications_threshold and self.notifications_on:
+        if (
+            voc > self.notifications_threshold
+            and self.notifications_on
+            and device == self.db.get_selected_device()
+        ):
             if (
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
@@ -150,13 +154,14 @@ class NotificationManager:
 
         return self.send_esp_alarm
 
-    def check_email_notif(self, voc):
+    def check_email_notif(self, voc, device):
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if (
             voc > self.email_notification_threshold
             and self.email_notifications_on
+            and device == self.db.get_selected_device()
         ):
             if (
                 not self.email_notification_sent
@@ -174,8 +179,11 @@ class NotificationManager:
 
                 self.email_notification_sent = True
                 self.last_email_notification = current_time
-        else:
-            self.email_notification_sent = False
+        elif voc <= self.email_notification_threshold:
+            if (current_time - self.last_email_notification) > self.email_cooldown:
+                self.email_notification_sent = False
+        """else:
+            self.email_notification_sent = False"""
 
     def send_email(self, receiver, subject, body):
         """Sends an email with the specified parameters."""
