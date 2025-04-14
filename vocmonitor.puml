@@ -23,6 +23,34 @@ class MQTTManager {
     + esp_notif_alarm(voc)
 }
 
+class Routes {
+    - db: object
+    - mqtt: object
+    - socketio: object
+    - mail: object
+    - routes: Blueprint
+    - socket_connection_established: bool
+    - selected_device: str
+    + __init__(db, mqtt, socketio, mail)
+    + create_routes()
+}
+
+class Config {
+    + MAIL_SERVER: str = "smtp.gmail.com"
+    + MAIL_PORT: int = 465
+    + MAIL_USE_TLS: bool = False
+    + MAIL_USE_SSL: bool = True
+    + MAIL_USERNAME: str = "sender email"
+    + MAIL_PASSWORD: str = "password"
+    + MAIL_DEFAULT_SENDER: str = "sender email"
+}
+
+class VOCMonitor {
+    + __init__()
+    + initialize_app(self)
+    + run()
+}
+
 class DatabaseManager {
     - db_name: str
     + __init__()
@@ -53,43 +81,6 @@ class DatabaseManager {
     + get_avg(self, time_period, table_name)
     + get_min_max(self, time_period, table_name)
     + is_valid_device_name(device_name)
-}
-
-class Config {
-    + MAIL_SERVER: str = "smtp.gmail.com"
-    + MAIL_PORT: int = 465
-    + MAIL_USE_TLS: bool = False
-    + MAIL_USE_SSL: bool = True
-    + MAIL_USERNAME: str = "sender email"
-    + MAIL_PASSWORD: str = "password"
-    + MAIL_DEFAULT_SENDER: str = "sender email"
-}
-
-class VOCMonitor {
-    + __init__()
-    + initialize_app(self)
-    + run()
-}
-
-class Routes {
-    - db: object
-    - mqtt: object
-    - socketio: object
-    - mail: object
-    - routes: Blueprint
-    - last_notification: int
-    - notification_sent: bool
-    - last_email_notification: int
-    - email_notification_sent: bool
-    - last_temp_notification: int
-    - temp_notification_sent: bool
-    - last_humi_notification: int
-    - humi_notification_sent: bool
-    - socket_connection_established: bool
-    - selected_device: str
-    + __init__(db, mqtt, socketio, mail)
-    + create_routes()
-    + register_socket_events()
 }
 
 class NotificationManager {
@@ -127,6 +118,7 @@ class NotificationManager {
     + check_email_notif(voc)
     + send_email(receiver, subject, body)
     + send_email_voc_threshold_exceeded(timestamp, voc_level, message)
+    + register_socket_events()
 }
 
 VOCMonitor "1" -- "1" Routes: uses

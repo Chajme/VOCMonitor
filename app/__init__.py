@@ -25,7 +25,7 @@ def create_app(mqtt, db_manager):
 
     from app.routes import Routes
 
-    routes = Routes(db_manager, mqtt, socketio, mail)
+    routes = Routes(db_manager, mqtt, socketio)
     app.register_blueprint(routes.routes)
     routes.register_socket_events()
 

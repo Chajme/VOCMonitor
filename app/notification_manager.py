@@ -5,7 +5,15 @@ from flask_mail import Message
 
 
 class NotificationManager:
+    """Class represents a manager of notifications."""
+
     def __init__(self, app, socketio, mail, db):
+        """
+        Defines the attributes needed to keep track of notifications, cooldowns and thresholds.
+        Updates all the attributes by requesting the needed data from the db.
+        """
+        self.socket_connection_established = False
+
         self.last_notification = 0
         self.notification_sent = False
         self.last_esp_notification = 0
@@ -45,9 +53,13 @@ class NotificationManager:
         self.update_notification_settings()
 
     def is_esp_alarm_enabled(self):
+        """Returns a boolean whether an esp alarm is enabled."""
+
         return self.esp_alarm_enabled
 
     def update_notification_settings(self):
+        """Updates the attribute values by requesting them from the db."""
+
         (
             self.notifications_on,
             self.notifications_threshold,
@@ -126,9 +138,15 @@ class NotificationManager:
             self.humi_notification_sent = False
 
     def send_esp_alarm_notif(self, voc, device):
+        """Returns a boolean whether an esp notification should be sent or not."""
+
         current_time = time.time()
 
-        if voc > self.notifications_threshold and self.notifications_on and device == self.db.get_selected_device():
+        if (
+            voc > self.notifications_threshold
+            and self.notifications_on
+            and device == self.db.get_selected_device()
+        ):
             if (
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
@@ -151,6 +169,8 @@ class NotificationManager:
         return self.send_esp_alarm
 
     def check_email_notif(self, voc, device):
+        """Sends out an email notification."""
+
         current_time = time.time()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -198,3 +218,19 @@ class NotificationManager:
         subject = "VOC Warning"
         body = f"{timestamp} \n Current VOC level: {voc_level}, set threshold exceeded. \n {message}"
         self.send_email(receiver_address, subject, body)
+
+    def register_socket_events(self):
+        """Registers used socket events."""
+        print(">>> Registering socket events...")
+
+        @self.socketio.on("connect")
+        def test_connect():
+            """Tests the socket connection."""
+
+            # If a socket connection isn't established yet, we establish it and notify the user
+            if self.socket_connection_established is not True:
+                print("Client connected!")
+                self.socketio.emit(
+                    "alert", {"message": "Welcome! Server is connected."}
+                )
+                self.socket_connection_established = True

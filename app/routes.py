@@ -11,7 +11,6 @@ class Routes:
         db,
         mqtt,
         notification_manager,
-        socketio,
         mail,
     ):
         """
@@ -24,14 +23,9 @@ class Routes:
         self.db = db
         self.mqtt = mqtt
         self.notification_manager = notification_manager
-        self.socketio = socketio
         self.mail = mail
 
         self.routes = Blueprint("routes", __name__)
-
-        self.socket_connection_established = False
-
-        self.selected_device = self.db.get_selected_device()
 
         self.create_routes()
 
@@ -62,7 +56,7 @@ class Routes:
         def all_data():
             """Sends all data from the db for the selected device."""
 
-            all_data_row = self.db.get_all_rows(self.selected_device)
+            all_data_row = self.db.get_all_rows(self.db.get_selected_device())
 
             all_data_list = {
                 "timestamp": [row[0] for row in all_data_row],
@@ -79,7 +73,7 @@ class Routes:
             """Sends new data from the db and checks for notifications."""
 
             try:
-                new_data_row = self.db.get_last_row(self.selected_device)
+                new_data_row = self.db.get_last_row(self.db.get_selected_device())
 
                 # If there's no data in the db yet, throw a response with the code 404
                 if not new_data_row:
@@ -112,10 +106,12 @@ class Routes:
         def get_averages():
             """Sends averages from the db for the specified device and time."""
 
+            selected_device = self.db.get_selected_device()
+
             try:
-                avg_24h = self.db.get_avg("-24 hours", self.selected_device)
-                avg_72h = self.db.get_avg("-72 hours", self.selected_device)
-                avg_7d = self.db.get_avg("-7 days", self.selected_device)
+                avg_24h = self.db.get_avg("-24 hours", selected_device)
+                avg_72h = self.db.get_avg("-72 hours", selected_device)
+                avg_7d = self.db.get_avg("-7 days", selected_device)
 
                 averages = {"avg_24h": avg_24h, "avg_72h": avg_72h, "avg_7d": avg_7d}
             except Exception as e:
@@ -127,13 +123,11 @@ class Routes:
         def get_min_max_voc():
             """Sends min and max value from the db for the specified device and time."""
 
+            selected_device = self.db.get_selected_device()
+
             try:
-                min_24h, max_24h = self.db.get_min_max(
-                    "-24 hours", self.selected_device
-                )
-                min_72h, max_72h = self.db.get_min_max(
-                    "-72 hours", self.selected_device
-                )
+                min_24h, max_24h = self.db.get_min_max("-24 hours", selected_device)
+                min_72h, max_72h = self.db.get_min_max("-72 hours", selected_device)
 
                 min_max_voc_list = {
                     "min_24h": min_24h,
@@ -375,29 +369,13 @@ class Routes:
             device_name = request.json.get("device_name")
             print("Select device params: ", device_id, topic, device_name)
             # Setting the selected device to the device user has clicked on
-            self.selected_device = device_name
-            self.db.set_selected_device(self.selected_device)
+            self.db.set_selected_device(device_name)
             return jsonify({"message": "New device selected!"}), 200
 
         @self.routes.route("/current_device")
         def get_current_device():
             """Returns the currently selected device."""
 
-            return jsonify({"selected_device": self.selected_device})
+            return jsonify({"selected_device": self.db.get_selected_device()})
 
         return self.routes
-
-    def register_socket_events(self):
-        """Registers used socket events."""
-
-        @self.socketio.on("connect")
-        def test_connect():
-            """Tests the socket connection."""
-
-            # If a socket connection isn't established yet, we establish it and notify the user
-            if self.socket_connection_established is not True:
-                print("Client connected!")
-                self.socketio.emit(
-                    "alert", {"message": "Welcome! Server is connected."}
-                )
-                self.socket_connection_established = True
