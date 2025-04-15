@@ -1,3 +1,5 @@
+"""Main class that runs the whole app and starts a web server in production version."""
+
 import threading
 
 from flask import Flask
@@ -12,12 +14,13 @@ from mqtt_manager import MQTTManager
 
 
 class VOCMonitor:
+    """Class represents our whole system."""
+
     def __init__(self):
+        """Initializes app, sets it's config, initializes socketio, mail, db, mqtt_manager and notification_manager."""
+
         self.app = Flask(__name__)
         self.app.config.from_object(Config)
-
-        """self.app.debug = True
-        self.app.use_reloader = False"""
 
         self.socketio = SocketIO(self.app, async_mode="gevent")
         self.mail = Mail(self.app)
@@ -38,6 +41,8 @@ class VOCMonitor:
         self.notification_manager.register_socket_events()
 
     def initialize_app(self):
+        """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
+
         self.db.initialize_db()
         self.db.new_device("esp", "data")
         self.db.new_device("device", "new/topic")
@@ -47,6 +52,8 @@ class VOCMonitor:
         self.db.set_selected_device("esp")
 
     def run(self):
+        """Stars the mqtt_manager in a thread and starts the production web server on port 8000."""
+
         # Start MQTT before creating Flask app
         mqtt_thread = threading.Thread(target=self.mqtt_manager.run_mqtt, daemon=True)
         mqtt_thread.start()
