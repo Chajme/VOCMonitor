@@ -31,10 +31,14 @@ def create_app(db_manager):
 
     # Initializes the db
     db_manager.initialize_db()
+    # Add new devices
     db_manager.new_device("esp", "data")
     db_manager.new_device("device", "new/topic")
+    # Clear the tables
     db_manager.clear_table("esp")
     db_manager.clear_table("device")
+    # Set the selected device to one of the new devices
+    db_manager.set_selected_device("esp")
 
     from app.routes import Routes
 
@@ -55,9 +59,10 @@ if __name__ == "__main__":
 
     try:
         # Runs the development web server
+        print(">>> Starting development server on port 5000...")
         socketio_t.run(
             flask_app, debug=True, use_reloader=False, allow_unsafe_werkzeug=True
         )
     except KeyboardInterrupt:
-        print("Stopping the server...")
+        print(">>> Stopping the server...")
         socketio_t.stop()

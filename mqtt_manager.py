@@ -35,7 +35,7 @@ class MQTTManager:
             self.print_loaded_topics()
             self.subscribe_to_all_topics()
         else:
-            print(f"Connection error: {str(reason_code)}")
+            print(f">>> Connection error: {str(reason_code)}")
 
     def on_message(self, client, userdata, message):
         """Callback function handles oncoming messages. Every 5 messages saves an average of voc to the db."""
@@ -46,7 +46,7 @@ class MQTTManager:
 
         # If the message isn't in the correct format (correct length) do nothing
         if len(msg_split) < 3:
-            print(f"Invalid message received: {msg_str}")
+            print(f">>> Invalid message received: {msg_str}")
             return
 
         # Save the parts of the split message to local variables
@@ -91,8 +91,8 @@ class MQTTManager:
             try:
                 result = self.client.connect(self.server, self.port, 60)
             except Exception as e:
-                print(f"Connection failed: {e}")
-                print("Will try reconnecting in 15 seconds...")
+                print(f">>> Connection failed: {e}")
+                print(">>> Will try reconnecting in 15 seconds...")
             time.sleep(15)
 
         try:
@@ -107,7 +107,7 @@ class MQTTManager:
             self.topics[topic] = device_name
             self.voc_index[device_name] = []
             self.client.subscribe(topic)
-        print(f"Subscribed to new topic: {topic}, Table: {device_name}")
+        print(f">>> Subscribed to new topic: {topic}, Table: {device_name}")
 
     def unsubscribe(self, topic):
         """Unsubscribe from the specified topic."""
@@ -118,7 +118,7 @@ class MQTTManager:
 
             del self.topics[topic]
             del self.voc_index[table_name]
-            print(f"Unsubscribed from topic: {topic}, Removed table: {table_name}")
+            print(f">>> Unsubscribed from topic: {topic}, Removed table: {table_name}")
 
     def load_topics_from_db(self):
         """Load all the topics from the db into an array."""
@@ -127,7 +127,7 @@ class MQTTManager:
         for topic, device_name in rows:
             self.topics[topic] = device_name
             self.voc_index[device_name] = []
-        print("Loaded topics: ", self.topics)
+        print(">>> Loaded topics: ", self.topics)
 
     def clear_topics(self):
         """Clear all topics in the array."""
@@ -140,19 +140,19 @@ class MQTTManager:
 
         for topic in self.topics.keys():
             self.client.subscribe(topic)
-            print(f"Subscribed to topic: {topic}")
+            print(f">>> Subscribed to topic: {topic}")
 
     def print_loaded_topics(self):
         """Print all the loaded topics."""
 
         for topic, table_name in self.topics.items():
-            print(f"Topic: {topic} -> Table: {table_name}")
+            print(f">>> Topic: {topic} -> Table: {table_name}")
 
     def threshold_exceeded_notification(self, payload):
         """Send a message to the specified topic with the payload."""
 
         self.client.publish("alert/testing", payload)
-        print("LED state changed: ", payload)
+        print(">>> LED state changed: ", payload)
 
     def esp_notif_alarm(self, voc, device):
         if self.notification_manager.is_esp_alarm_enabled():

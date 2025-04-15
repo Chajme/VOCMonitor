@@ -347,7 +347,7 @@ class Routes:
             device_id = request.json.get("id")
             device_name = request.json.get("device_name")
             topic = request.json.get("topic")
-            print("Device id: ", device_id)
+            print(">>> Deleting device: ", device_name, topic)
             try:
                 # Deleting a device based on it's name and id
                 self.db.delete_device(device_id, device_name)
@@ -367,7 +367,7 @@ class Routes:
             device_id = request.json.get("id")
             topic = request.json.get("topic")
             device_name = request.json.get("device_name")
-            print("Select device params: ", device_id, topic, device_name)
+            print(">>> Selected device: ", device_id, topic, device_name)
             # Setting the selected device to the device user has clicked on
             self.db.set_selected_device(device_name)
             return jsonify({"message": "New device selected!"}), 200

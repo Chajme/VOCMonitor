@@ -23,9 +23,6 @@ class DatabaseManager:
     def initialize_db(self):
         """Initialize the db connection, cursor, create tables and set default user settings."""
 
-        con = sqlite3.connect(self.db_name)
-        cur = con.cursor()
-
         # Clearing the db and dropping tables
         self.drop_table("user_settings")
         self.clear_table("devices")
@@ -41,8 +38,6 @@ class DatabaseManager:
 
         # Setting default user settings
         self.set_default_settings()
-
-        con.close()
 
     def _connect(self):
         """Connects to the db and returns the connection."""

@@ -61,10 +61,8 @@ class VOCMonitor:
         # Create Flask app and Socket.IO
         self.initialize_app()
 
-        print("Starting production server on port 8000...")
-        """eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 8000)), app)"""
-
         try:
+            print(">>> Starting production server on port 8000...")
             self.socketio.run(self.app, host="0.0.0.0", port=8000)
         except KeyboardInterrupt:
             print("Stopping the server...")

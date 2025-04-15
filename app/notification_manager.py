@@ -198,8 +198,6 @@ class NotificationManager:
         elif voc <= self.email_notification_threshold:
             if (current_time - self.last_email_notification) > self.email_cooldown:
                 self.email_notification_sent = False
-        """else:
-            self.email_notification_sent = False"""
 
     def send_email(self, receiver, subject, body):
         """Sends an email with the specified parameters."""
@@ -207,9 +205,9 @@ class NotificationManager:
             with self.app.app_context():
                 message = Message(subject, recipients=receiver, body=body)
                 self.mail.send(message)
-                print("Email sent!")
+                print(">>> Email notification sent!")
         except Exception as e:
-            print(f"Failed to send email: {e}")
+            print(f">>> Failed to send email: {e}")
 
     def send_email_voc_threshold_exceeded(self, timestamp, voc_level, message):
         """Sends a specific email about exceeded voc threshold to a user set email address."""
@@ -229,7 +227,7 @@ class NotificationManager:
 
             # If a socket connection isn't established yet, we establish it and notify the user
             if self.socket_connection_established is not True:
-                print("Client connected!")
+                print(">>> Client connected!")
                 self.socketio.emit(
                     "alert", {"message": "Welcome! Server is connected."}
                 )
