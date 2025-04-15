@@ -1,3 +1,5 @@
+""" Handles notification logic. """
+
 import datetime
 import time
 
@@ -12,6 +14,7 @@ class NotificationManager:
         Defines the attributes needed to keep track of notifications, cooldowns and thresholds.
         Updates all the attributes by requesting the needed data from the db.
         """
+        
         self.socket_connection_established = False
 
         self.last_notification = 0
@@ -158,6 +161,7 @@ class NotificationManager:
                 # Setting the notification sent to True and last_notification to the current_time
                 self.esp_notification_sent = True
                 self.last_esp_notification = current_time
+
             # If the user set alarm notification time passed, turn off the alarm
             if (
                 current_time - self.last_esp_notification
@@ -203,6 +207,7 @@ class NotificationManager:
 
     def send_email(self, receiver, subject, body):
         """Sends an email with the specified parameters."""
+        
         try:
             with self.app.app_context():
                 message = Message(subject, recipients=receiver, body=body)
@@ -221,15 +226,16 @@ class NotificationManager:
 
     def register_socket_events(self):
         """Registers used socket events."""
+        
         print(">>> Registering socket events...")
 
         @self.socketio.on("connect")
-        def test_connect():
-            """Tests the socket connection."""
+        def on_connect():
+            """ Sends a notification when a client connects. """
 
             # If a socket connection isn't established yet, we establish it and notify the user
             if self.socket_connection_established is not True:
-                print("Client connected!")
+                print(">>> Client connected!")
                 self.socketio.emit(
                     "alert", {"message": "Welcome! Server is connected."}
                 )

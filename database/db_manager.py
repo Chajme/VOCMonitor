@@ -506,7 +506,7 @@ class DatabaseManager:
             7200,
             "erikmolitoris60@gmail.com",
             1,
-            10,
+            5,
             0,
             0,
             300,
