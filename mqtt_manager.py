@@ -60,6 +60,8 @@ class MQTTManager:
             self.voc_index[table_name].append(int(voc))
             curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+            self.esp_notif_alarm(int(voc), table_name)
+
             # If the voc index array with the specified table_name has 5 elements
             if len(self.voc_index[table_name]) == 5:
                 # Calculate an average voc for the 5 values
@@ -72,7 +74,6 @@ class MQTTManager:
                 )
 
                 self.notification_manager.check_email_notif(avg_voc, table_name)
-                self.esp_notif_alarm(avg_voc, table_name)
 
                 # Clear the voc array of the specified table
                 self.voc_index[table_name].clear()
@@ -157,6 +158,7 @@ class MQTTManager:
     def esp_notif_alarm(self, voc, device):
         if self.notification_manager.is_esp_alarm_enabled():
             current_state = self.notification_manager.send_esp_alarm_notif(voc, device)
+            print(f">>> Current state: {current_state}")
             if current_state != self.last_alarm_state:
                 if current_state:
                     self.threshold_exceeded_notification("on")

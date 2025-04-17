@@ -4,34 +4,36 @@ left to right direction
 class MQTTManager {
     - server: str
     - port: int
-    - db_manager: object
-    - selected_device: str
     - client: object
+    - db_manager: object
+    - notification_manager: object
     - topics: dict
     - voc_index: dict
-    - threshold_exceeded: boolean
-    + __init__(db)
+    - threshold_exceeded: bool
+    - last_alarm_state: bool
+    + __init__(db, notification_manager)
     + on_connect(client, userdata, flags, reason_code, properties)
     + on_message(client, userdata, message)
     + run_mqtt()
     + subscribe(topic, device_name)
     + unsubscribe(topic)
-    + load_topics_from_db():
+    + load_topics_from_db()
     + clear_topics()
+    + subscribe_to_all_topics()
     + print_loaded_topics()
     + threshold_exceeded_notification(payload)
-    + esp_notif_alarm(voc)
+    + esp_notif_alarm(voc, device)
 }
 
 class Routes {
     - db: object
     - mqtt: object
-    - socketio: object
+    - notification_manager: object
     - mail: object
     - routes: Blueprint
     - socket_connection_established: bool
     - selected_device: str
-    + __init__(db, mqtt, socketio, mail)
+    + __init__(db, mqtt, notification_manager, mail)
     + create_routes()
 }
 
@@ -53,7 +55,10 @@ class VOCMonitor {
 
 class DatabaseManager {
     - db_name: str
+    - selected_device: str
     + __init__()
+    + set_selected_device(new_device)
+    + get_selected_device()
     + initialize_db()
     + _connect()
     + insert(table_name, timestamp, temperature, humidity, voc)
@@ -84,6 +89,7 @@ class DatabaseManager {
 }
 
 class NotificationManager {
+    - socket_connection_established: bool
     - last_notification: int
     - notification_sent: bool
     - last_esp_notification: int

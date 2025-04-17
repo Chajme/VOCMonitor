@@ -147,10 +147,12 @@ class NotificationManager:
             and self.notifications_on
             and device == self.db.get_selected_device()
         ):
+            print(f">>> Device: {self.db.get_selected_device()}, VOC: {voc}, Notifications on: {self.notifications_on}")
             if (
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
             ):
+                print(f">>> ESP notif sent: {self.esp_notification_sent}, Curr time: {current_time}, Last notif: {self.last_esp_notification}, Cooldown: {self.cooldown}")
                 # If an esp alarm is enabled we send a message using mqtt turning the alarm on
                 if self.esp_alarm_enabled:
                     self.send_esp_alarm = True
