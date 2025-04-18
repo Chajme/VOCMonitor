@@ -1,5 +1,6 @@
 """Main class that runs the whole app and starts a web server in production version."""
 
+import socket
 import threading
 
 from flask import Flask
@@ -44,12 +45,12 @@ class VOCMonitor:
         """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
 
         self.db.initialize_db()
-        self.db.new_device("esp", "data")
-        self.db.new_device("device", "new/topic")
-        self.db.clear_table("esp")
-        self.db.clear_table("device")
-
         self.db.set_selected_device("esp")
+
+        # self.db.new_device("esp", "data")
+        # self.db.new_device("device", "new/topic")
+        # self.db.clear_table("esp")
+        # self.db.clear_table("device")
 
     def run(self):
         """Stars the mqtt_manager in a thread and starts the production web server on port 8000."""
@@ -61,8 +62,13 @@ class VOCMonitor:
         # Create Flask app and Socket.IO
         self.initialize_app()
 
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+
         try:
             print(">>> Starting production server on port 8000...")
+            print(">>> Localhost:   http://localhost:8000")
+            print(f">>> LAN:   http://{local_ip}:8000")
             self.socketio.run(self.app, host="0.0.0.0", port=8000)
         except KeyboardInterrupt:
             print("Stopping the server...")

@@ -156,9 +156,10 @@ class MQTTManager:
         print(">>> LED state changed: ", payload)
 
     def esp_notif_alarm(self, voc, device):
+        """Sends a message to the esp based on a boolean returned by NotificationManager"""
+
         if self.notification_manager.is_esp_alarm_enabled():
             current_state = self.notification_manager.send_esp_alarm_notif(voc, device)
-            print(f">>> Current state: {current_state}")
             if current_state != self.last_alarm_state:
                 if current_state:
                     self.threshold_exceeded_notification("on")

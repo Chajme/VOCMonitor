@@ -24,8 +24,8 @@ class DatabaseManager:
         """Initialize the db connection, cursor, create tables and set default user settings."""
 
         # Clearing the db and dropping tables
-        self.drop_table("user_settings")
-        self.clear_table("devices")
+        """self.drop_table("user_settings")"""
+        """self.clear_table("devices")"""
 
         # self.clear_table("esp")
         # self.clear_table("device")

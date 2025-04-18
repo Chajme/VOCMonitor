@@ -27,6 +27,8 @@ class Routes:
 
         self.routes = Blueprint("routes", __name__)
 
+        self.previous_timestamp = None
+
         self.create_routes()
 
     def create_routes(self):
@@ -75,9 +77,14 @@ class Routes:
             try:
                 new_data_row = self.db.get_last_row(self.db.get_selected_device())
 
+                timestamp = new_data_row[0]
+
                 # If there's no data in the db yet, throw a response with the code 404
                 if not new_data_row:
                     return jsonify({"message": "No data available"}), 404
+
+                if timestamp == self.previous_timestamp:
+                    return jsonify({"message": "No new data available"}), 404
 
                 new_data_list = {
                     "timestamp": new_data_row[0],
@@ -97,6 +104,8 @@ class Routes:
                     humidity,
                     temperature,
                 )
+
+                self.previous_timestamp = timestamp
                 return jsonify(new_data_list), 200
 
             except Exception as e:
