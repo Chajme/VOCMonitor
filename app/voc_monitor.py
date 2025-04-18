@@ -27,6 +27,7 @@ class VOCMonitor:
         self.mail = Mail(self.app)
 
         self.db = DatabaseManager()
+
         self.notification_manager = NotificationManager(
             self.app, self.socketio, self.mail, self.db
         )
@@ -44,11 +45,13 @@ class VOCMonitor:
     def initialize_app(self):
         """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
 
-        self.db.initialize_db()
+        self.db.drop_table("user_settings")
+        self.db.clear_table("devices")
+
         self.db.set_selected_device("esp")
 
-        # self.db.new_device("esp", "data")
-        # self.db.new_device("device", "new/topic")
+        self.db.new_device("esp", "data")
+        self.db.new_device("device", "new/topic")
         # self.db.clear_table("esp")
         # self.db.clear_table("device")
 
@@ -67,8 +70,8 @@ class VOCMonitor:
 
         try:
             print(">>> Starting production server on port 8000...")
-            print(">>> Localhost:   http://localhost:8000")
-            print(f">>> LAN:   http://{local_ip}:8000")
+            print(">>> Localhost:    http://localhost:8000")
+            print(f">>> LAN:    http://{local_ip}:8000")
             self.socketio.run(self.app, host="0.0.0.0", port=8000)
         except KeyboardInterrupt:
             print("Stopping the server...")

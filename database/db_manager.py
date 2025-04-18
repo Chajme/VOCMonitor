@@ -1,5 +1,6 @@
 """Module handles database querries and connection."""
 
+import os
 import re
 import sqlite3
 
@@ -10,9 +11,13 @@ class DatabaseManager:
     def __init__(self):
         """Defined the db_name and attributes like connection and cursor."""
 
-        self.db_name = r"E:\Bakalarka\WebServer\pythonProject\database\database.db"
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.db_name = os.path.join(base_dir, "database", "database.db")
 
         self.selected_device = None
+
+        self.initialize_db()
+        self.debug_print_tables()
 
     def set_selected_device(self, new_device):
         self.selected_device = new_device
@@ -22,10 +27,6 @@ class DatabaseManager:
 
     def initialize_db(self):
         """Initialize the db connection, cursor, create tables and set default user settings."""
-
-        # Clearing the db and dropping tables
-        """self.drop_table("user_settings")"""
-        """self.clear_table("devices")"""
 
         # self.clear_table("esp")
         # self.clear_table("device")
@@ -38,6 +39,14 @@ class DatabaseManager:
 
         # Setting default user settings
         self.set_default_settings()
+
+    def debug_print_tables(self):
+        with self._connect() as con:
+            cur = con.cursor()
+            tables = cur.execute(
+                "SELECT name FROM sqlite_master WHERE type='table';"
+            ).fetchall()
+            print("[DEBUG] Tables in DB:", tables)
 
     def _connect(self):
         """Connects to the db and returns the connection."""
@@ -184,6 +193,8 @@ class DatabaseManager:
 
     def create_user_settings_table(self):
         """Create a table to store user settings."""
+
+        print("Creating user settings table...")
 
         with self._connect() as con:
             cur = con.cursor()
