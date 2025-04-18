@@ -17,7 +17,6 @@ class DatabaseManager:
         self.selected_device = None
 
         self.initialize_db()
-        self.debug_print_tables()
 
     def set_selected_device(self, new_device):
         self.selected_device = new_device
@@ -40,17 +39,9 @@ class DatabaseManager:
         # Setting default user settings
         self.set_default_settings()
 
-    def debug_print_tables(self):
-        with self._connect() as con:
-            cur = con.cursor()
-            tables = cur.execute(
-                "SELECT name FROM sqlite_master WHERE type='table';"
-            ).fetchall()
-            print("[DEBUG] Tables in DB:", tables)
-
     def _connect(self):
         """Connects to the db and returns the connection."""
-        print(f"[DEBUG] Connecting to DB: {self.db_name}")
+
         return sqlite3.connect(self.db_name)
 
     def insert(self, table_name, timestamp, temperature, humidity, voc):
