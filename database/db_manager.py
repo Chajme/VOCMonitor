@@ -50,7 +50,7 @@ class DatabaseManager:
 
     def _connect(self):
         """Connects to the db and returns the connection."""
-
+        print(f"[DEBUG] Connecting to DB: {self.db_name}")
         return sqlite3.connect(self.db_name)
 
     def insert(self, table_name, timestamp, temperature, humidity, voc):
@@ -350,8 +350,8 @@ class DatabaseManager:
             con.commit()
 
     def get_user_settings(self):
-        """Get all the user settings from the user settings table."""
-
+        """Get all the use settings from the user settings table."""
+        print("Getting user_settings...")
         with self._connect() as con:
             cur = con.cursor()
             query = """
