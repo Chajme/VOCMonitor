@@ -1,3 +1,5 @@
-Flask Web Server with a web app using mqtt for communication with ESP32 and SQLite3 to store data.
+Flask Web Server with a web app 
+- mqtt for communication with ESP32
+- SQLite3 to store data
 
 Molitoris Erik
