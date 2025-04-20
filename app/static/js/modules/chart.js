@@ -1,9 +1,20 @@
 window.jsPDF = window.jspdf.jsPDF;
-
+/**
+ * Created chart
+ */
 let myChart;
+/**
+ * Gradient
+ */
 let gradient, width, height;
 
-// chart initialization, passing labels, datasets and context.
+/**
+ * Chart initialization, passing labels, datasets and context.
+ *
+ * @param context
+ * @param labels
+ * @param datasets
+ */
 function initChart(context, labels, datasets) {
     myChart = new Chart(context, {
         type: 'line',
@@ -55,7 +66,14 @@ function initChart(context, labels, datasets) {
     });
 }
 
-// Updating the chart datasets.
+/**
+ * Updating the chart datasets.Updating the chart datasets.
+ *
+ * @param timestamps
+ * @param sensorData
+ * @param temperatureData
+ * @param humidityData
+ */
 function updateChart(timestamps, sensorData, temperatureData, humidityData) {
     myChart.data.labels = timestamps;
     myChart.data.datasets[0].data = sensorData;
@@ -64,7 +82,12 @@ function updateChart(timestamps, sensorData, temperatureData, humidityData) {
     myChart.update();
 }
 
-// Changing the scales of the y-axis based on the selected dataset.
+/**
+ * Changing the scales of the y-axis based on the selected dataset.
+ *
+ * @param legendItem
+ * @param chart
+ */
 function toggleDatasetVisibility(legendItem, chart) {
     const index = legendItem.datasetIndex;
     const meta = chart.getDatasetMeta(index);
@@ -84,7 +107,12 @@ function toggleDatasetVisibility(legendItem, chart) {
     chart.update();
 }
 
-// Changing the colour of one dataset to reflect the values in colour.
+/**
+ * Changing the colour of one dataset to reflect the values in colour.
+ *
+ * @param ctx
+ * @param chartArea
+ */
 function getGradient(ctx, chartArea) {
     const chartWidth = chartArea.right - chartArea.left;
     const chartHeight = chartArea.bottom - chartArea.top;
@@ -100,7 +128,12 @@ function getGradient(ctx, chartArea) {
     return gradient;
 }
 
-// Fetching all data from the server and updating the chart. Function is used for displaying all data from the database.
+/**
+ * Fetching all data from the server and updating the chart. Function is used for displaying all data from the database.
+ *
+ * @async
+ * @param updateChart
+ */
 async function fetchAllData(updateChart) {
     try {
         const response = await fetch('/all-data');
@@ -115,7 +148,23 @@ async function fetchAllData(updateChart) {
     }
 }
 
-// Fetching sensor data, function fetches the most recent data from the database.
+/**
+ * Fetching sensor data, function fetches the most recent data from the database.
+ *
+ * @async
+ * @param updateChart
+ * @param setCurrentState
+ * @param sensorData
+ * @param temperatureData
+ * @param humidityData
+ * @param timestamps
+ * @param advice_1
+ * @param advice_2
+ * @param advice_3
+ * @param advice_4
+ * @param advice_5
+ * @param advice_6
+ */
 async function fetchSensorData(
     updateChart, setCurrentState, sensorData, temperatureData, humidityData, timestamps,
     advice_1, advice_2, advice_3, advice_4, advice_5, advice_6
@@ -159,7 +208,11 @@ async function fetchSensorData(
     }
 }
 
-// Fetches average data for the past 24h, 72h and 7d from the database.
+/**
+ * Fetches average data for the past 24h, 72h and 7d from the database.
+ *
+ * @async
+ */
 async function fetchAverages() {
     try {
         const response = await fetch('/avg');
@@ -179,7 +232,11 @@ async function fetchAverages() {
     }
 }
 
-// Fetches the min and max values for the past 24h and 72h.
+/**
+ * Fetches the min and max values for the past 24h and 72h.
+ *
+ * @async
+ */
 async function fetchMinMaxValues() {
     try {
         const response = await fetch('/minmax');
@@ -200,7 +257,13 @@ async function fetchMinMaxValues() {
     }
 }
 
-
+/**
+ * Sets up intervals.
+ *
+ * @param fetchSensorInterval
+ * @param fetchAveragesInterval
+ * @param fetchMinMaxInterval
+ */
 function setupIntervals(fetchSensorInterval, fetchAveragesInterval, fetchMinMaxInterval) {
     if (fetchSensorInterval > 0 && fetchAveragesInterval > 0 && fetchMinMaxInterval > 0) {
         // Set the intervals once all values are valid
@@ -227,7 +290,11 @@ function setupIntervals(fetchSensorInterval, fetchAveragesInterval, fetchMinMaxI
     }
 }
 
-// Gives air rating based on the current VOC index value.
+/**
+ * Gives air rating based on the current VOC index value.
+ *
+ * @param currentVOC
+ */
 function setCurrentState(currentVOC) {
     if (currentVOC <= 50) {
         document.getElementById('recommendation').innerHTML = "Excellent";
@@ -244,7 +311,17 @@ function setCurrentState(currentVOC) {
     }
 }
 
-// Gives user set advice for different VOC thresholds.
+/**
+ * Gives user set advice for different VOC thresholds.
+ *
+ * @param currentVOC
+ * @param advice_1
+ * @param advice_2
+ * @param advice_3
+ * @param advice_4
+ * @param advice_5
+ * @param advice_6
+ */
 function getAdvice(currentVOC, advice_1, advice_2, advice_3, advice_4, advice_5, advice_6) {
     if (currentVOC <= 50) {
         document.getElementById('advice').innerHTML =

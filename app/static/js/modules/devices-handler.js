@@ -1,4 +1,8 @@
-// Function to fetch all devices from the db
+/**
+ * Fetches all the currently added devices from the server.
+ *
+ * @async
+ */
 async function fetchDevices() {
     try {
         const response = await fetch('/devices_list');
@@ -49,7 +53,8 @@ async function fetchDevices() {
  * Fetched all the devices stored in the db and displayes them in a dropdown.
  *
  * @async
- * @param {*} callback
+ * @param callback
+ * @param dataStorage
  */
 async function fetchDevicesDropdown(callback, dataStorage) {
     try {
@@ -85,13 +90,12 @@ async function fetchDevicesDropdown(callback, dataStorage) {
 
 
 /**
- * Ability to remove devices one by one
+ * Ability to remove devices one by one.
  *
  * @async
- * @param {*} id
- * @param {*} device_name
- * @param {*} topic
- * @returns {*}
+ * @param id
+ * @param device_name
+ * @param topic
  */
 async function deleteDevice(id, device_name, topic) {
     let response = await fetch('/delete_device', {
@@ -112,12 +116,12 @@ async function deleteDevice(id, device_name, topic) {
 }
 
 /**
- * Ability to remove devices one by one
+ * Ability to remove devices one by one.
  *
  * @async
- * @param {*} id
- * @param {*} device_name
- * @param {*} topic
+ * @param id
+ * @param device_name
+ * @param topic
  */
 async function selectDevice(id, device_name, topic) {
     let response = await fetch('/select_device', {
@@ -134,6 +138,13 @@ async function selectDevice(id, device_name, topic) {
     // }
 }
 
+/**
+ * Fetched the currently selected device from the server.
+ *
+ * @async
+ * @param dataStorage
+ * @returns
+ */
 async function fetchSelectedDevice(dataStorage) {
     const response = await fetch('/current_device');
     const data = await response.json();

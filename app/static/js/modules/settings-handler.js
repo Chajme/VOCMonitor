@@ -1,7 +1,5 @@
 /**
  * Messages for different voc thresholds.
- *
- * @type {*}
  */
 let advice_1;
 let advice_2;
@@ -12,111 +10,77 @@ let advice_6;
 
 /**
  * Fetching interval in ms.
- *
- * @type {*}
  */
 let fetchSensorInterval;
 let fetchAveragesInterval;
 let fetchMinMaxInterval;
 /**
  * Stores whether notifications are enabled.
- *
- * @type {*}
  */
 let notificationsOn;
 /**
  * Threshold for a notification.
- *
- * @type {*}
  */
 let notificationsThreshold;
 /**
  * Cooldown for notifications.
- *
- * @type {*}
  */
 let notificationCooldown;
 /**
  * Message that gets sent for a socket notification.
- *
- * @type {*}
  */
 let notificationMessage;
 /**
  * Email notifications enabled.
- *
- * @type {*}
  */
 let emailNotificationOn;
 /**
  * Threshold for email notifiations.
- *
- * @type {*}
  */
 let emailNotificationThreshold;
 /**
  * Cooldown for email notifications.
- *
- * @type {*}
  */
 let emailNotificationCooldown;
 /**
  * Email address.
- *
- * @type {*}
  */
 let emailAddress;
 /**
  * ESP alarm enabled.
- *
- * @type {*}
  */
 let espAlarmEnabled;
 /**
  * Length of time for the alarm in s.
- *
- * @type {*}
  */
 let alarmTime;
 /**
  * Temperature notifiactions enabled.
- *
- * @type {*}
  */
 let tempNotificationsEnabled;
 /**
  * Temperature notifications threshold.
- *
- * @type {*}
  */
 let tempThreshold;
 /**
  * Temperature notifications cooldown.
- *
- * @type {*}
  */
 let tempCooldown;
 /**
  * Humidity notifications enabled.
- *
- * @type {*}
  */
 let humiNotificationsEnabled;
 /**
  * Humidity threshold.
- *
- * @type {*}
  */
 let humiThreshold;
 /**
  * Humidity notifications cooldown.
- *
- * @type {*}
  */
 let humiCooldown;
 
 
-// Fetching user settings and setting variable values. Setting values to input fields.
+/** Fetched the current user settings from the server. */
 async function fetchUserSettings() {
     fetch('/get_settings')
         .then(response => response.json())
@@ -201,10 +165,9 @@ async function fetchUserSettings() {
 
 
 /**
- * // Fetching user settings, returning the fetched JSON.
+ * Fetching user settings, returning the fetched JSON.
  *
  * @async
- * @returns {response}
  */
 async function fetchUserSettingsJson() {
     return fetch('/get_settings')

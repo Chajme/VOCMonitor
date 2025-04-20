@@ -26,7 +26,7 @@ function exportChartAsPNG() {
 /**
  * Button listener to reset chart zoom.
  *
- * @param {*} resetZoomFunction
+ * @param resetZoomFunction
  */
 function attachEventHandlers(resetZoomFunction) {
     document.getElementById('resetZoom').addEventListener('click', resetZoomFunction);
@@ -35,7 +35,7 @@ function attachEventHandlers(resetZoomFunction) {
 /**
  * Pauses fetching of new data.
  *
- * @param {*} pauseFetchingFunction
+ * @param pauseFetchingFunction
  */
 function pauseFetchingHandler(pauseFetchingFunction) {
     document.getElementById('pauseFetching').addEventListener('click', pauseFetchingFunction);

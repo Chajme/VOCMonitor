@@ -57,7 +57,8 @@ const setupMenuHighlighter = () => {
 
 
 /** Visual element for a menu toggle when the width of the screen goes below 1024 pixels.
- * Solves the problem of displaying the navigation on smaller screens. */
+ * Solves the problem of displaying the navigation on smaller screens.
+ */
 const setupMenuToggle = () => {
     const menuToggle = document.querySelector('.menu-toggle');
     const menuSection = document.querySelector('.menu-section');

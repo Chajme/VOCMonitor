@@ -1,7 +1,5 @@
 /**
  * Defines a socket.
- *
- * @type {*}
  */
 const socket = io();
 
@@ -9,7 +7,7 @@ const socket = io();
 /**
  * Handles a notification permission.
  *
- * @param {*} message
+ * @param message
  */
 function handleNotification(message) {
     if (Notification.permission === 'granted') {
@@ -37,7 +35,6 @@ function initializeSocket() {
  * Function to fetch notification history from the db.
  *
  * @async
- * @returns {*}
  */
 async function fetchNotifications() {
     try {

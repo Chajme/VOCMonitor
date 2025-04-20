@@ -45,7 +45,7 @@ class VOCMonitor:
     def initialize_app(self):
         """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
 
-        # self.db.drop_table("user_settings")
+        #self.db.drop_table("user_settings")
         self.db.clear_table("devices")
 
         self.db.set_selected_device("esp")
