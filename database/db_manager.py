@@ -558,6 +558,15 @@ class DatabaseManager:
 
             return all_rows
 
+    def get_all_data_from_timestamp(self, table_name, from_timestamp):
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
+                f"SELECT * FROM {table_name} WHERE timestamp >= ?", (from_timestamp,)
+            )
+            rows = cur.fetchall()
+            return rows
+
     def get_avg(self, time_period, table_name):
         """Return the average for the data from the specified table withing the specified time range."""
 

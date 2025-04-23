@@ -59,6 +59,9 @@ class Routes:
             """Sends all data from the db for the selected device."""
 
             all_data_row = self.db.get_all_rows(self.db.get_selected_device())
+            # all_data_row = self.db.get_all_data_from_timestamp(
+            #    self.db.get_selected_device(), "2025-04-20 18:15:05"
+            # )
 
             all_data_list = {
                 "timestamp": [row[0] for row in all_data_row],

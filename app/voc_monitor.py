@@ -1,5 +1,5 @@
 """Main class that runs the whole app and starts a web server in production version."""
-
+import os
 import socket
 import threading
 
@@ -21,9 +21,10 @@ class VOCMonitor:
         """Initializes app, sets it's config, initializes socketio, mail, db, mqtt_manager and notification_manager."""
 
         self.app = Flask(__name__)
+        self.app.secret_key = os.urandom(24)
         self.app.config.from_object(Config)
 
-        self.socketio = SocketIO(self.app, async_mode="gevent")
+        self.socketio = SocketIO(self.app, async_mode="gevent", cors_allowed_origins="*")
         self.mail = Mail(self.app)
 
         self.db = DatabaseManager()
@@ -45,8 +46,8 @@ class VOCMonitor:
     def initialize_app(self):
         """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
 
-        #self.db.drop_table("user_settings")
-        self.db.clear_table("devices")
+        # self.db.drop_table("user_settings")
+        # self.db.clear_table("devices")
 
         self.db.set_selected_device("esp")
 

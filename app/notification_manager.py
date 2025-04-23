@@ -147,7 +147,6 @@ class NotificationManager:
             and self.notifications_on
             and device == self.db.get_selected_device()
         ):
-            print(f">>> Device: {self.db.get_selected_device()}, VOC: {voc}, Notifications on: {self.notifications_on}")
             if (
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
