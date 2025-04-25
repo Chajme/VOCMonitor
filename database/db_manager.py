@@ -342,7 +342,7 @@ class DatabaseManager:
 
     def get_user_settings(self):
         """Get all the use settings from the user settings table."""
-        print("Getting user_settings...")
+
         with self._connect() as con:
             cur = con.cursor()
             query = """

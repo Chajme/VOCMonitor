@@ -62,6 +62,7 @@ const setupMenuHighlighter = () => {
 const setupMenuToggle = () => {
     const menuToggle = document.querySelector('.menu-toggle');
     const menuSection = document.querySelector('.menu-section');
+    const notificationPanel = document.getElementById("notificationPanel");
 
     const updateMenuState = () => {
         if (window.innerWidth >= 1024) {
@@ -72,7 +73,13 @@ const setupMenuToggle = () => {
     // Add event listener for the toggle button
     menuToggle?.addEventListener('click', () => {
         if (window.innerWidth < 1024) {
-            menuSection.classList.toggle('open'); // Toggle the menu for small screens
+            // Toggle the menu for small screens
+            menuSection.classList.toggle('open');
+
+            if (notificationPanel.style.right === "0px") {
+            // Close the panel
+            notificationPanel.style.right = "-350px";
+            }
         }
     });
 
@@ -89,6 +96,7 @@ const setupNotificationToggle = () => {
     const toggleButton = document.getElementById("toggleNotifications");
     const closeButton = document.getElementById("closeNotifications");
     const clearAll = document.getElementById("clearAll");
+    const menuSection = document.querySelector('.menu-section');
 
     // Show the notification panel
     toggleButton.addEventListener("click", function (event) {
@@ -102,6 +110,10 @@ const setupNotificationToggle = () => {
             // Open the panel
             notificationPanel.style.right = "0px";
             fetchNotifications();
+
+            if (window.innerWidth < 1024) {
+                menuSection.classList.remove('open');
+            }
         }
     });
 
