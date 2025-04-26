@@ -29,14 +29,13 @@
 
 body {
     width: 100vw;
-    /* height: 100vh; */
     height: auto;
     min-height: 100vh;
     margin: 0;
     overflow-y: auto;
 }
 
-/*****************Grid container*/
+/***************************** Grid container */
 .container-grid {
     display: grid;
     grid-template-columns: minmax(250px, 1.25fr) minmax(0, 6.5fr) minmax(0, 2.25fr);
@@ -88,7 +87,7 @@ body {
 }
 
 
-/*****************************Flexbox top section*/
+/***************************** Flexbox top section */
 .top-section-flex-container {
     display: flex;
     flex-direction: row;
@@ -121,7 +120,7 @@ body {
     letter-spacing: 3px;
 }
 
-/*****************************Flexbox main-values section*/
+/***************************** Flexbox main-values section */
 .main-values-flex-container {
     display: flex;
     flex-direction: column;
@@ -147,7 +146,7 @@ body {
     letter-spacing: 3px;
 }
 
-/***************************Flexbox main-chart section*/
+/***************************** Flexbox main-chart section */
 .main-section-chart {
     display: flex;
     flex-direction: column;
@@ -189,7 +188,7 @@ body {
 }
 
 
-/**************************Flexbox averages-list*/
+/***************************** Flexbox averages-list */
 .averages-list {
     display: flex;
     flex-direction: column;
@@ -213,7 +212,7 @@ body {
     text-align: right;
 }
 
-/*******************************Flexbox min max values*/
+/***************************** Flexbox min max values */
 .record-maxmin {
     width: 100%;
 }
@@ -247,7 +246,7 @@ body {
     box-shadow: var(--box-shadow);
 }
 
-/******************************Flexbox menu-section*/
+/***************************** Flexbox menu-section */
 .menu-section-flex-container {
     display: flex;
     flex-direction: column;
@@ -317,14 +316,9 @@ body {
     border-radius: 30px;
     margin-right: 7px;
 }
-/*
-.sidebar-nav a[data-selected="true"] h4 {
-    margin-left: 5px;
-}
-*/
 
 .sidebar-nav li {
-    width: calc(100% - 45px)     /* previously 100% */
+    width: calc(100% - 45px)
 }
 
 .sidebar-nav li:hover {
@@ -363,7 +357,7 @@ body {
     display: none;
 }
 
-/*Container grid basic*/
+/***************************** Container grid basic */
 .container-grid-basic {
     display: grid;
     grid-template-columns: minmax(250px, 1.25fr) minmax(0, 8.75fr);
@@ -414,15 +408,13 @@ body {
     min-height: 75px;
 }
 
-/*Container grid - settings.html*/
+/***************************** Container grid - settings.html */
 .settings-container {
     border-radius: 30px;
     background-color: var(--color-container);
     width: 98%;
     max-width: 98%;
     overflow: hidden;
-    /* height: 30%; */
-    /* min-height: 280px; */
     min-height: 240px;
     height: auto;
     box-shadow: var(--box-shadow);
@@ -461,7 +453,7 @@ body {
     border-bottom: solid lightgrey 1px;
 }
 
-/* Changes container with cancel, reset and apply */
+/***************************** Changes container with cancel, reset and apply */
 .changes-container {
     position: sticky;
     bottom: 0;
@@ -507,7 +499,7 @@ body {
     letter-spacing: 2px;
 }
 
-/* Input field in input field display */
+/***************************** Input field in input field display */
 .input-container {
     display: inline-block;
     position: relative;
@@ -520,14 +512,11 @@ body {
     transition: all .05s ease-in-out;
   }
 
-  /* move unit more to the left on hover or focus within
-     for arrow buttons will appear to the right of number inputs */
 .input-container:hover::after,
 .input-container:focus-within::after {
     right: 1.5em;
   }
 
-  /* handle Firefox (arrows always shown) */
   @supports (-moz-appearance:none) {
     .input-container::after {
       right: 1.5em;
@@ -608,7 +597,6 @@ body {
 #notification-list li {
     position: relative;
     background-color: var(--color-container);
-    /*border: 1px solid #ddd;*/
     padding: 25px;
     margin-bottom: 10px;
     border-radius: 30px;
@@ -622,7 +610,7 @@ body {
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Notification Panel Styles */
+/***************************** Notification Panel Styles */
 .notifications-container {
     position: fixed;
     top: 0;
@@ -644,24 +632,23 @@ body {
 }
 
 .notifications-container:hover {
-    /* transform: translateX(5px); */
     box-shadow: 0px 0px 30px rgba(4, 6, 134, 0.5);
     filter: brightness(99%);
     transition: 0.3s ease-in-out;
 }
 
 .notifications-container:not(:hover) {
-    transition: 0.3s ease-in-out; /* Smooth transition back */
+    transition: 0.3s ease-in-out;
 }
 
 
-/* Show the panel when active */
+/***************************** Show the panel when active */
 .notifications-container.active {
     right: 0;
     transition: right 0.5s ease-in-out;
 }
 
-/* Close button */
+/***************************** Close button */
 .close-btn {
     background: transparent;
     border: none;
@@ -702,7 +689,7 @@ body {
     font-weight: 200;
 }
 
-/* Dropdown menu */
+/***************************** Dropdown menu */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -782,7 +769,7 @@ body {
     border: 2px solid #4285f4;
 }
 
-/*--Media layouts-------------------------------------------------------------------------------*/
+/***************************** Media layouts */
 @media (max-width: 1745px) {
     .chart-box-2 {
         height: auto;
@@ -818,7 +805,7 @@ body {
         height: auto;
     }
 
-    /*****************************Flexbox top section*/
+    /***************************** Flexbox top section */
     .top-section-flex-container {
         display: flex;
         flex-wrap: wrap;
@@ -920,7 +907,7 @@ body {
     }
 }
 
-/*-------------------------------------------------------------------------------*/
+/***************************** Designs from the internet */
 .button-17 {
   align-items: center;
   appearance: none;
@@ -1109,7 +1096,6 @@ box-sizing: inherit;
 .checkbox-wrapper-14 *:after {
 box-sizing: inherit;
 }
-/*-------------------------------------------------------------------------------*/
 
 .input {
     border: 2px solid transparent;

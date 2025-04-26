@@ -1,4 +1,5 @@
 """Main class that runs the whole app and starts a web server in production version."""
+
 import os
 import socket
 import threading
@@ -6,6 +7,7 @@ import threading
 from flask import Flask
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from gevent import monkey
 
 from app import Config
 from app.notification_manager import NotificationManager
@@ -20,11 +22,20 @@ class VOCMonitor:
     def __init__(self):
         """Initializes app, sets it's config, initializes socketio, mail, db, mqtt_manager and notification_manager."""
 
+        monkey.patch_all()
+
         self.app = Flask(__name__)
         self.app.secret_key = os.urandom(24)
         self.app.config.from_object(Config)
 
-        self.socketio = SocketIO(self.app, async_mode="gevent", cors_allowed_origins="*")
+        # Possible security improvements for production version
+        """self.app.config.update(
+            SESSION_COOKIE_SECURE=True,
+            SESSION_COOKIE_HTTPONLY=True,
+            SESSION_COOKIE_SAMESITE="Lax",
+        )"""
+
+        self.socketio = SocketIO(self.app, async_mode="gevent", cors_allowed_origins="*", engineio_logger=False, logger=False)
         self.mail = Mail(self.app)
 
         self.db = DatabaseManager()
@@ -45,9 +56,6 @@ class VOCMonitor:
 
     def initialize_app(self):
         """Initializes apps db, adds default devices and sets the currently selected device to one of them."""
-
-        # self.db.drop_table("user_settings")
-        # self.db.clear_table("devices")
 
         self.db.set_selected_device("esp")
 
@@ -73,6 +81,7 @@ class VOCMonitor:
             print(">>> Starting production server on port 8000...")
             print(">>> Localhost:    http://localhost:8000")
             print(f">>> LAN:    http://{local_ip}:8000")
+            print(f">>> For HTTPS server access use: https://{local_ip} (WARNING: services such as nginx are needed for the HTTPS server access!!!)")
             self.socketio.run(self.app, host="0.0.0.0", port=8000)
         except KeyboardInterrupt:
             print("Stopping the server...")

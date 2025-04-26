@@ -31,7 +31,6 @@ class DatabaseManager:
         # self.clear_table("device")
 
         # Create tables
-        """self.create_table_data("data")"""
         self.create_table_notification_history()
         self.create_user_settings_table()
         self.create_table_devices()
@@ -63,6 +62,11 @@ class DatabaseManager:
             cur.execute(f"DELETE FROM {table_name}")
             con.commit()
 
+    def delete_table(self, table_name):
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(f"DROP TABLE IF EXISTS {table_name}")
+
     def create_table_data(self, table_name):
         """Create a table with the specified table_name."""
 
@@ -80,7 +84,7 @@ class DatabaseManager:
             cur = con.cursor()
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS devices ("
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT, topic TEXT"
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT UNIQUE, topic TEXT"
                 ")"
             )
             con.commit()
@@ -100,7 +104,7 @@ class DatabaseManager:
                 cur.execute(
                     f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
                 )
-            con.commit()
+                con.commit()
 
     def delete_device(self, device_id, device_name):
         """Remove a device from the devices table."""
@@ -342,7 +346,7 @@ class DatabaseManager:
 
     def get_user_settings(self):
         """Get all the use settings from the user settings table."""
-
+        
         with self._connect() as con:
             cur = con.cursor()
             query = """
