@@ -30,10 +30,14 @@ import {
     fetchSelectedDevice
 } from "./modules/devices-handler.js";
 
+import {
+    initializeSocket
+} from "./modules/socket.js";
+
 import dataStorage from "./modules/data-storage.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
-
+    initializeSocket();
     setupMenuHighlighter();
     setupMenuToggle();
     setupNotificationToggle();

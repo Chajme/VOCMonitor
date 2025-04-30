@@ -16,13 +16,14 @@ import {
     fetchUserSettingsJson
 } from "./modules/settings-handler.js"
 
-document.addEventListener('DOMContentLoaded', async () => {
-    var sensorData = [];
-    var temperatureData = [];
-    var humidityData = [];
-    var timestamps = [];
-    let fetchInterval;
+import {
+    initializeSocket
+} from "./modules/socket.js";
 
+import dataStorage from "./modules/data-storage.js";
+
+document.addEventListener('DOMContentLoaded', async () => {
+    initializeSocket();
     setupMenuHighlighter();
     setupMenuToggle();
     setupNotificationToggle();
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchInterval = setInterval(() => {
         console.log('Calling fetchSensorData...');
         fetchSensorData(
-            updateChart, setCurrentState, timestamps, sensorData, temperatureData, humidityData,
+            updateChart, setCurrentState, dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData,
             userSettingsJson.advice1, userSettingsJson.advice2, userSettingsJson.advice3, userSettingsJson.advice4, userSettingsJson.advice5, userSettingsJson.advice6
         );
     }, userSettingsJson.fetch_sensor);

@@ -86,8 +86,8 @@ class Routes:
                 if not new_data_row:
                     return jsonify({"message": "No data available"}), 404
 
-                if timestamp == self.previous_timestamp:
-                    return jsonify({"message": "No new data available"}), 404
+                """if timestamp == self.previous_timestamp:
+                    return jsonify({"message": "No new data available"}), 404"""
 
                 new_data_list = {
                     "timestamp": new_data_row[0],
