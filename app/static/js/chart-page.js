@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             myChart.data.labels.pop();
             await fetchAllData(updateChart);
             clearInterval(dataStorage.fetchInterval);
+            dataStorage.paused = true;
         } else {
             dataStorage.sensorData = [];
             dataStorage.temperatureData = [];
@@ -116,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             dataStorage.timestamps = [];
 
             updateChart(dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData);
+            dataStorage.paused = false;
 
             dataStorage.fetchInterval = setInterval(() => {
                 console.log('Calling fetchSensorData...');

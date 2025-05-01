@@ -21,9 +21,11 @@ async function fetchDevices() {
             // listItem.textContent = notification.message;  // Correctly access message field
 
             listItem.innerHTML = `
-                <strong>${count}</strong>
-                <strong>${device.device_name}</strong>
-                ${device.topic} <br>
+                <div class="device-index"><strong>${count}</strong></div>
+                <div class="device-info">
+                    <div class="device-name"><strong>${device.device_name}</strong></div>
+                    <div class="device-topic">${device.topic}</div>
+                </div>
             `;
 
             count++;
@@ -186,7 +188,7 @@ function addNewDevice() {
 
 /** Canceling the changes in the fields. Doesn't work when changes have been applied already. */
 function cancelChanges() {
-    fetchDevices();
+    document.getElementById('devices-form').reset();
 }
 
 export {

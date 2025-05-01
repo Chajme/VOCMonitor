@@ -463,6 +463,7 @@ body {
     gap: 10px;
 }
 
+/***************************** Devices page devices container */
 .devices-container {
     display: flex;
     flex-direction: column;
@@ -479,16 +480,6 @@ body {
     gap: 20px;
 }
 
-
-.devices-list-c li {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: auto;
-    border-bottom: solid lightgray 1px;
-    padding-bottom: 10px;
-}
-
 .devices-list-c li button {
     display: inline;
     border: none;
@@ -497,6 +488,37 @@ body {
     cursor: pointer;
     font-family: "Inter";
     letter-spacing: 2px;
+}
+
+.devices-list-c li {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-bottom: solid lightgray 1px;
+    padding-bottom: 10px;
+}
+
+.device-index {
+    width: 30px;
+    text-align: left;
+}
+
+.device-info {
+    flex-grow: 1;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.device-name {
+    font-weight: bold;
+}
+
+.device-topic {
+    color: gray;
 }
 
 /***************************** Input field in input field display */
