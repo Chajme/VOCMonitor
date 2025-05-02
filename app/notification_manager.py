@@ -104,7 +104,7 @@ class NotificationManager:
                 # Setting the notification sent to True and last_notification to the current_time
                 self.notification_sent = True
                 self.last_notification = current_time
-        else:
+        elif (current_time - self.last_notification) > self.cooldown:
             self.notification_sent = False
 
         # If temperature has exceeded the user set limit and the temperature notification are on
@@ -120,7 +120,7 @@ class NotificationManager:
 
                 self.temp_notification_sent = True
                 self.last_temp_notification = current_time
-        else:
+        elif (current_time - self.last_temp_notification) > self.temp_cooldown:
             self.temp_notification_sent = False
 
         # If humidity has exceeded the user set limit and humidity notifications are on
@@ -134,7 +134,7 @@ class NotificationManager:
 
                 self.humi_notification_sent = True
                 self.last_humi_notification = current_time
-        else:
+        elif (current_time - self.last_humi_notification) > self.humi_cooldown:
             self.humi_notification_sent = False
 
     def send_esp_alarm_notif(self, voc, device):
@@ -151,7 +151,7 @@ class NotificationManager:
                 not self.esp_notification_sent
                 or (current_time - self.last_esp_notification) > self.cooldown
             ):
-                print(f">>> ESP notif sent: {self.esp_notification_sent}, Curr time: {current_time}, Last notif: {self.last_esp_notification}, Cooldown: {self.cooldown}")
+                print(">>> ESP notification sent!")
                 # If an esp alarm is enabled we send a message using mqtt turning the alarm on
                 if self.esp_alarm_enabled:
                     self.send_esp_alarm = True
@@ -164,7 +164,7 @@ class NotificationManager:
                 current_time - self.last_esp_notification
             ) > self.alarm_time and self.esp_alarm_enabled:
                 self.send_esp_alarm = False
-        else:
+        elif (current_time - self.last_esp_notification) > self.cooldown:
             self.esp_notification_sent = False
 
         return self.send_esp_alarm

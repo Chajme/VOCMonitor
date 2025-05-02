@@ -9,10 +9,10 @@ import paho.mqtt.client as mqtt
 class MQTTManager:
     """Represents a manager for mqtt connections with the server."""
 
-    def __init__(self, db, notification_manager):
+    def __init__(self, db, notification_manager, mqtt_server):
         """Receives db as a parameter, sets the server ip, port and selected device. Creates a client."""
 
-        self.server = "192.168.0.103"
+        self.server = mqtt_server
         self.port = 1883
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2, client_id="pc", protocol=mqtt.MQTTv5
