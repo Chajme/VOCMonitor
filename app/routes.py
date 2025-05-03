@@ -337,11 +337,7 @@ class Routes:
                         self.mqtt.subscribe(topic, device_name)
                         return jsonify({"message": "New device added!"}), 200
                     else:
-                        return jsonify(
-                            {
-                                "message": "Specified topic or device name already in use."
-                            }
-                        ), 409
+                        return jsonify({"message": "Specified topic or device name already in use."}), 409
                 except Exception as e:
                     return jsonify({"message": f"Internal error: {str(e)}"}), 500
             except Exception as e:
