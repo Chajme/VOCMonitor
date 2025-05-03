@@ -330,12 +330,22 @@ class Routes:
                 topic = request.form.get("topic")
 
                 # Adding a new device and subscribing to the new topic in mqtt_manager
-                self.db.new_device(device_name, topic)
-                self.mqtt.subscribe(topic, device_name)
+                try:
+                    device_added = self.db.new_device(device_name, topic)
 
-                return jsonify({"message": "New device added!"}), 200
+                    if device_added:
+                        self.mqtt.subscribe(topic, device_name)
+                        return jsonify({"message": "New device added!"}), 200
+                    else:
+                        return jsonify(
+                            {
+                                "message": "Specified topic or device name already in use."
+                            }
+                        ), 409
+                except Exception as e:
+                    return jsonify({"message": f"Internal error: {str(e)}"}), 500
             except Exception as e:
-                return {"message": f"Error adding device: {str(e)}"}, 500
+                return jsonify({"message": f"Error adding device: {str(e)}"}), 500
 
         @self.routes.route("/devices_clear", methods=["POST"])
         def clear_devices():

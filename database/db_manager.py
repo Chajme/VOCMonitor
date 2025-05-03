@@ -33,6 +33,7 @@ class DatabaseManager:
         # Create tables
         self.create_table_notification_history()
         self.create_user_settings_table()
+        # self.delete_table("devices")
         self.create_table_devices()
 
         # Setting default user settings
@@ -84,7 +85,7 @@ class DatabaseManager:
             cur = con.cursor()
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS devices ("
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT UNIQUE, topic TEXT"
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, device_name TEXT UNIQUE, topic TEXT UNIQUE"
                 ")"
             )
             con.commit()
@@ -101,10 +102,16 @@ class DatabaseManager:
                     (device_name, topic),
                 )
 
+                if cur.rowcount == 0:
+                    return False
+
                 cur.execute(
                     f"CREATE TABLE IF NOT EXISTS {device_name} (timestamp, temperature, humidity, voc)"
                 )
                 con.commit()
+                return True
+            else:
+                raise ValueError("Invalid device name.")
 
     def delete_device(self, device_id, device_name):
         """Remove a device from the devices table."""
@@ -188,8 +195,6 @@ class DatabaseManager:
 
     def create_user_settings_table(self):
         """Create a table to store user settings."""
-
-        print("Creating user settings table...")
 
         with self._connect() as con:
             cur = con.cursor()
@@ -346,7 +351,7 @@ class DatabaseManager:
 
     def get_user_settings(self):
         """Get all the use settings from the user settings table."""
-        
+
         with self._connect() as con:
             cur = con.cursor()
             query = """
