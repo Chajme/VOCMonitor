@@ -39,13 +39,7 @@ class VOCMonitor:
             SESSION_COOKIE_SAMESITE="Lax",
         )"""
 
-        self.socketio = SocketIO(
-            self.app,
-            async_mode="gevent",
-            cors_allowed_origins="*",
-            engineio_logger=False,
-            logger=False,
-        )
+        self.socketio = SocketIO(self.app, async_mode="gevent", cors_allowed_origins="*", engineio_logger=False, logger=False)
         self.mail = Mail(self.app)
 
         self.db = DatabaseManager()
@@ -53,9 +47,7 @@ class VOCMonitor:
         self.notification_manager = NotificationManager(
             self.app, self.socketio, self.mail, self.db
         )
-        self.mqtt_manager = MQTTManager(
-            self.db, self.notification_manager, self.mqtt_server, self.mqtt_port
-        )
+        self.mqtt_manager = MQTTManager(self.db, self.notification_manager, self.mqtt_server, self.mqtt_port)
 
         self.routes = Routes(
             self.db, self.mqtt_manager, self.notification_manager, self.mail
@@ -93,9 +85,7 @@ class VOCMonitor:
             print(f">>> Starting production server on port {self.web_server_port}...")
             print(f">>> Localhost:    http://localhost:{self.web_server_port}")
             print(f">>> LAN:    http://{local_ip}:{self.web_server_port}")
-            print(
-                f">>> For HTTPS server access use: https://{local_ip} (WARNING: services such as nginx are needed for the HTTPS server access!!!)"
-            )
+            print(f">>> For HTTPS server access use: https://{local_ip} (WARNING: services such as nginx are needed for the HTTPS server access!!!)")
             self.socketio.run(self.app, host="0.0.0.0", port=self.web_server_port)
         except KeyboardInterrupt:
             print("Stopping the server...")
