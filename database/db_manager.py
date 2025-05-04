@@ -36,9 +36,6 @@ class DatabaseManager:
         # self.delete_table("devices")
         self.create_table_devices()
 
-        # Setting default user settings
-        self.set_default_settings()
-
     def _connect(self):
         """Connects to the db and returns the connection."""
 
@@ -348,6 +345,8 @@ class DatabaseManager:
                 ),
             )
             con.commit()
+        # Setting default user settings
+        self.set_default_settings()
 
     def get_user_settings(self):
         """Get all the use settings from the user settings table."""

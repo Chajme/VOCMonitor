@@ -109,10 +109,15 @@ class Routes:
                 )
 
                 self.previous_timestamp = timestamp
-                return jsonify(new_data_list), 200
+
+                response = jsonify(new_data_list)
+                response.headers["Content-Type"] = "application/json; charset=utf-8"
+                return response, 200
 
             except Exception as e:
-                return jsonify({"message": f"Error fetching new data: {str(e)}"}), 500
+                response = jsonify({"message": f"Error fetching new data: {str(e)}"})
+                response.headers["Content-Type"] = "application/json; charset=utf-8"
+                return response, 500
 
         @self.routes.route("/avg")
         def get_averages():
@@ -126,10 +131,13 @@ class Routes:
                 avg_7d = self.db.get_avg("-7 days", selected_device)
 
                 averages = {"avg_24h": avg_24h, "avg_72h": avg_72h, "avg_7d": avg_7d}
+                response = jsonify(averages)
+                response.headers["Content-Type"] = "application/json; charset=utf-8"
+                return response, 200
             except Exception as e:
-                return jsonify({"message": f"Error fetching averages {e}"}), 500
-
-            return jsonify(averages), 200
+                response = jsonify({"message": f"Error fetching averages {e}"})
+                response.headers["Content-Type"] = "application/json; charset=utf-8"
+                return response, 500
 
         @self.routes.route("/minmax")
         def get_min_max_voc():
@@ -297,7 +305,7 @@ class Routes:
         def delete_notification():
             """Deletes a selected notification using the id."""
             notification_id = request.json.get("id")
-            print("Notification id: ", notification_id)
+            print(f">>> Deleting notification {notification_id}")
             try:
                 self.db.delete_notification(notification_id)
                 return jsonify({"message": "Notification successfully deleted!"}), 200
@@ -337,7 +345,11 @@ class Routes:
                         self.mqtt.subscribe(topic, device_name)
                         return jsonify({"message": "New device added!"}), 200
                     else:
-                        return jsonify({"message": "Specified topic or device name already in use."}), 409
+                        return jsonify(
+                            {
+                                "message": "Specified topic or device name already in use."
+                            }
+                        ), 409
                 except Exception as e:
                     return jsonify({"message": f"Internal error: {str(e)}"}), 500
             except Exception as e:
