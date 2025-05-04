@@ -145,7 +145,6 @@ async function selectDevice(id, device_name, topic) {
  *
  * @async
  * @param dataStorage
- * @returns
  */
 async function fetchSelectedDevice(dataStorage) {
     const response = await fetch('/current_device');

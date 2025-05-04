@@ -100,9 +100,6 @@ const setupNotificationToggle = () => {
 
     // Show the notification panel
     toggleButton.addEventListener("click", function (event) {
-        // event.preventDefault(); // Prevent default link behavior
-        // notificationPanel.classList.add("active");
-
         if (notificationPanel.style.right === "0px") {
             // Close the panel
             notificationPanel.style.right = "-350px";
@@ -122,15 +119,10 @@ const setupNotificationToggle = () => {
         if (notificationPanel.style.right === "0px") {
             notificationPanel.style.right = "-350px";
         }
-        // notificationPanel.classList.remove("active");
     });
 
     // Clear all notifications button
     clearAll.addEventListener("click", function () {
-        // let list = document.getElementById("notification-list");
-        // while (list.firstChild) {
-        //     list.removeChild(list.firstChild);
-        // }
         document.getElementById("notification-list").innerHTML = "";
         fetch('/notification_clear', {
             method: 'POST',
