@@ -225,6 +225,8 @@ class DatabaseManager:
                 "humi_cooldown INTEGER)"
             )
             con.commit()
+        # Setting default user settings
+        self.set_default_settings()
 
     def set_user_settings(
         self,
@@ -345,8 +347,6 @@ class DatabaseManager:
                 ),
             )
             con.commit()
-        # Setting default user settings
-        self.set_default_settings()
 
     def get_user_settings(self):
         """Get all the use settings from the user settings table."""
