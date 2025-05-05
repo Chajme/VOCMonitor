@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Waiting for user settings to get fetched, then setting the intervals
     const userSettingsJson = await fetchUserSettingsJson();
-    fetchInterval = setInterval(() => {
+    dataStorage.fetchInterval = setInterval(() => {
         console.log('Calling fetchSensorData...');
         fetchSensorData(
             updateChart, setCurrentState, dataStorage.timestamps, dataStorage.sensorData, dataStorage.temperatureData, dataStorage.humidityData,
