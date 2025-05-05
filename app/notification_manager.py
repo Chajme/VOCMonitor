@@ -144,7 +144,7 @@ class NotificationManager:
 
         if (
             voc > self.notifications_threshold
-            and self.notifications_on
+            and self.esp_alarm_enabled
             and device == self.db.get_selected_device()
         ):
             if (
