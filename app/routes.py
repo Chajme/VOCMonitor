@@ -362,11 +362,12 @@ class Routes:
             try:
                 # Clearing the table with all the devices and clearing topics in mqtt_manager
                 self.db.clear_table("devices")
+                self.db.set_selected_device("Select Device")
                 self.mqtt.clear_topics()
-                return jsonify({"message": "Notifications successfully cleared!"}), 200
+                return jsonify({"message": "Devices successfully removed!"}), 200
             except Exception as e:
                 return (
-                    jsonify({"message": f"Error clearing notifications: {str(e)}"}),
+                    jsonify({"message": f"Error removing devices: {str(e)}"}),
                     500,
                 )
 
@@ -383,6 +384,10 @@ class Routes:
                 self.db.delete_device(device_id, device_name)
                 # Unsubscribing from the topic of the deleted device
                 self.mqtt.unsubscribe(topic)
+
+                if device_name == self.db.get_selected_device():
+                    self.db.set_selected_device("Select Device")
+
                 return jsonify({"message": "Device successfully deleted!"}), 200
             except Exception as e:
                 return (
