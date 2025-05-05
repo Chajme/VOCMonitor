@@ -225,8 +225,10 @@ class DatabaseManager:
                 "humi_cooldown INTEGER)"
             )
             con.commit()
-        # Setting default user settings
-        self.set_default_settings()
+            # Setting default user settings
+            cur.execute("SELECT COUNT(*) FROM user_settings")
+            if cur.fetchone()[0] == 0:
+                self.set_default_settings()
 
     def set_user_settings(
         self,
