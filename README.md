@@ -17,4 +17,8 @@ Python app created in Python designed to continously take messages from MQTT and
 
 In order to achieve HTTPS, nginx can be used as a reverse proxy.
 
+## Warning
+
+In order to use email notifications for exceeded data thresholds, gmail account is required. Configuration file config.py needs to get updated with your own mail address and password.
+
 Molitoris Erik
